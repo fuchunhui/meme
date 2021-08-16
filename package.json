@@ -1,0 +1,26 @@
+{
+  "name": "meme",
+  "version": "0.1.0",
+  "description": "a robot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fuchunhui/emoticon.git"
+  },
+  "keywords": [
+    "robot",
+    "webhook",
+    "image",
+    "text",
+    "emoji"
+  ],
+  "author": "fuchunhui",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fuchunhui/emoticon/issues"
+  },
+  "homepage": "https://github.com/fuchunhui/emoticon#readme"
+}
