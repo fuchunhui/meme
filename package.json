@@ -4,8 +4,10 @@
   "description": "a robot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tsh": "sh .draft/test.sh",
+    "tjs": "node .draft/test.js"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fuchunhui/meme.git"
@@ -22,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/fuchunhui/meme/issues"
   },
-  "homepage": "https://github.com/fuchunhui/meme#readme"
+  "homepage": "https://github.com/fuchunhui/meme#readme",
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
 }
