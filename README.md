@@ -1,5 +1,5 @@
-# emoticon
-auto emoticon robot.
+# meme
+auto image robot.
 
 way1: by text, send message.
 

@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fuchunhui/emoticon.git"
+    "url": "git+https://github.com/fuchunhui/meme.git"
   },
   "keywords": [
     "robot",
@@ -20,7 +20,7 @@
   "author": "fuchunhui",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/fuchunhui/emoticon/issues"
+    "url": "https://github.com/fuchunhui/meme/issues"
   },
-  "homepage": "https://github.com/fuchunhui/emoticon#readme"
+  "homepage": "https://github.com/fuchunhui/meme#readme"
 }
