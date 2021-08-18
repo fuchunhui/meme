@@ -17,7 +17,7 @@
     "webhook",
     "image",
     "text",
-    "emoji"
+    "meme"
   ],
   "author": "fuchunhui",
   "license": "ISC",
@@ -27,9 +27,6 @@
   "homepage": "https://github.com/fuchunhui/meme#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "crypto-js": "^4.1.1",
-    "express": "^4.17.1",
-    "koa": "^2.13.1",
-    "koa-bodyparser": "^4.3.0"
+    "express": "^4.17.1"
   }
 }

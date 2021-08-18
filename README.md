@@ -8,4 +8,4 @@ way2: by http, get img.
 ### roadmap
 
 1. node 服务接收请求参数。
-2. 
+2. 见.draft目录

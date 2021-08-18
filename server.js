@@ -19,9 +19,8 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-app.get('/get',(req, res) => {
-  console.log('请求url：', req.path);
-  console.log('请求参数：', req.query);
+app.get('/get', (req, res) => {
+  console.log(`url: ${req.path} 参数: ${req.query}`);
   res.send('这是get请求');
 })
 
