@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "tsh": "sh .draft/test.sh",
-    "tjs": "node .draft/test.js"
+    "tjs": "node .draft/test.js",
+    "test": "cross-env NODE_ENV=test node app.js"
   },
   "type": "module",
   "repository": {
@@ -27,6 +28,10 @@
   "homepage": "https://github.com/fuchunhui/meme#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "sql.js": "^1.6.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

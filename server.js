@@ -7,7 +7,7 @@ app.use(express.json());
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
 
-const hostName = '127.0.0.1';
+const hostName = 'localhost';
 const port = 8080;
 
 app.all('*', (req, res, next) => {  
@@ -19,6 +19,7 @@ app.all('*', (req, res, next) => {
   next();
 });
 
+app.use(express.static('public'));
 app.get('/get', (req, res) => {
   console.log(`url: ${req.path} 参数: ${req.query}`);
   res.send('这是get请求');
