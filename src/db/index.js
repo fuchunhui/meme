@@ -1,22 +1,17 @@
 /**
  * 数据库文件
  */
-
+import * as fs from 'fs';
 import initSqlJs from 'sql.js';
-import axios from 'axios';
 import uuid from '../utils/uuid.js';
 
-const baseUrl = process.env.MEME_BASE_URL;
+const TABLE_NAME = 'STORY';
+const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
   locateFile: file => `./public/db/${file}`
 });
-
-const buffer = await axios({
-  url: `${baseUrl}/db/meme.db`,
-  method: 'get',
-  responseType: 'arraybuffer'
-}).then(res => Promise.resolve(res.data));
+const buffer = fs.readFileSync(DB_PATH);
 
 const db = new SQL.Database(new Uint8Array(buffer));
 
@@ -28,7 +23,7 @@ const getDB = () => {
  * 保留建表语句
  */
 const _initTable = () => {
-  const sqlstr = `CREATE TABLE STORY (
+  const sqlstr = `CREATE TABLE ${TABLE_NAME} (
     ID char(50) PRIMARY KEY NOT NULL,
     TITLE char(100),
     IMAGE TEXT NOT NULL,
@@ -42,18 +37,31 @@ const queryAllTables = () => {
 };
 
 const getTable = () => {
-  const contents = getDB().exec("SELECT * FROM STORY");
+  const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME}`);
   console.log({...contents});
   console.log(JSON.stringify(contents));
 };
 
-const insert = ({title, image, x = 0, y = 0}) => {
-  const sql = `INSERT INTO STORY VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
+const insertTable = ({title, image, x = 0, y = 0}) => {
+  const sql = `INSERT INTO ${TABLE_NAME} VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
   getDB().run(sql);
 };
+
+const writeDB = () => {
+  const data = getDB().export();
+  const buffer = new Uint8Array(data);
+  fs.writeFileSync(DB_PATH, buffer);
+};
+
+const deleteTable = (like) => {
+  const sql = `DELETE FROM ${TABLE_NAME} WHERE TITLE NOT LIKE '${like}'`
+  getDB().run(sql);
+}
 
 export {
   queryAllTables,
   getTable,
-  insert
+  insertTable,
+  writeDB,
+  deleteTable
 };
