@@ -1,15 +1,12 @@
 import './src/config/index.js';
-import {insertTable, queryAllTables, getTable, writeDB, deleteTable} from './src/db/index.js';
+import {getTable, writeDB, initDB} from './src/db/index.js';
 
-// console.log(getTable());
-// console.log(JSON.stringify(queryAllTables()));
-
-insertTable({
-  title: '123123',
-  image: 'dasdasdasdasdasd',
-  x: 100,
-  y: 100
-});
+// insertTable({
+//   title: '123123',
+//   image: 'dasdasdasdasdasd',
+//   x: 100,
+//   y: 100
+// });
 // insertTable({
 //   title: '5555',
 //   image: 'gggggg',
@@ -17,9 +14,8 @@ insertTable({
 //   y: 20
 // });
 
-getTable();
-deleteTable();
+// getTable();
 
-console.log('------------------------------------');
-getTable();
-writeDB();
+// writeDB();
+
+initDB();

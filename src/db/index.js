@@ -24,12 +24,34 @@ const getDB = () => {
  */
 const _initTable = () => {
   const sqlstr = `CREATE TABLE ${TABLE_NAME} (
-    ID char(50) PRIMARY KEY NOT NULL,
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    MID char(50) NOT NULL,
     TITLE char(100),
     IMAGE TEXT NOT NULL,
-    X INT NOT NULL,
-    Y INT NOT NULL);`
-    getDB().run(sqlstr);
+    X INT DEFAULT 0,
+    Y INT DEFAULT 0);`
+  getDB().run(sqlstr);
+};
+
+const initDB = () => {
+  _resetDB();
+  _initTable();
+  insertTable({ // 更改为从初始化脚本读取
+    title: 'aa',
+    image: 'asd'
+  })
+  writeDB();
+};
+
+const writeDB = () => {
+  const data = getDB().export();
+  const buffer = new Uint8Array(data);
+  fs.writeFileSync(DB_PATH, buffer);
+};
+
+const _resetDB = () => {
+  const sql = `DROP TABLE ${TABLE_NAME}`;
+  getDB().run(sql);
 };
 
 const queryAllTables = () => {
@@ -43,14 +65,8 @@ const getTable = () => {
 };
 
 const insertTable = ({title, image, x = 0, y = 0}) => {
-  const sql = `INSERT INTO ${TABLE_NAME} VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
+  const sql = `INSERT INTO ${TABLE_NAME} (MID, TITLE, IMAGE, X, Y) VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
   getDB().run(sql);
-};
-
-const writeDB = () => {
-  const data = getDB().export();
-  const buffer = new Uint8Array(data);
-  fs.writeFileSync(DB_PATH, buffer);
 };
 
 const deleteTable = (like) => {
@@ -59,9 +75,10 @@ const deleteTable = (like) => {
 }
 
 export {
+  initDB,
+  writeDB,
   queryAllTables,
   getTable,
   insertTable,
-  writeDB,
   deleteTable
 };
