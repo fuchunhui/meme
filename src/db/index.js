@@ -58,8 +58,6 @@ const queryAllTables = () => {
 
 const getTable = () => {
   const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME}`);
-  console.log({...contents});
-  console.log(JSON.stringify(contents));
   return contents;
 };
 
@@ -73,11 +71,19 @@ const deleteTable = (like) => {
   getDB().run(sql);
 }
 
+const getDataByColumn = (column, value) => {
+  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${column} = :val`);
+  const result = stmt.getAsObject({':val': value});
+  stmt.free();
+  return result;
+};
+
 export {
   initDB,
   writeDB,
   queryAllTables,
   getTable,
   insertTable,
-  deleteTable
+  deleteTable,
+  getDataByColumn
 };
