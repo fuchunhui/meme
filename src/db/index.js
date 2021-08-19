@@ -4,6 +4,7 @@
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
+import information from '../config/information.js'
 
 const TABLE_NAME = 'STORY';
 const DB_PATH = './public/db/meme.db';
@@ -36,10 +37,7 @@ const _initTable = () => {
 const initDB = () => {
   _resetDB();
   _initTable();
-  insertTable({ // 更改为从初始化脚本读取
-    title: 'aa',
-    image: 'asd'
-  })
+  information.forEach(item => insertTable(item));
   writeDB();
 };
 
@@ -62,6 +60,7 @@ const getTable = () => {
   const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME}`);
   console.log({...contents});
   console.log(JSON.stringify(contents));
+  return contents;
 };
 
 const insertTable = ({title, image, x = 0, y = 0}) => {
