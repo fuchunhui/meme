@@ -25,12 +25,12 @@ const getDB = () => {
  */
 const _initTable = () => {
   const sqlstr = `CREATE TABLE ${TABLE_NAME} (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    MID char(50) NOT NULL,
-    TITLE char(100),
-    IMAGE TEXT NOT NULL,
-    X INT DEFAULT 0,
-    Y INT DEFAULT 0);`
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid char(50) NOT NULL,
+    title char(100) COLLATE NOCASE,
+    image TEXT NOT NULL,
+    x INT DEFAULT 0,
+    y INT DEFAULT 0);`
   getDB().run(sqlstr);
 };
 
@@ -62,12 +62,12 @@ const getTable = () => {
 };
 
 const insertTable = ({title, image, x = 0, y = 0}) => {
-  const sql = `INSERT INTO ${TABLE_NAME} (MID, TITLE, IMAGE, X, Y) VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
+  const sql = `INSERT INTO ${TABLE_NAME} (mid, title, image, x, y) VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
   getDB().run(sql);
 };
 
 const deleteTable = (like) => {
-  const sql = `DELETE FROM ${TABLE_NAME} WHERE TITLE NOT LIKE '${like}'`
+  const sql = `DELETE FROM ${TABLE_NAME} WHERE title NOT LIKE '${like}'`
   getDB().run(sql);
 }
 
