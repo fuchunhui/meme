@@ -40,11 +40,26 @@ const getGIFSize = buffer => {
   };
 };
 
+const getBMPSize = buffer => {
+  if (buffer.readUInt16BE(0) !== 0x424d) {
+    return {
+      width: 0,
+      height: 0
+    };
+  }
+
+  return {
+    width: buffer.readUInt32LE(18),
+    height: buffer.readUInt32LE(22)
+  };
+};
+
 const typeMap = new Map([
   ['png', getPNGSize],
   ['jpg', getJPGSize],
   ['jpeg', getJPGSize],
-  ['gif', getGIFSize]
+  ['gif', getGIFSize],
+  ['bmp', getBMPSize]
 ]);
 
 const getSize = base64Img => {
