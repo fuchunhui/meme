@@ -1,14 +1,24 @@
 {
   "name": "meme",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "a robot",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "tsh": "sh .draft/test.sh",
     "tjs": "node .draft/test.js",
-    "test": "cross-env NODE_ENV=test node app.js"
+    "test": "cross-env NODE_ENV=test node app.js",
+    "debug": "cross-env NODE_ENV=test node --inspect-brk app.js"
   },
   "type": "module",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "canvas": "^2.8.0",
+    "express": "^4.17.1",
+    "sql.js": "^1.6.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fuchunhui/meme.git"
@@ -25,14 +35,5 @@
   "bugs": {
     "url": "https://github.com/fuchunhui/meme/issues"
   },
-  "homepage": "https://github.com/fuchunhui/meme#readme",
-  "dependencies": {
-    "axios": "^0.21.1",
-    "canvas": "^2.8.0",
-    "express": "^4.17.1",
-    "sql.js": "^1.6.1"
-  },
-  "devDependencies": {
-    "cross-env": "^7.0.3"
-  }
+  "homepage": "https://github.com/fuchunhui/meme#readme"
 }
