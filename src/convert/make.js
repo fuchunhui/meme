@@ -3,60 +3,19 @@
 // 计算base64图片的原始长宽
 // 有趣的图片加密？？？
 
-// import {Image} from 'canvas';
 import {Buffer} from 'buffer';
 import * as fs from 'fs';
 
-import pkg from 'canvas';
-const { Image } = pkg;
-
-const getSize = base64Img => {
-  const parts = base64Img.split(';base64,');
-  const base64Image = parts.pop();
-  const buffer = Buffer.from(base64Image.toString(), 'base64');
-  // 判断类型
-  // 执行不同的函数处理
-
-  const type = getType(parts.pop());
-
-  let width = 0;
-  let height = 0;
-
-  console.log(getSizeByImage(base64Img), 'image');
-  
-  // console.log(getPNGSize(buffer), 'png');
-  console.log(getJPGSize(buffer), 'jpg');
-  // console.log(getJPGSize(buffer), 'jpeg');
-  // console.log(getGifSize(buffer), 'gif');
-  writeImg(base64Img, type);
-
-  return {
-    width,
-    height
-  }
-};
-
-const getType = header => {
-  return header.split('/').pop();
-};
-
 const getPNGSize = buffer => {
+  let w = 16;
+  let h = 20;
   if (buffer.toString('ascii', 12, 16) === 'CgBI') {
-    return {
-      'width': buffer.readUInt32BE(32),
-      'height': buffer.readUInt32BE(36)
-    };
+    w = 32;
+    h = 36;
   }
   return {
-    'width': buffer.readUInt32BE(16),
-    'height': buffer.readUInt32BE(20)
-  };
-}
-
-const getGifSize = buffer => { 
-  return {
-    width: buffer.readUInt16LE(6),
-    height: buffer.readUInt16LE(8)
+    width: buffer.readUInt32BE(w),
+    height: buffer.readUInt32BE(h)
   };
 };
 
@@ -75,7 +34,35 @@ const getJPGSize = buffer => {
 
     buffer_data = buffer_data.slice(i + 2); // move to the next block
   }
-}
+};
+
+const getGIFSize = buffer => { 
+  return {
+    width: buffer.readUInt16LE(6),
+    height: buffer.readUInt16LE(8)
+  };
+};
+
+const typeMap = new Map([
+  ['png', getPNGSize],
+  ['jpg', getJPGSize],
+  ['jpeg', getJPGSize],
+  ['gif', getGIFSize]
+]);
+
+const getSize = base64Img => {
+  const parts = base64Img.split(';base64,');
+  const base64Image = parts.pop();
+  const buffer = Buffer.from(base64Image.toString(), 'base64');
+
+  const type = parts.pop().split('/').pop();
+  const {width, height} = typeMap.get(type)(buffer);
+
+  return {
+    width,
+    height
+  };
+};
 
 const getSizeByImage = base64Img => {
   let width = 0;
