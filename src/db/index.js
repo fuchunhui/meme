@@ -4,9 +4,10 @@
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
-import information from '../config/information.js'
+import information from '../config/information.js';
 
 const TABLE_NAME = 'STORY';
+const TEXT_TABLE = 'TEXT';
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
@@ -24,20 +25,31 @@ const getDB = () => {
  * 保留建表语句
  */
 const _initTable = () => {
-  const sqlstr = `CREATE TABLE ${TABLE_NAME} (
+  const sql = `CREATE TABLE ${TABLE_NAME} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    mid char(50) NOT NULL,
-    title char(100) COLLATE NOCASE,
-    image TEXT NOT NULL,
+    mid CHAR(50) NOT NULL,
+    title CHAR(100) COLLATE NOCASE,
+    image TEXT NOT NULL
+  );`
+  const textSQL = `CREATE TABLE ${TEXT_TABLE} (
+    tid INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
     x INT DEFAULT 0,
-    y INT DEFAULT 0);`
-  getDB().run(sqlstr);
+    y INT DEFAULT 0,
+    max INT DEFAULT 0,
+    font CHAR(50) NOT NULL,
+    color CHAR(20) NOT NULL,
+    align CHAR(10) NOT NULL
+  );`
+  getDB().run(sql + textSQL);
 };
 
 const initDB = () => {
   _resetDB();
   _initTable();
-  information.forEach(item => insertTable(item));
+  information.forEach(item => {
+    insertTable(item);
+  });
   writeDB();
 };
 
@@ -48,30 +60,39 @@ const writeDB = () => {
 };
 
 const _resetDB = () => {
-  const sql = `DROP TABLE ${TABLE_NAME}`;
-  getDB().run(sql);
+  const sql = `DROP TABLE ${TABLE_NAME};`;
+  const text = `DROP TABLE ${TEXT_TABLE};`;
+  getDB().run(sql + text);
 };
 
 const queryAllTables = () => {
   return getDB().exec('SELECT name, sql FROM sqlite_master');
 };
 
-const getTable = () => {
+const getTable = () => { // TODO 是否需要扩展读取，text信息，用于展示
   const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME}`);
   return contents;
 };
 
-const insertTable = ({title, image, x = 0, y = 0}) => {
-  const sql = `INSERT INTO ${TABLE_NAME} (mid, title, image, x, y) VALUES ('${uuid()}', '${title}', '${image}', ${x}, ${y});`;
-  getDB().run(sql);
+const insertTable = options => {
+  const {title, image, x = 0, y = 0, max = 0, font = '32px sans-serif', color = 'black', align = 'start'} = options;
+  const mid = uuid();
+  const sql = `INSERT INTO ${TABLE_NAME} (mid, title, image) VALUES ('${mid}', '${title}', '${image}');`;
+  const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
+    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}');`;
+  getDB().run(sql + text);
 };
 
-const deleteTable = (like) => {
-  const sql = `DELETE FROM ${TABLE_NAME} WHERE title NOT LIKE '${like}'`
+const deleteTable = like => {
+  const text = `DELETE FROM ${TEXT_TABLE} WHERE mid in (SELECT mid FROM ${TABLE_NAME} WHERE title NOT LIKE '${like}');`;
+  const sql = `DELETE FROM ${TABLE_NAME} WHERE title NOT LIKE '${like}';`;
+  getDB().run(text);
   getDB().run(sql);
-}
 
-const getDataByColumn = (column, value) => {
+  writeDB();
+};
+
+const getDataByColumn = (column, value) => { // TODO 拼接数据
   const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
