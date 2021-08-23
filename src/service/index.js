@@ -21,7 +21,7 @@ const send = base64Img => {
       ]
     }
   };
-  console.log(JSON.stringify(data));
+  // console.log(JSON.stringify(data));
   axios({
     url: server,
     method: 'post',
