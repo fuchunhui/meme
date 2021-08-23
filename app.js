@@ -11,16 +11,12 @@ const data = getDataByColumn('title', 'happy'); // jpeg
 // const data = getDataByColumn('title', '太难了'); // jpg
 // const data = getDataByColumn('title', '晕倒'); // gif
 // const data = getDataByColumn('title', '安排'); // bmp
-// console.log(data);
-
-
+console.log(data);
 
 // initDB();
 
-deleteTable('te%');
-getTable();
-
-writeDB();
+// deleteTable('te%');
+// writeDB();
 
 const base64Img = data.image;
 // const newBasse = make(base64Img, {

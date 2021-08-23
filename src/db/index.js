@@ -92,8 +92,8 @@ const deleteTable = like => {
   writeDB();
 };
 
-const getDataByColumn = (column, value) => { // TODO 拼接数据
-  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${column} = :val`);
+const getDataByColumn = (column, value) => {
+  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} a INNER JOIN ${TEXT_TABLE} b USING(mid) WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;
