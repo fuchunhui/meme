@@ -1,8 +1,3 @@
-// canvas 合成图片
-// 剪切图片，随机调整
-// 输出base64
-// 有趣的图片加密？？？
-
 import * as fs from 'fs';
 import pkg from 'canvas';
 import { getSize } from './size.js';
@@ -10,10 +5,10 @@ import { getSize } from './size.js';
 const { createCanvas, Image } = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
 
-const make = (base64Img, options) => {
+const make = (text, options) => {
+  const base64Img = options.image;
   const parts = base64Img.split(';base64,');
   const type = parts[0].split(':').pop();
-  console.log('type: ', type);
 
   if (NOT_SUPPORT.includes(type)) {
     return writeImg(base64Img);
@@ -30,12 +25,11 @@ const make = (base64Img, options) => {
     img.onload = () => {
       ctx.drawImage(img, 0, 0);
 
-      // 解构options
-      const {x, y, text, font, fillStyle, textAlign, maxWidth} = options;
+      const {x, y, font, color, align, max} = options;
       ctx.font = font;
-      ctx.fillStyle = fillStyle;
-      ctx.textAlign = textAlign;
-      ctx.fillText(text, x, y, maxWidth);
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.fillText(text, x, y, max);
 
       base64 = canvas.toDataURL(type);
       writeImg(base64); // test
@@ -54,6 +48,11 @@ const writeImg = base64Img => {
   const type = parts.pop().split('/').pop();
   const fileName = `meme_${new Date().getTime()}`.padEnd(18, '0');
   fs.writeFileSync(`${fileName}.${type}`, base64Image, {encoding: 'base64'});
+};
+
+const cook = () => {
+  // 用于制作图片，修剪操作。
+  // 图片的剪切，打补丁等操作。
 };
 
 export {

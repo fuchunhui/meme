@@ -69,8 +69,8 @@ const queryAllTables = () => {
   return getDB().exec('SELECT name, sql FROM sqlite_master');
 };
 
-const getTable = () => { // TODO 是否需要扩展读取，text信息，用于展示
-  const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME}`);
+const getTable = () => {
+  const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid)`);
   return contents;
 };
 
@@ -93,7 +93,7 @@ const deleteTable = like => {
 };
 
 const getDataByColumn = (column, value) => {
-  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} a INNER JOIN ${TEXT_TABLE} b USING(mid) WHERE ${column} = :val`);
+  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;
