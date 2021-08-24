@@ -76,11 +76,18 @@ const getSize = base64Img => {
   };
 };
 
+/**
+ * 另一种方式 获取尺寸
+ * 虽然是使用load方式，不过速度也超级快，几乎是同步。安全和规范，必须使用onload处理
+ * 需要 import pkg from 'canvas'; const { Image } = pkg;
+ * @param {*} base64Img 传入的base格式文件
+ * @returns {width, height}
+ */
 const getSizeByImage = base64Img => {
   let width = 0;
   let height = 0;
 
-  const img = new Image(); // import pkg from 'canvas'; const { Image } = pkg;
+  const img = new Image();
   img.onload = () => {
     width = img.naturalWidth;
     height = img.naturalHeight;
