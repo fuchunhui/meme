@@ -10,8 +10,9 @@ const make = (text, options) => {
   const parts = base64Img.split(';base64,');
   const type = parts[0].split(':').pop();
 
-  if (NOT_SUPPORT.includes(type)) {
-    return writeImg(base64Img);
+  if (NOT_SUPPORT.includes(type) || text === '') {
+    // return writeImg(base64Img);
+    return base64Img;
   }
 
   let base64 = '';
