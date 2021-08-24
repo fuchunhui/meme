@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "canvas": "^2.8.0",
+    "crypto-js": "^4.1.1",
     "express": "^4.17.1",
     "sql.js": "^1.6.1"
   },
