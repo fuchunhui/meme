@@ -2,7 +2,8 @@ const formatMenu = data => {
   const list = data.map(item => {
     return `- ${item}`;
   });
-  return list.join('\n');
+  const menu = '### 常用菜单：\n' + list.join('\n');
+  return menu;
 };
 
 const warns = [

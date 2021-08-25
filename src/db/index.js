@@ -8,6 +8,7 @@ import information from '../config/information.js';
 
 const TABLE_NAME = 'STORY';
 const TEXT_TABLE = 'TEXT';
+const LOG_TABLE = 'LOGGER';
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
@@ -31,7 +32,7 @@ const _initTable = () => {
     title CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL
   );`
-  const textSQL = `CREATE TABLE ${TEXT_TABLE} (
+  const text = `CREATE TABLE ${TEXT_TABLE} (
     tid INTEGER PRIMARY KEY AUTOINCREMENT,
     mid CHAR(50) NOT NULL,
     x INT DEFAULT 0,
@@ -41,14 +42,20 @@ const _initTable = () => {
     color CHAR(20) NOT NULL,
     align CHAR(10) NOT NULL
   );`
-  getDB().run(sql + textSQL);
+  const logger = `CREATE TABLE ${LOG_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fromid CHAR(100) NOT NULL,
+    text CHAR(100) NOT NULL,
+    date Date
+  );`;
+  getDB().run(sql + text + logger);
 };
 
 const initDB = () => {
   _resetDB();
   _initTable();
   information.forEach((item, index) => {
-    insertTable(item);
+    insertTable(item, false);
   });
   writeDB();
 };
@@ -60,9 +67,9 @@ const writeDB = () => {
 };
 
 const _resetDB = () => {
-  const sql = `DROP TABLE ${TABLE_NAME};`;
-  const text = `DROP TABLE ${TEXT_TABLE};`;
-  getDB().run(sql + text);
+  const nameList = [`${TABLE_NAME}`, `${TEXT_TABLE}`, `${LOG_TABLE}`];
+  const sql = nameList.map(item => `DROP TABLE ${item};`).join('');
+  getDB().run(sql);
 };
 
 const queryAllTables = () => {
@@ -80,13 +87,15 @@ const getTable = () => {
   return contents;
 };
 
-const insertTable = options => {
+const insertTable = (options, write = true) => {
   const {title, image, x = 0, y = 0, max = 0, font = '32px sans-serif', color = 'black', align = 'start'} = options;
   const mid = uuid();
   const sql = `INSERT INTO ${TABLE_NAME} (mid, title, image) VALUES ('${mid}', '${title}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}');`;
   getDB().run(sql + text);
+
+  write && writeDB();
 };
 
 const deleteTable = like => {
@@ -105,6 +114,20 @@ const getDataByColumn = (value, column = 'title') => {
   return result;
 };
 
+const insertLog = ({fromid, text, date}, write = true) => {
+  const sql = `INSERT INTO ${LOG_TABLE} (fromid, text, date) VALUES ('${fromid}', '${text}', '${date}');`;
+  getDB().run(sql);
+
+  write && writeDB();
+};
+
+const getColumnByTable = (value, column, table) => {
+  const stmt = getDB().prepare(`SELECT * FROM ${table} WHERE ${column} = :val`);
+  const result = stmt.getAsObject({':val': value});
+  stmt.free();
+  return result;
+};
+
 export {
   initDB,
   writeDB,
@@ -112,5 +135,7 @@ export {
   getTable,
   insertTable,
   deleteTable,
-  getDataByColumn
+  getDataByColumn,
+  getColumnByTable,
+  insertLog
 };
