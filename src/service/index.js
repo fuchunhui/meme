@@ -7,7 +7,7 @@ const headers = {
   'content-type': 'application/json'
 };
 
-const send = (base64Img, toid) => {
+const send = (toid, content, type = 'IMAGE') => {
   const data = {
     message: {
       header: {
@@ -15,8 +15,8 @@ const send = (base64Img, toid) => {
       },
       body: [
         {
-          content: base64Img,
-          type: 'IMAGE'
+          content,
+          type
         }
       ]
     }
