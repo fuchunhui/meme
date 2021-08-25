@@ -11,7 +11,6 @@ const make = (text, options) => {
   const type = parts[0].split(':').pop();
 
   if (NOT_SUPPORT.includes(type) || text === '') {
-    // return writeImg(base64Img);
     return base64Img;
   }
 
@@ -30,10 +29,9 @@ const make = (text, options) => {
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textAlign = align;
-      ctx.fillText(text, x, y, max); // TODO if max 没有设置，为0如何处理。
+      ctx.fillText(text, x, y, max || width);
 
       base64 = canvas.toDataURL(type);
-      // writeImg(base64); // test
     };
     img.onerror = err => {
       console.error(err);

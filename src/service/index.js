@@ -21,14 +21,14 @@ const send = (toid, content, type = 'IMAGE') => {
       ]
     }
   };
-  // console.log(JSON.stringify(data));
+
   axios({
     url: server,
     method: 'post',
     headers,
     data
   }).then(res => {
-    console.log(res.data);
+    // console.log(res.data);
   }).catch(error => {
     console.error(error);
   });

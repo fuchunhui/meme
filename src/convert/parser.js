@@ -36,7 +36,6 @@ class AESCipher {
 const _decode = encryption => {
   const cipher = new AESCipher(key);
   const data = cipher.decrypt(encryption);
-  console.log('消息体内容', data); // TODO delete
   return JSON.parse(data);
 };
 
@@ -46,6 +45,7 @@ const parser = encryption => {
   const {fromuserid: fromid, toid} = header;
   const cell = body.find(item => item.type === 'TEXT');
   const message =  cell ? cell.content.trim() : '';
+
   let command = '';
   let text = '';
   if (message) {
