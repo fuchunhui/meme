@@ -70,7 +70,13 @@ const queryAllTables = () => {
 };
 
 const getTable = () => {
-  const contents = getDB().exec(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid)`);
+  const contents = [];
+  const stmt = db.prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid)`);
+  while (stmt.step()) {
+    const cell = stmt.getAsObject();
+    contents.push(cell);
+  }
+  stmt.free();
   return contents;
 };
 
@@ -92,7 +98,7 @@ const deleteTable = like => {
   writeDB();
 };
 
-const getDataByColumn = (column, value) => {
+const getDataByColumn = (value, column = 'title') => {
   const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();

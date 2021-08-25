@@ -1,17 +1,17 @@
 import axios from 'axios';
 import config from '../config/index.js';
 
-const {server, traget} = config;
+const {server} = config;
 
 const headers = {
   'content-type': 'application/json'
 };
 
-const send = base64Img => {
+const send = (base64Img, toid) => {
   const data = {
     message: {
       header: {
-        toid: [traget]
+        toid: [toid]
       },
       body: [
         {
