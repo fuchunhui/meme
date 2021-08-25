@@ -11,7 +11,7 @@ import main from './src/main.js';
 // const data = getDataByColumn('安排'); // bmp
 // console.log(data);
 
-// initDB();
+initDB();
 
 // deleteTable('te%');
 // writeDB();

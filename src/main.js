@@ -18,7 +18,7 @@ const control = encryption => {
     const comList = list.map(item => item.title);
     console.log(comList);
     const content = formatMenu(comList);
-    // send(toid, content, 'MD'); // 发送菜单
+    send(toid, content, 'MD'); // 发送菜单
   } else {
     const data = getDataByColumn(command);
     if (data.image) {

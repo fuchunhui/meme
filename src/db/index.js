@@ -47,7 +47,7 @@ const _initTable = () => {
 const initDB = () => {
   _resetDB();
   _initTable();
-  information.forEach(item => {
+  information.forEach((item, index) => {
     insertTable(item);
   });
   writeDB();

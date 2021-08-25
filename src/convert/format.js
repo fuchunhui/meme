@@ -1,6 +1,8 @@
 const formatMenu = data => {
-
-  return '';
+  const list = data.map(item => {
+    return `- ${item}`;
+  });
+  return list.join('\n');
 };
 
 const warns = [
