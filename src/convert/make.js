@@ -16,7 +16,7 @@ const make = (text, options) => {
 
   let base64 = '';
   const {width, height} = getSize(base64Img);
-  
+
   if (width && height) {
     const img = new Image();
     const canvas = createCanvas(width, height);

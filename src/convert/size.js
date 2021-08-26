@@ -33,7 +33,7 @@ const getJPGSize = buffer => {
   }
 };
 
-const getGIFSize = buffer => { 
+const getGIFSize = buffer => {
   return {
     width: buffer.readUInt16LE(6),
     height: buffer.readUInt16LE(8)
@@ -97,8 +97,8 @@ const getSizeByImage = base64Img => {
   return {
     width,
     height
-  }
-}
+  };
+};
 
 export {
   getSize

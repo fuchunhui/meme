@@ -1,14 +1,14 @@
 import express from 'express';
+import md5 from 'md5';
+import come from './app.js';
+import config from './src/config/index.js';
+
 const app = express();
 
-// parse application/json
 app.use(express.json());
-
-// parse application/x-www-form-urlencoded
+app.use(express.text());
+app.use(express.raw());
 app.use(express.urlencoded({ extended: false }));
-
-const hostName = 'localhost';
-const port = 8080;
 
 app.all('*', (req, res, next) => {  
   res.header('Access-Control-Allow-Origin', '*');
@@ -20,17 +20,32 @@ app.all('*', (req, res, next) => {
 });
 
 app.use(express.static('public'));
-app.get('/get', (req, res) => {
-  console.log(`url: ${req.path} 参数: ${req.query}`);
-  res.send('这是get请求');
+
+app.get('/test', (req, res) => {
+  console.log(`url: ${req.path} 参数: ${JSON.stringify(req.query)}`);
+  res.send('test get请求');
 })
 
-app.post('/post', (req, res) => {
-  console.log('请求参数：', req.body, JSON.stringify(req.body));
-  const result = {code: 200, msg: 'post请求成功'};
-  res.send(result);
+app.post('*', (req, res) => {
+  console.log('请求参数：', JSON.stringify(req.body));
+
+  if (req.body.echostr) {
+    const {signature, rn, timestamp} = req.query;
+    const str = md5(`${rn}${timestamp}${config.token}`);
+    if (signature === str) {
+      res.send(req.body.echostr);
+    } else {
+      res.send('check signature fail');
+    }
+
+    return;
+  }
+
+  const data = req.body;
+  if (!data) {
+    console.error('req.body不见了');
+  }
+  come(data);
 });
 
-app.listen(port, hostName, () => {
-  console.log(`服务器运行在 http://${hostName}:${port}`);
-});
+app.listen(8080);
