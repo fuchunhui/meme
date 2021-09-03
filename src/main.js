@@ -37,7 +37,7 @@ const control = encryption => {
     if (commands.length === 0) {
       commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
     }
-    if (commands.length > 1) { 
+    if (commands.length > 1) {
       const commandList = commands.map(item => item.title);
       const composeContent = formatMenu(commandList, commands[0].feature);
       send(toid, composeContent, 'MD');
