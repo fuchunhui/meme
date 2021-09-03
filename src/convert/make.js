@@ -55,5 +55,6 @@ const cook = () => {
 };
 
 export {
-  make
+  make,
+  writeImg
 };

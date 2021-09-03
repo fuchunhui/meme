@@ -30,6 +30,7 @@ const _initTable = () => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mid CHAR(50) NOT NULL,
     title CHAR(100) COLLATE NOCASE,
+    feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL
   );`
   const text = `CREATE TABLE ${TEXT_TABLE} (
@@ -78,7 +79,7 @@ const queryAllTables = () => {
 
 const getTable = () => {
   const contents = [];
-  const stmt = db.prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid)`);
+  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid)`);
   while (stmt.step()) {
     const cell = stmt.getAsObject();
     contents.push(cell);
@@ -88,9 +89,9 @@ const getTable = () => {
 };
 
 const insertTable = (options, write = true) => {
-  const {title, image, x = 0, y = 0, max = 0, font = '32px sans-serif', color = 'black', align = 'start'} = options;
+  const {title, feature, image, x = 0, y = 0, max = 0, font = '32px sans-serif', color = 'black', align = 'start'} = options;
   const mid = uuid();
-  const sql = `INSERT INTO ${TABLE_NAME} (mid, title, image) VALUES ('${mid}', '${title}', '${image}');`;
+  const sql = `INSERT INTO ${TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}');`;
   getDB().run(sql + text);
@@ -114,6 +115,17 @@ const getDataByColumn = (value, column = 'title') => {
   return result;
 };
 
+const getDataListByColumn = (value, column = 'title') => {
+  const contents = [];
+  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${column} = '${value}'`);
+  while (stmt.step()) {
+    const cell = stmt.getAsObject();
+    contents.push(cell);
+  }
+  stmt.free();
+  return contents;
+};
+
 const insertLog = ({fromid, text, date}, write = true) => {
   const sql = `INSERT INTO ${LOG_TABLE} (fromid, text, date) VALUES ('${fromid}', '${text}', '${date}');`;
   getDB().run(sql);
@@ -128,6 +140,17 @@ const getColumnByTable = (value, column, table) => {
   return result;
 };
 
+const getColumnByCompose = (value, column = 'title', target = 'feature') => {
+  const contents = [];
+  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${target} = (SELECT ${target} FROM ${TABLE_NAME} WHERE ${column} = '${value}')`);
+  while (stmt.step()) {
+    const cell = stmt.getAsObject();
+    contents.push(cell);
+  }
+  stmt.free();
+  return contents;
+};
+
 export {
   initDB,
   writeDB,
@@ -137,5 +160,7 @@ export {
   deleteTable,
   getDataByColumn,
   getColumnByTable,
+  getColumnByCompose,
+  getDataListByColumn,
   insertLog
 };

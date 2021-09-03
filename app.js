@@ -1,22 +1,28 @@
+import { writeImg, make } from './src/convert/make.js';
 import { getSize } from './src/convert/size.js';
-import { initDB, getDataByColumn, getColumnByTable } from './src/db/index.js';
+import { initDB, getDataByColumn, getColumnByCompose, getTable } from './src/db/index.js';
 import main from './src/main.js';
 
-// initDB();
+initDB();
 
-// const data = getDataByColumn('weekly'); // png
+// const data = getDataByColumn('weekly2');
 // console.log(getSize(data.image));
 
 // const newBasse = make('超级', {
-//   image: base64Img,
-//   text: '超级', // 外参
-//   x: 25,
-//   y: 130,
-//   font: '24px sans-serif',
-//   color: 'black',
-//   align: 'start',
-//   max: 100
+//   image: data.image,
+//   x: 280,
+//   y: 536,
+//   font: '64px sans-serif',
+//   color: 'white',
+//   align: 'end',
+//   max: 280
 // });
+
+// const a = getColumnByCompose('weekly');
+// console.log(a)
+
+// writeImg(newBasse);
+
 
 export default encryption => {
   main(encryption);
