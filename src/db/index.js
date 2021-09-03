@@ -140,17 +140,6 @@ const getColumnByTable = (value, column, table) => {
   return result;
 };
 
-const getColumnByCompose = (value, column = 'title', target = 'feature') => {
-  const contents = [];
-  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${target} = (SELECT ${target} FROM ${TABLE_NAME} WHERE ${column} = '${value}')`);
-  while (stmt.step()) {
-    const cell = stmt.getAsObject();
-    contents.push(cell);
-  }
-  stmt.free();
-  return contents;
-};
-
 export {
   initDB,
   writeDB,
@@ -160,7 +149,6 @@ export {
   deleteTable,
   getDataByColumn,
   getColumnByTable,
-  getColumnByCompose,
   getDataListByColumn,
   insertLog
 };

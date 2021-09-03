@@ -3,7 +3,7 @@
  */
 
 import { parser } from './convert/parser.js';
-import { getDataByColumn, getTable, insertLog, getColumnByCompose, getDataListByColumn } from './db/index.js';
+import { getDataByColumn, getTable, insertLog, getDataListByColumn } from './db/index.js';
 import { make } from './convert/make.js';
 import { formatMenu, formatNull } from './convert/format.js';
 import { send } from './service/index.js';
@@ -33,10 +33,7 @@ const control = encryption => {
 
     send(toid, content, 'MD');
   } else {
-    let commands = getColumnByCompose(command); // 当成 command，查询是否多个 feature
-    if (commands.length === 0) {
-      commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
-    }
+    const commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
     if (commands.length > 1) {
       const commandList = commands.map(item => item.title);
       const composeContent = formatMenu(commandList, commands[0].feature);

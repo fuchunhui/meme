@@ -27,13 +27,13 @@ app.get('/test', (req, res) => {
 })
 
 app.post('*', (req, res) => {
-  console.log('请求参数：', JSON.stringify(req.body));
+  console.log('request: ', JSON.stringify(req.body));
 
   if (req.body.echostr) {
-    const {signature, rn, timestamp} = req.query;
+    const {signature, rn, timestamp, echostr} = req.body;
     const str = md5(`${rn}${timestamp}${config.token}`);
     if (signature === str) {
-      res.send(req.body.echostr);
+      res.send(echostr);
     } else {
       res.send('check signature fail');
     }
