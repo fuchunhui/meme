@@ -8,7 +8,7 @@
     "tjs": "node .draft/test.js",
     "test": "cross-env NODE_ENV=test node app.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
-    "import": "node --version"
+    "import": "node build/import.js"
   },
   "type": "module",
   "dependencies": {
