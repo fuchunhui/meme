@@ -6,9 +6,6 @@ import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
 import information from '../config/information.js';
 import special from '../config/special/index.js';
-// import '../config/special/index.js';
-
-console.log('main------>', special);
 
 const TABLE_NAME = 'STORY';
 const TEXT_TABLE = 'TEXT';

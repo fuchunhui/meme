@@ -47,7 +47,7 @@ const control = encryption => {
       return;
     }
 
-    if (special(command)) {
+    if (special(command, toid, text)) {
       return;
     }
 
@@ -68,7 +68,7 @@ const control = encryption => {
   }
 };
 
-const special = (command, toid) => {
+const special = (command, toid, text) => {
   const commands = getSpecialDataListByColumn(command);
   const specialCommand = commands.length > 0;
 
