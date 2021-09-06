@@ -23,7 +23,7 @@ import main from './src/main.js';
 
 // writeImg(newBasse);
 
-main('') // 测试命令
+// main('') // 测试命令
 
 export default encryption => {
   main(encryption);

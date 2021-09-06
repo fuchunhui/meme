@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import template from './template.js';
+import { getSize } from '../src/convert/size.js';
 
 const fileName = process.argv.splice(2)[0];
 if (!fileName) {
@@ -38,9 +39,13 @@ fs.readdir(tardir, (err, files) => {
     const data = fs.readFileSync(filePath, {encoding: 'base64'});
     const base64 = appendBase64(data, ext);
 
+    const {width, height} = getSize(base64);
     fileList.push({
       title: item.replace(ext, ''),
-      image: base64
+      image: base64,
+      max: width,
+      x: width / 10,
+      y: height / 2
     });
   });
 

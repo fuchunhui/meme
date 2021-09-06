@@ -159,7 +159,14 @@ const _initSpecialTable = () => {
 }
 
 const getSpecialDataListByColumn = (value, column = 'feature') => {
-  return getDataListByColumn(value, column, SPECIAL_TABLE);
+  const contents = [];
+  const stmt = getDB().prepare(`SELECT * FROM ${SPECIAL_TABLE} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = '${value}'`);
+  while (stmt.step()) {
+    const cell = stmt.getAsObject();
+    contents.push(cell);
+  }
+  stmt.free();
+  return contents;
 };
 
 export {
