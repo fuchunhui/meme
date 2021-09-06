@@ -3,7 +3,13 @@
  */
 
 import { parser } from './convert/parser.js';
-import { getDataByColumn, getTable, insertLog, getDataListByColumn } from './db/index.js';
+import {
+  getTable,
+  getDataByColumn,
+  getDataListByColumn,
+  getSpecialDataListByColumn,
+  insertLog
+} from './db/index.js';
 import { make } from './convert/make.js';
 import { formatMenu, formatNull } from './convert/format.js';
 import { send } from './service/index.js';
@@ -41,6 +47,10 @@ const control = encryption => {
       return;
     }
 
+    if (special(command)) {
+      return;
+    }
+
     const data = getDataByColumn(command);
     if (data.image) {
       const base64 = make(text, data);
@@ -56,6 +66,22 @@ const control = encryption => {
       });
     }
   }
+};
+
+const special = (command, toid) => {
+  const commands = getSpecialDataListByColumn(command);
+  const specialCommand = commands.length > 0;
+
+  if (specialCommand) {
+    const index = Math.floor(Math.random() * commands.length);
+    const data = commands[index];
+    if (data.image) {
+      const base64 = make(text, data);
+      send(toid, base64);
+    }
+  }
+
+  return specialCommand;
 };
 
 export default control;

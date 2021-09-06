@@ -5,10 +5,15 @@ import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
 import information from '../config/information.js';
+import special from '../config/special/index.js';
+// import '../config/special/index.js';
+
+console.log('main------>', special);
 
 const TABLE_NAME = 'STORY';
 const TEXT_TABLE = 'TEXT';
 const LOG_TABLE = 'LOGGER';
+const SPECIAL_TABLE = 'SPECIAL';
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
@@ -55,9 +60,10 @@ const _initTable = () => {
 const initDB = () => {
   _resetDB();
   _initTable();
-  information.forEach((item, index) => {
+  information.forEach(item => {
     insertTable(item, false);
   });
+  _initSpecialTable();
   writeDB();
 };
 
@@ -68,8 +74,8 @@ const writeDB = () => {
 };
 
 const _resetDB = () => {
-  const nameList = [`${TABLE_NAME}`, `${TEXT_TABLE}`, `${LOG_TABLE}`];
-  const sql = nameList.map(item => `DROP TABLE ${item};`).join('');
+  const nameList = [TABLE_NAME, TEXT_TABLE, LOG_TABLE, SPECIAL_TABLE];
+  const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getDB().run(sql);
 };
 
@@ -88,10 +94,10 @@ const getTable = () => {
   return contents;
 };
 
-const insertTable = (options, write = true) => {
+const insertTable = (options, write = true, special = false) => {
   const {title, feature, image, x = 0, y = 0, max = 0, font = '32px sans-serif', color = 'black', align = 'start'} = options;
   const mid = uuid();
-  const sql = `INSERT INTO ${TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
+  const sql = `INSERT INTO ${special ? SPECIAL_TABLE : TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}');`;
   getDB().run(sql + text);
@@ -115,9 +121,9 @@ const getDataByColumn = (value, column = 'title') => {
   return result;
 };
 
-const getDataListByColumn = (value, column = 'title') => {
+const getDataListByColumn = (value, column = 'title', name = TABLE_NAME) => {
   const contents = [];
-  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} WHERE ${column} = '${value}'`);
+  const stmt = getDB().prepare(`SELECT * FROM ${name} WHERE ${column} = '${value}'`);
   while (stmt.step()) {
     const cell = stmt.getAsObject();
     contents.push(cell);
@@ -140,6 +146,25 @@ const getColumnByTable = (value, column, table) => {
   return result;
 };
 
+const _initSpecialTable = () => {
+  const sql = `CREATE TABLE ${SPECIAL_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
+    title CHAR(100) COLLATE NOCASE,
+    feature CHAR(100) COLLATE NOCASE,
+    image TEXT NOT NULL
+  );`
+  getDB().run(sql);
+
+  special.forEach((item, index) => {
+    insertTable(item, false, true);
+  });
+}
+
+const getSpecialDataListByColumn = (value, column = 'feature') => {
+  return getDataListByColumn(value, column, SPECIAL_TABLE);
+};
+
 export {
   initDB,
   writeDB,
@@ -150,5 +175,6 @@ export {
   getDataByColumn,
   getColumnByTable,
   getDataListByColumn,
+  getSpecialDataListByColumn,
   insertLog
 };

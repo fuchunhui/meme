@@ -1,9 +1,9 @@
 import { writeImg, make } from './src/convert/make.js';
 import { getSize } from './src/convert/size.js';
-import { initDB, getDataByColumn, getColumnByCompose, getTable } from './src/db/index.js';
+import { initDB, getDataByColumn, getDataListByColumn, getTable } from './src/db/index.js';
 import main from './src/main.js';
 
-initDB();
+// initDB();
 
 // const data = getDataByColumn('weekly2');
 // console.log(getSize(data.image));
@@ -18,11 +18,12 @@ initDB();
 //   max: 280
 // });
 
-// const a = getColumnByCompose('weekly');
+// const a = getDataListByColumn('weekly');
 // console.log(a)
 
 // writeImg(newBasse);
 
+main('') // 测试命令
 
 export default encryption => {
   main(encryption);
