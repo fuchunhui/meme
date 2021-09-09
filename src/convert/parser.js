@@ -43,7 +43,7 @@ const parser = encryption => {
   const content = _decode(encryption);
   const {header, body} = content.message;
   const {fromuserid: fromid, toid} = header;
-  const cell = body.find(item => item.type === 'TEXT');
+  const cell = body.find(({type, content}) => type === 'TEXT' && content.trim());
   const message =  cell ? cell.content.trim() : '';
 
   let command = '';
