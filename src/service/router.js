@@ -1,9 +1,8 @@
-import {getCatalog} from './data.js';
+import {getCatalog, open} from './data.js';
 
 const listen = app => {
   app.get('/image/catalog', (req, res) => {
     const data = getCatalog();
-
     res.send({
       data,
       errNo: 0,
@@ -12,9 +11,18 @@ const listen = app => {
   });
 
   app.get('/image/open', (req, res) => {
-    console.log('catalog: ', req.body);
+    console.log('open: ', req.body);
 
-    res.send('catalog open. 打开单个文件');
+    // const {mid, type} = req.body;
+    let mid = 'meme_1630929518004';
+    let type = 'COMMON';
+
+    const data = open(mid, type);
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
   });
 
   app.post('/image/save', (req, res) => {

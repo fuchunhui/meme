@@ -1,11 +1,15 @@
 import {
   getTable,
+  getDataByColumn,
+  getSpecialDataListByColumn,
   TABLE_NAME,
   SPECIAL_TABLE
 } from '../db/index.js';
 
 const COMMON_ID = 'meme_common';
 const COMMON_TEXT = '常用';
+const COMMON_TYPE = 'COMMON';
+const SPECIAL_TYPE = 'SPECIAL';
 
 const getCatalog = () => {
   const result = [];
@@ -20,7 +24,7 @@ const getCatalog = () => {
     result.push({
       id: COMMON_ID,
       text: COMMON_TEXT,
-      type: 'COMMON',
+      type: COMMON_TYPE,
       children
     });
   }
@@ -43,7 +47,7 @@ const getCatalog = () => {
       result.push({
         id: key,
         text: key,
-        type: 'SPECIAL',
+        type: SPECIAL_TYPE,
         children: value
       });
     });
@@ -51,6 +55,19 @@ const getCatalog = () => {
   return result;
 };
 
+const open = (mid, type) => {
+  let data = {};
+  if (type === COMMON_TYPE) {
+    data = getDataByColumn(mid, 'mid');
+  } else if (type === SPECIAL_TYPE) {
+    data = getSpecialDataListByColumn(mid, 'mid');
+  }
+
+  const {mid, title, feature, image, x, y, max, font, color, align} = data;
+  return {mid, title, feature, image, x, y, max, font, color, align};
+};
+
 export {
-  getCatalog
+  getCatalog,
+  open
 };
