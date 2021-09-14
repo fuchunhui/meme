@@ -1,7 +1,6 @@
 import {
   getTable,
   getDataByColumn,
-  getSpecialDataListByColumn,
   TABLE_NAME,
   SPECIAL_TABLE
 } from '../db/index.js';
@@ -10,6 +9,11 @@ const COMMON_ID = 'meme_common';
 const COMMON_TEXT = '常用';
 const COMMON_TYPE = 'COMMON';
 const SPECIAL_TYPE = 'SPECIAL';
+
+const TabMap = {
+  [COMMON_TYPE]: TABLE_NAME,
+  [SPECIAL_TABLE]: SPECIAL_TYPE
+};
 
 const getCatalog = () => {
   const result = [];
@@ -56,14 +60,10 @@ const getCatalog = () => {
 };
 
 const open = (mid, type) => {
-  let data = {};
-  if (type === COMMON_TYPE) {
-    data = getDataByColumn(mid, 'mid');
-  } else if (type === SPECIAL_TYPE) {
-    data = getSpecialDataListByColumn(mid, 'mid');
-  }
-
+  let tabName = TabMap[type];
+  const data = getDataByColumn(mid, 'mid', tabName);
   const {title, feature, image, x, y, max, font, color, align} = data;
+
   return {mid, title, feature, image, x, y, max, font, color, align};
 };
 

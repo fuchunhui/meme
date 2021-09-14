@@ -112,8 +112,8 @@ const deleteTable = like => {
   writeDB();
 };
 
-const getDataByColumn = (value, column = 'title') => {
-  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = :val`);
+const getDataByColumn = (value, column = 'title', name = TABLE_NAME) => {
+  const stmt = getDB().prepare(`SELECT * FROM ${name} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;

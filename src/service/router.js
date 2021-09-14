@@ -3,6 +3,7 @@ import {getCatalog, open} from './data.js';
 const listen = app => {
   app.get('/image/catalog', (req, res) => {
     const data = getCatalog();
+
     res.send({
       data,
       errNo: 0,
@@ -13,6 +14,7 @@ const listen = app => {
   app.get('/image/open', (req, res) => {
     const {mid, type} = req.query;
     const data = open(mid, type);
+
     res.send({
       data,
       errNo: 0,
