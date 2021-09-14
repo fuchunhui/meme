@@ -7,10 +7,10 @@ import uuid from '../utils/uuid.js';
 import information from '../config/information.js';
 import special from '../config/special/index.js';
 
-const TABLE_NAME = 'STORY';
-const TEXT_TABLE = 'TEXT';
-const LOG_TABLE = 'LOGGER';
-const SPECIAL_TABLE = 'SPECIAL';
+export const TABLE_NAME = 'STORY';
+export const TEXT_TABLE = 'TEXT';
+export const LOG_TABLE = 'LOGGER';
+export const SPECIAL_TABLE = 'SPECIAL';
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
@@ -80,9 +80,10 @@ const queryAllTables = () => {
   return getDB().exec('SELECT name, sql FROM sqlite_master');
 };
 
-const getTable = () => {
+const getTable = (tableName = TABLE_NAME, join = true) => {
   const contents = [];
-  const stmt = getDB().prepare(`SELECT * FROM ${TABLE_NAME} INNER JOIN ${TEXT_TABLE} USING(mid)`);
+  const sqlplus = join ? ` INNER JOIN ${TEXT_TABLE} USING(mid)` : '';
+  const stmt = getDB().prepare(`SELECT * FROM ${tableName}${sqlplus};`);
   while (stmt.step()) {
     const cell = stmt.getAsObject();
     contents.push(cell);

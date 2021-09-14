@@ -20,7 +20,8 @@
     "sql.js": "^1.6.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "md5": "^2.3.0"
   },
   "repository": {
     "type": "git",

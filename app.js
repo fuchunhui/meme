@@ -1,7 +1,7 @@
 import { writeImg, make } from './src/convert/make.js';
 import { getSize } from './src/convert/size.js';
 import { initDB, getDataByColumn, getDataListByColumn, getTable } from './src/db/index.js';
-import main from './src/main.js';
+import main, {listen} from './src/main.js';
 
 // initDB();
 
@@ -25,6 +25,15 @@ import main from './src/main.js';
 
 // main('') // 测试命令
 
-export default encryption => {
+// export default encryption => {
+//   main(encryption);
+// };
+
+const come = encryption => {
   main(encryption);
+};
+
+export {
+  come,
+  listen
 };

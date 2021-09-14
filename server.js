@@ -1,6 +1,6 @@
 import express from 'express';
 import md5 from 'md5';
-import come from './app.js';
+import {come, listen} from './app.js';
 import config from './src/config/index.js';
 
 const app = express();
@@ -20,6 +20,8 @@ app.all('*', (req, res, next) => {
 });
 
 app.use(express.static('public'));
+
+listen(app);
 
 app.get('/test', (req, res) => {
   console.log(`url: ${req.path} 参数: ${JSON.stringify(req.query)}`);

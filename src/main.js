@@ -13,6 +13,7 @@ import {
 import { make } from './convert/make.js';
 import { formatMenu, formatNull } from './convert/format.js';
 import { send } from './service/index.js';
+export * from './service/router.js';
 
 const control = encryption => {
   const {fromid, toid, command, text} = parser(encryption);
