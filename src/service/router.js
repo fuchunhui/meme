@@ -11,12 +11,7 @@ const listen = app => {
   });
 
   app.get('/image/open', (req, res) => {
-    console.log('open: ', req.body);
-
-    // const {mid, type} = req.body;
-    let mid = 'meme_1630929518004';
-    let type = 'COMMON';
-
+    const {mid, type} = req.query;
     const data = open(mid, type);
     res.send({
       data,

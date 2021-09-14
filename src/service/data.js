@@ -63,7 +63,7 @@ const open = (mid, type) => {
     data = getSpecialDataListByColumn(mid, 'mid');
   }
 
-  const {mid, title, feature, image, x, y, max, font, color, align} = data;
+  const {title, feature, image, x, y, max, font, color, align} = data;
   return {mid, title, feature, image, x, y, max, font, color, align};
 };
 
