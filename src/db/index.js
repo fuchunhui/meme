@@ -40,7 +40,7 @@ const _initTable = () => {
     mid CHAR(50) NOT NULL,
     x INT DEFAULT 0,
     y INT DEFAULT 0,
-    max INT DEFAULT 0,
+    max INT DEFAULT 100,
     font CHAR(50) NOT NULL,
     color CHAR(20) NOT NULL,
     align CHAR(10) NOT NULL
