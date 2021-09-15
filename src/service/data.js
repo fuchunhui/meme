@@ -1,5 +1,7 @@
 import {
   getTable,
+  updateTable,
+  updateTextTable,
   getDataByColumn,
   TABLE_NAME,
   SPECIAL_TABLE
@@ -60,14 +62,29 @@ const getCatalog = () => {
 };
 
 const open = (mid, type) => {
-  let tabName = TabMap[type];
+  const tabName = TabMap[type];
   const data = getDataByColumn(mid, 'mid', tabName);
   const {title, feature, image, x, y, max, font, color, align} = data;
 
   return {mid, title, feature, image, x, y, max, font, color, align};
 };
 
+const update = (options) => { // TODO 尚未区分title image，目前一个接口，需做拆分
+  const {type, ...rest} = options;
+  const tabName = TabMap[type];
+
+  return updateTable(rest, tabName);
+};
+
+const updateText = (options) => {
+  const data = updateTextTable(options);
+  console.log('updateText----------->'); // TODO 0916 返回值未处理
+  return data;
+};
+
 export {
   getCatalog,
-  open
+  open,
+  update,
+  updateText
 };

@@ -93,7 +93,7 @@ const getTable = (tableName = TABLE_NAME, join = true) => {
 };
 
 const insertTable = (options, write = true, special = false) => {
-  const {title, feature, image, x = 0, y = 0, max = 0, font = '32px sans-serif', color = 'black', align = 'start'} = options;
+  const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start'} = options;
   const mid = uuid();
   const sql = `INSERT INTO ${special ? SPECIAL_TABLE : TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
@@ -101,6 +101,23 @@ const insertTable = (options, write = true, special = false) => {
   getDB().run(sql + text);
 
   write && writeDB();
+};
+
+const updateTable = (options, tableName = TABLE_NAME) => {
+  const {mid, title, feature, image} = options;
+  const sql = `UPDATE ${tableName} SET title = '${title}', feature = '${feature}', image = '${image}' WHERE mid = '${mid}';`;
+  getDB().run(sql);
+
+  writeDB();
+};
+
+const updateTextTable = (options) => {
+  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start'} = options;
+  const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}', color = '${color}', align = '${align}' `
+    + `WHERE mid = '${mid}';`;
+  getDB().run(text);
+
+  writeDB();
 };
 
 const deleteTable = like => {
@@ -176,10 +193,12 @@ export {
   queryAllTables,
   getTable,
   insertTable,
+  updateTable,
   deleteTable,
   getDataByColumn,
   getColumnByTable,
   getDataListByColumn,
   getSpecialDataListByColumn,
+  updateTextTable,
   insertLog
 };

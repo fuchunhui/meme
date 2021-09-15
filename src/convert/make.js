@@ -29,7 +29,6 @@ const make = (text, options) => {
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textAlign = align;
-      ctx.textBaseline = 'top';
       ctx.fillText(text, x, y, max || width);
 
       base64 = canvas.toDataURL(type);
