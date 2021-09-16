@@ -14,6 +14,23 @@ import { make } from './convert/make.js';
 import { formatMenu, formatNull } from './convert/format.js';
 import { send } from './service/index.js';
 export * from './service/router.js';
+export * from './export/backup.js';
+
+const special = (command, toid, text) => {
+  const commands = getSpecialDataListByColumn(command);
+  const specialCommand = commands.length > 0;
+
+  if (specialCommand) {
+    const index = Math.floor(Math.random() * commands.length);
+    const data = commands[index];
+    if (data.image) {
+      const base64 = make(text, data);
+      send(toid, base64);
+    }
+  }
+
+  return specialCommand;
+};
 
 const control = encryption => {
   const {fromid, toid, command, text} = parser(encryption);
@@ -67,22 +84,6 @@ const control = encryption => {
       });
     }
   }
-};
-
-const special = (command, toid, text) => {
-  const commands = getSpecialDataListByColumn(command);
-  const specialCommand = commands.length > 0;
-
-  if (specialCommand) {
-    const index = Math.floor(Math.random() * commands.length);
-    const data = commands[index];
-    if (data.image) {
-      const base64 = make(text, data);
-      send(toid, base64);
-    }
-  }
-
-  return specialCommand;
 };
 
 export default control;

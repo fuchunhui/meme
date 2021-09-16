@@ -1,7 +1,7 @@
 import { writeImg, make } from './src/convert/make.js';
 import { getSize } from './src/convert/size.js';
 import { initDB, getDataByColumn, getDataListByColumn, getTable } from './src/db/index.js';
-import main, {listen} from './src/main.js';
+import main, {listen, backup} from './src/main.js';
 
 // initDB();
 
@@ -35,5 +35,6 @@ const come = encryption => {
 
 export {
   come,
-  listen
+  listen,
+  backup
 };
