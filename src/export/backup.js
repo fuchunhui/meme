@@ -19,11 +19,11 @@ const getData = (tableName) => {
       color,
       align,
       max
-    }
+    };
   });
 
   return result;
-}
+};
 
 const saveData = (targetFile, fileList) => {
   const data = 'export default ' + JSON.stringify(fileList) + ';\n';
