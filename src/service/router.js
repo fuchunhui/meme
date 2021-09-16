@@ -25,12 +25,7 @@ const listen = app => {
   app.post('/image/save', (req, res) => {
     console.log('request: ', JSON.stringify(req.body));
     const data = updateText(req.body);
-
-    res.send({
-      data,
-      errNo: 0,
-      message: 'success'
-    });
+    res.send(data);
   });
 };
 

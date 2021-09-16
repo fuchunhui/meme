@@ -114,10 +114,14 @@ const updateTable = (options, tableName = TABLE_NAME) => {
 const updateTextTable = (options) => {
   const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start'} = options;
   const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}', color = '${color}', align = '${align}' `
-    + `WHERE mid = '${mid}';`;
-  getDB().run(text);
+    + `WHERE mid1 = '${mid}';`;
+  try {
+    getDB().run(text);
 
-  writeDB();
+    writeDB();
+  } catch (error) {
+    return error.toString();
+  }
 };
 
 const deleteTable = like => {

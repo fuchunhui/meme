@@ -6,6 +6,8 @@ import {
   TABLE_NAME,
   SPECIAL_TABLE
 } from '../db/index.js';
+import {emptySucess, error} from './ajax.js';
+import {UPDATE_TEXT_FAIL} from '../config/constant.js';
 
 const COMMON_ID = 'meme_common';
 const COMMON_TEXT = '常用';
@@ -78,8 +80,10 @@ const update = (options) => { // TODO 尚未区分title image，目前一个接�
 
 const updateText = (options) => {
   const data = updateTextTable(options);
-  console.log('updateText----------->'); // TODO 0916 返回值未处理
-  return data;
+  if (data) {
+    return error(data, UPDATE_TEXT_FAIL);
+  }
+  return emptySucess();
 };
 
 export {
