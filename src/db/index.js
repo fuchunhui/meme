@@ -4,7 +4,7 @@
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
-import information from '../config/information.js';
+import information from '../config/common.js';
 import special from '../config/special/index.js';
 
 export const TABLE_NAME = 'STORY';
