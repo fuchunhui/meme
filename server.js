@@ -10,10 +10,10 @@ app.use(express.text());
 app.use(express.raw());
 app.use(express.urlencoded({ extended: false }));
 
-app.all('*', (req, res, next) => {  
+app.all('*', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods','PUT,POST,GET,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS');
   res.header('X-Powered-By', '3.2.1');
   res.header('Content-Type', 'application/json;charset=utf-8');
   next();
@@ -25,8 +25,8 @@ listen(app);
 
 app.get('/test', (req, res) => {
   console.log(`url: ${req.path} 参数: ${JSON.stringify(req.query)}`);
-  res.send('test get请求');
-})
+  res.send('test get request.');
+});
 
 app.post('*', (req, res) => {
   console.log('request: ', JSON.stringify(req.body));

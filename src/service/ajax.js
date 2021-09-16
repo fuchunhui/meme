@@ -10,10 +10,10 @@ class AjaxResult {
   data = {};
   message = '';
 
-  constructor (errNo, data, message) {
+  constructor(errNo, data, message) {
     this.errNo = errNo;
     this.data = data;
-    this.message = message
+    this.message = message;
   }
 }
 
