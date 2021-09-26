@@ -1,5 +1,6 @@
 import express from 'express';
 import md5 from 'md5';
+import path from 'path';
 import {come, listen} from './app.js';
 import config from './src/config/index.js';
 
@@ -10,6 +11,9 @@ app.use(express.text());
 app.use(express.raw());
 app.use(express.urlencoded({ extended: false }));
 
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.all('*', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -19,12 +23,10 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-app.use(express.static('public'));
-
 listen(app);
 
 app.get('/test', (req, res) => {
-  console.log(`url: ${req.path} 参数: ${JSON.stringify(req.query)}`);
+  console.log(`url: ${req.path} request: ${JSON.stringify(req.query)}`);
   res.send('test get request.');
 });
 
