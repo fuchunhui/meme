@@ -1,7 +1,6 @@
 import express from 'express';
-import md5 from 'md5';
-import {come, listen} from './app.js';
-import config from './src/config/index.js';
+import {listen} from './app.js';
+import path from 'path';
 
 const app = express();
 
@@ -19,35 +18,18 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-app.use(express.static('public'));
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, 'public')));
 
 listen(app);
 
 app.get('/test', (req, res) => {
-  console.log(`url: ${req.path} 参数: ${JSON.stringify(req.query)}`);
+  console.log(`url: ${req.path} request: ${JSON.stringify(req.query)}`);
   res.send('test get request.');
 });
 
 app.post('*', (req, res) => {
   console.log('request: ', JSON.stringify(req.body));
-
-  if (req.body.echostr) {
-    const {signature, rn, timestamp, echostr} = req.body;
-    const str = md5(`${rn}${timestamp}${config.token}`);
-    if (signature === str) {
-      res.send(echostr);
-    } else {
-      res.send('check signature fail');
-    }
-
-    return;
-  }
-
-  const data = req.body;
-  if (!data) {
-    console.error('req.body不见了');
-  }
-  come(data);
 });
 
 app.listen(8080);

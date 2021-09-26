@@ -24,3 +24,5 @@ yarn-error.log*
 .draft
 
 assets/*
+
+.vercel
