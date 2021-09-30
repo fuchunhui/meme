@@ -27,6 +27,14 @@ const listen = app => {
     const data = updateText(req.body);
     res.send(data);
   });
+
+  app.get('/image/download', (req, res) => {
+    console.log('备用接口');
+  });
+
+  app.get('/image/export', (req, res) => {
+    console.log('备用接口');
+  });
 };
 
 export {
