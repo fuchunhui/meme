@@ -26,3 +26,4 @@ yarn-error.log*
 assets/*
 
 .vercel
+package-lock.json
