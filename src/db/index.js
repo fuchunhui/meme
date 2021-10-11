@@ -98,17 +98,25 @@ const insertTable = (options, write = true, special = false) => {
   const sql = `INSERT INTO ${special ? SPECIAL_TABLE : TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}');`;
-  getDB().run(sql + text);
 
-  write && writeDB();
+  try {
+    getDB().run(sql + text);
+    write && writeDB();
+  } catch (error) {
+    return error.toString();
+  }
 };
 
 const updateTable = (options, tableName = TABLE_NAME) => {
   const {mid, title, feature, image} = options;
   const sql = `UPDATE ${tableName} SET title = '${title}', feature = '${feature}', image = '${image}' WHERE mid = '${mid}';`;
-  getDB().run(sql);
 
-  writeDB();
+  try {
+    getDB().run(sql);
+    writeDB();
+  } catch (error) {
+    return error.toString();
+  }
 };
 
 const updateTextTable = (options) => {

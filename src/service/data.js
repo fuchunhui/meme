@@ -1,5 +1,6 @@
 import {
   getTable,
+  insertTable,
   updateTable,
   updateTextTable,
   getDataByColumn,
@@ -71,11 +72,13 @@ const open = (mid, type) => {
   return {mid, title, feature, image, x, y, max, font, color, align};
 };
 
-const update = (options) => { // TODO 尚未区分title image，目前一个接口，需做拆分
-  const {type, ...rest} = options;
-  const tabName = TabMap[type];
-
-  return updateTable(rest, tabName);
+const create = (options) => {
+  const {create, ...rest} = options;
+  const data = create ? insertTable(rest) : updateTable(rest);
+  if (data) {
+    return error(data, UPDATE_TEXT_FAIL);
+  }
+  return emptySucess();
 };
 
 const updateText = (options) => {
@@ -89,6 +92,6 @@ const updateText = (options) => {
 export {
   getCatalog,
   open,
-  update,
+  create,
   updateText
 };
