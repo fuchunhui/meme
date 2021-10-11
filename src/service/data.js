@@ -1,13 +1,17 @@
 import {
   getTable,
+  insertTable,
   updateTable,
   updateTextTable,
   getDataByColumn,
   TABLE_NAME,
   SPECIAL_TABLE
 } from '../db/index.js';
-import {emptySucess, error} from './ajax.js';
-import {UPDATE_TEXT_FAIL} from '../config/constant.js';
+import {emptySucess, sucess, error} from './ajax.js';
+import {
+  UPDATE_TEXT_FAIL,
+  CREATE_REPEAT_TITLE
+} from '../config/constant.js';
 
 const COMMON_ID = 'meme_common';
 const COMMON_TEXT = '常用';
@@ -71,11 +75,30 @@ const open = (mid, type) => {
   return {mid, title, feature, image, x, y, max, font, color, align};
 };
 
-const update = (options) => { // TODO 尚未区分title image，目前一个接口，需做拆分
-  const {type, ...rest} = options;
-  const tabName = TabMap[type];
+const create = (options) => {
+  const result = getDataByColumn(options.title, 'title', TABLE_NAME);
+  if (result.mid) {
+    return error({
+      title: options.title
+    }, CREATE_REPEAT_TITLE);
+  }
 
-  return updateTable(rest, tabName);
+  const data = insertTable(options);
+  if (data.error) {
+    return error(data.data, UPDATE_TEXT_FAIL);
+  }
+
+  return sucess({
+    mid: data.data
+  });
+};
+
+const update = (options) => {
+  const data = updateTable(options);
+  if (data) {
+    return error(data, UPDATE_TEXT_FAIL);
+  }
+  return emptySucess();
 };
 
 const updateText = (options) => {
@@ -89,6 +112,7 @@ const updateText = (options) => {
 export {
   getCatalog,
   open,
+  create,
   update,
   updateText
 };
