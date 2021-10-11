@@ -102,8 +102,15 @@ const insertTable = (options, write = true, special = false) => {
   try {
     getDB().run(sql + text);
     write && writeDB();
+    return {
+      error: false,
+      data: mid
+    };
   } catch (error) {
-    return error.toString();
+    return {
+      error: true,
+      data: error.toString()
+    };
   }
 };
 

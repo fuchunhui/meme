@@ -7,8 +7,11 @@ import {
   TABLE_NAME,
   SPECIAL_TABLE
 } from '../db/index.js';
-import {emptySucess, error} from './ajax.js';
-import {UPDATE_TEXT_FAIL} from '../config/constant.js';
+import {emptySucess, sucess, error} from './ajax.js';
+import {
+  UPDATE_TEXT_FAIL,
+  CREATE_REPEAT_TITLE
+} from '../config/constant.js';
 
 const COMMON_ID = 'meme_common';
 const COMMON_TEXT = '常用';
@@ -73,8 +76,25 @@ const open = (mid, type) => {
 };
 
 const create = (options) => {
-  const {create, ...rest} = options;
-  const data = create ? insertTable(rest) : updateTable(rest);
+  const result = getDataByColumn(options.title, 'title', TABLE_NAME);
+  if (result.mid) {
+    return error({
+      title: options.title
+    }, CREATE_REPEAT_TITLE);
+  }
+
+  const data = insertTable(options);
+  if (data.error) {
+    return error(data.data, UPDATE_TEXT_FAIL);
+  }
+
+  return sucess({
+    mid: data.data
+  });
+};
+
+const update = (options) => {
+  const data = updateTable(options);
   if (data) {
     return error(data, UPDATE_TEXT_FAIL);
   }
@@ -93,5 +113,6 @@ export {
   getCatalog,
   open,
   create,
+  update,
   updateText
 };
