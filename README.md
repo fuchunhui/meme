@@ -14,4 +14,8 @@ way2: by http, get img.
 2. 在对应test目录下生成`test.js`。
 
 ### 数据导入
-1. 目前仅支持脚本方式。
+1. `npm run import` 支持数据批量导入
+2. 交互式单图导入，访问Web端。
+
+### 数据导出
+1. `npm run backup` 数据备份到本地
