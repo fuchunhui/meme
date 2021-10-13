@@ -23,12 +23,16 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-listen(app);
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
 
 app.get('/test', (req, res) => {
   console.log(`url: ${req.path} request: ${JSON.stringify(req.query)}`);
   res.send('test get request.');
 });
+
+listen(app);
 
 app.post('*', (req, res) => {
   console.log('request: ', JSON.stringify(req.body));

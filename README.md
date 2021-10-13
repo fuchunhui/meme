@@ -5,6 +5,8 @@ way1: by text, send message.
 
 way2: by http, get img.
 
+文章详细介绍，详见[掘金-水鳜鱼肥](https://juejin.cn/post/7018395454962401288)
+
 ### roadmap
 1. node 服务接收请求参数。
 2. 见.draft目录
