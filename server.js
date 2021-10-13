@@ -9,6 +9,9 @@ app.use(express.text());
 app.use(express.raw());
 app.use(express.urlencoded({ extended: false }));
 
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.all('*', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -17,9 +20,6 @@ app.all('*', (req, res, next) => {
   res.header('Content-Type', 'application/json;charset=utf-8');
   next();
 });
-
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
