@@ -21,15 +21,21 @@ app.all('*', (req, res, next) => {
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));
 
-listen(app);
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
 
 app.get('/test', (req, res) => {
   console.log(`url: ${req.path} request: ${JSON.stringify(req.query)}`);
   res.send('test get request.');
 });
 
+listen(app);
+
 app.post('*', (req, res) => {
   console.log('request: ', JSON.stringify(req.body));
 });
 
-app.listen(8080);
+app.listen(8080, () => {
+  console.log('server start.');
+});
