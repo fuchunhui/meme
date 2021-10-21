@@ -4597,7 +4597,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
       const fileList = event.clipboardData.files;
       handleFiles(fileList);
     };
-    const MAX_SIZE = 2 * 1024 * 1024;
+    const MAX_SIZE = 1 * 1024 * 1024;
     const IMAGE_TYPE = /^image\//;
     const handleFiles = (fileList) => {
       if (fileList.length !== 1) {
@@ -4611,7 +4611,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
         return false;
       }
       if (size2 > MAX_SIZE) {
-        toast("\u6587\u4EF6\u8D85\u8FC7\u6700\u5927\u9650\u52362M\uFF0C\u8BF7\u91CD\u65B0\u9009\u62E9");
+        toast("\u6587\u4EF6\u8D85\u8FC7\u6700\u5927\u9650\u52361M\uFF0C\u8BF7\u91CD\u65B0\u9009\u62E9");
         return false;
       }
       const reader = new FileReader();
