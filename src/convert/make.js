@@ -16,7 +16,7 @@ const make = (text, options) => {
   }
 
   if (config.extension.bmp && type === 'image/bmp') {
-    convertBMP(base64Img); // 调用python程序处理
+    convertBMP(base64Img); // TODO 调用python程序处理
   }
 
   if (NOT_SUPPORT.includes(type)) {
