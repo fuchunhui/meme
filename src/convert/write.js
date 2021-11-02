@@ -15,7 +15,7 @@ const writeImg = (base64Img, fileName = named(), targetDir = 'output') => {
 };
 
 const removeImg = path => {
-  console.log('file remove.');
+  fs.rmSync(path);
 }
 
 export {

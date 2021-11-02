@@ -1,7 +1,5 @@
 import pkg from 'canvas';
 import { getSize } from './size.js';
-import config from '../config/index.js';
-import { convertBMP } from '../process/index.js';
 
 const { createCanvas, Image } = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
@@ -11,15 +9,7 @@ const make = (text, options) => {
   const parts = base64Img.split(';base64,');
   const type = parts[0].split(':').pop();
 
-  if (text === '') {
-    return base64Img;
-  }
-
-  if (config.extension.bmp && type === 'image/bmp') {
-    convertBMP(base64Img); // TODO 调用python程序处理
-  }
-
-  if (NOT_SUPPORT.includes(type)) {
+  if (NOT_SUPPORT.includes(type) || text === '') {
     return base64Img;
   }
 
@@ -50,14 +40,6 @@ const make = (text, options) => {
   return base64;
 };
 
-// const writeImg = base64Img => {
-//   const parts = base64Img.split(';base64,');
-//   const base64Image = parts.pop();
-//   const type = parts.pop().split('/').pop();
-//   const fileName = `meme_${new Date().getTime()}`.padEnd(18, '0');
-//   fs.writeFileSync(`${fileName}.${type}`, base64Image, {encoding: 'base64'});
-// };
-
 const cook = () => {
   // 用于制作图片，修剪操作。
   // 图片的剪切，打补丁等操作。
@@ -65,5 +47,4 @@ const cook = () => {
 
 export {
   make
-  // writeImg
 };

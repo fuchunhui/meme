@@ -12,7 +12,5 @@ export default {
   server,
   traget,
   key,
-  extension: {
-    bmp: true // 默认false，依赖于python环境处理
-  }
+  extension: {}
 };

@@ -20,7 +20,7 @@ if (!fs.existsSync(tardir)) {
   process.exit(1);
 }
 
-const EXT_RULES = ['.jpeg', '.jpg', '.png', '.gif', '.bmp']; // 目前支持格式列表
+const EXT_RULES = ['.jpeg', '.jpg', '.png', '.gif']; // 目前支持格式列表
 
 const appendBase64 = (buffer, ext) => {
   return `data:image${ext.replace('.', '/')};base64,${buffer}`;
@@ -31,7 +31,7 @@ let fileList = [];
 fs.readdir(tardir, (err, files) => {
   files.forEach(item => {
     const filePath = path.resolve(tardir, item);
-    const ext  = path.extname(filePath);
+    const ext = path.extname(filePath);
     if (!EXT_RULES.includes(ext)) {
       return;
     }
