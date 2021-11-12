@@ -1970,6 +1970,35 @@ const updateSlots = (instance, children, optimized) => {
     }
   }
 };
+function withDirectives(vnode, directives) {
+  const internalInstance = currentRenderingInstance;
+  if (internalInstance === null) {
+    return vnode;
+  }
+  const instance = internalInstance.proxy;
+  const bindings = vnode.dirs || (vnode.dirs = []);
+  for (let i = 0; i < directives.length; i++) {
+    let [dir, value, arg, modifiers = EMPTY_OBJ] = directives[i];
+    if (isFunction$1(dir)) {
+      dir = {
+        mounted: dir,
+        updated: dir
+      };
+    }
+    if (dir.deep) {
+      traverse(value);
+    }
+    bindings.push({
+      dir,
+      instance,
+      value,
+      oldValue: void 0,
+      arg,
+      modifiers
+    });
+  }
+  return vnode;
+}
 function invokeDirectiveHook(vnode, prevVNode, instance, name2) {
   const bindings = vnode.dirs;
   const oldBindings = prevVNode && prevVNode.dirs;
@@ -3273,6 +3302,36 @@ function renderList(source2, renderItem, cache, index2) {
   }
   return ret;
 }
+function renderSlot(slots, name2, props = {}, fallback, noSlotted) {
+  if (currentRenderingInstance.isCE) {
+    return createVNode("slot", name2 === "default" ? null : { name: name2 }, fallback && fallback());
+  }
+  let slot = slots[name2];
+  if (slot && slot._c) {
+    slot._d = false;
+  }
+  openBlock();
+  const validSlotContent = slot && ensureValidVNode(slot(props));
+  const rendered = createBlock(Fragment, { key: props.key || `_${name2}` }, validSlotContent || (fallback ? fallback() : []), validSlotContent && slots._ === 1 ? 64 : -2);
+  if (!noSlotted && rendered.scopeId) {
+    rendered.slotScopeIds = [rendered.scopeId + "-s"];
+  }
+  if (slot && slot._c) {
+    slot._d = true;
+  }
+  return rendered;
+}
+function ensureValidVNode(vnodes) {
+  return vnodes.some((child) => {
+    if (!isVNode(child))
+      return true;
+    if (child.type === Comment)
+      return false;
+    if (child.type === Fragment && !ensureValidVNode(child.children))
+      return false;
+    return true;
+  }) ? vnodes : null;
+}
 const getPublicInstance = (i) => {
   if (!i)
     return null;
@@ -4273,6 +4332,44 @@ const withKeys = (fn, modifiers) => {
     }
   };
 };
+const vShow = {
+  beforeMount(el, { value }, { transition }) {
+    el._vod = el.style.display === "none" ? "" : el.style.display;
+    if (transition && value) {
+      transition.beforeEnter(el);
+    } else {
+      setDisplay(el, value);
+    }
+  },
+  mounted(el, { value }, { transition }) {
+    if (transition && value) {
+      transition.enter(el);
+    }
+  },
+  updated(el, { value, oldValue }, { transition }) {
+    if (!value === !oldValue)
+      return;
+    if (transition) {
+      if (value) {
+        transition.beforeEnter(el);
+        setDisplay(el, true);
+        transition.enter(el);
+      } else {
+        transition.leave(el, () => {
+          setDisplay(el, false);
+        });
+      }
+    } else {
+      setDisplay(el, value);
+    }
+  },
+  beforeUnmount(el, { value }) {
+    setDisplay(el, value);
+  }
+};
+function setDisplay(el, value) {
+  el.style.display = value ? el._vod : "none";
+}
 const rendererOptions = extend$1({ patchProp }, nodeOps);
 let renderer;
 function ensureRenderer() {
@@ -4307,10 +4404,10 @@ function normalizeContainer(container) {
   return container;
 }
 var Side_vue_vue_type_style_index_0_lang = "";
-const _hoisted_1$6 = { class: "side" };
-const _hoisted_2$3 = { class: "side-content-title" };
-const _hoisted_3$3 = ["onClick"];
-const _sfc_main$8 = /* @__PURE__ */ defineComponent({
+const _hoisted_1$8 = { class: "side" };
+const _hoisted_2$5 = { class: "side-content-title" };
+const _hoisted_3$5 = ["onClick"];
+const _sfc_main$a = /* @__PURE__ */ defineComponent({
   props: {
     catalogList: { type: Array, required: true },
     current: { type: String, required: true }
@@ -4323,13 +4420,13 @@ const _sfc_main$8 = /* @__PURE__ */ defineComponent({
       emit("change", __spreadValues({ type }, child));
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$6, [
+      return openBlock(), createElementBlock("div", _hoisted_1$8, [
         (openBlock(true), createElementBlock(Fragment, null, renderList(unref(catalogList), (item) => {
           return openBlock(), createElementBlock("div", {
             key: item.id,
             class: "side-content"
           }, [
-            createBaseVNode("p", _hoisted_2$3, toDisplayString(item.text), 1),
+            createBaseVNode("p", _hoisted_2$5, toDisplayString(item.text), 1),
             (openBlock(true), createElementBlock(Fragment, null, renderList(item.children, (child) => {
               return openBlock(), createElementBlock("div", {
                 key: child.mid,
@@ -4338,7 +4435,7 @@ const _sfc_main$8 = /* @__PURE__ */ defineComponent({
                   "side-content-cell-active": __props.current === child.mid
                 }),
                 onClick: ($event) => showCell(item.type, child)
-              }, toDisplayString(child.title), 11, _hoisted_3$3);
+              }, toDisplayString(child.title), 11, _hoisted_3$5);
             }), 128))
           ]);
         }), 128))
@@ -4347,14 +4444,7 @@ const _sfc_main$8 = /* @__PURE__ */ defineComponent({
   }
 });
 var Button_vue_vue_type_style_index_0_lang = "";
-var _export_sfc = (sfc, props) => {
-  for (const [key, val] of props) {
-    sfc[key] = val;
-  }
-  return sfc;
-};
-const _sfc_main$7 = defineComponent({
-  name: "Button",
+const _sfc_main$9 = /* @__PURE__ */ defineComponent({
   props: {
     label: {
       type: String,
@@ -4365,26 +4455,31 @@ const _sfc_main$7 = defineComponent({
       default: false
     }
   },
-  setup(props) {
-    const { label } = toRefs(props);
-    return {
-      localLabel: label
+  setup(__props) {
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("button", {
+        class: normalizeClass([
+          "meme-button",
+          {
+            "disabled": __props.disabled
+          }
+        ])
+      }, [
+        renderSlot(_ctx.$slots, "default", {}, () => [
+          createTextVNode(toDisplayString(__props.label), 1)
+        ])
+      ], 2);
     };
   }
 });
-function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
-  return openBlock(), createElementBlock("button", {
-    class: normalizeClass([
-      "meme-button",
-      {
-        "disabled": _ctx.disabled
-      }
-    ])
-  }, toDisplayString(_ctx.localLabel), 3);
-}
-var MemeButton = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$1]]);
 var Input_vue_vue_type_style_index_0_lang = "";
-const _sfc_main$6 = defineComponent({
+var _export_sfc = (sfc, props) => {
+  for (const [key, val] of props) {
+    sfc[key] = val;
+  }
+  return sfc;
+};
+const _sfc_main$8 = defineComponent({
   name: "Input",
   props: {
     modelValue: {
@@ -4416,7 +4511,7 @@ const _sfc_main$6 = defineComponent({
     };
   }
 });
-const _hoisted_1$5 = ["title", "value"];
+const _hoisted_1$7 = ["title", "value"];
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createElementBlock("input", {
     ref: "input",
@@ -4433,9 +4528,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       var _a;
       return (_a = _ctx.input) == null ? void 0 : _a.blur();
     }, ["enter"]))
-  }, null, 42, _hoisted_1$5);
+  }, null, 42, _hoisted_1$7);
 }
-var MemeInput = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render]]);
+var MemeInput = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render]]);
 var Loading_vue_vue_type_style_index_0_lang = "";
 const MIN = 500;
 const INTERVAL = 300;
@@ -4500,10 +4595,10 @@ defineComponent({
   }
 });
 var Radio_vue_vue_type_style_index_0_lang = "";
-const _hoisted_1$4 = { class: "meme-radio" };
-const _hoisted_2$2 = ["name", "value", "checked"];
-const _hoisted_3$2 = { class: "meme-radio-label" };
-const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+const _hoisted_1$6 = { class: "meme-radio" };
+const _hoisted_2$4 = ["name", "value", "checked"];
+const _hoisted_3$4 = { class: "meme-radio-label" };
+const _sfc_main$7 = /* @__PURE__ */ defineComponent({
   props: {
     label: { type: String, required: true },
     name: { type: String, required: true },
@@ -4516,7 +4611,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
       emit("toggle", value);
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("label", _hoisted_1$4, [
+      return openBlock(), createElementBlock("label", _hoisted_1$6, [
         createBaseVNode("input", {
           class: "meme-radio-input",
           type: "radio",
@@ -4524,22 +4619,22 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
           value: __props.value,
           checked: __props.checked,
           onChange: _cache[0] || (_cache[0] = ($event) => changeValue(__props.value))
-        }, null, 40, _hoisted_2$2),
-        createBaseVNode("span", _hoisted_3$2, toDisplayString(__props.label), 1)
+        }, null, 40, _hoisted_2$4),
+        createBaseVNode("span", _hoisted_3$4, toDisplayString(__props.label), 1)
       ]);
     };
   }
 });
 var FileUpload_vue_vue_type_style_index_0_lang = "";
-const _hoisted_1$3 = { class: "meme-file-upload" };
-const _hoisted_2$1 = { class: "file-button" };
-const _hoisted_3$1 = /* @__PURE__ */ createBaseVNode("i", { class: "file-glyphicon" }, null, -1);
+const _hoisted_1$5 = { class: "meme-file-upload" };
+const _hoisted_2$3 = { class: "file-button" };
+const _hoisted_3$3 = /* @__PURE__ */ createBaseVNode("i", { class: "file-glyphicon" }, null, -1);
 const _hoisted_4$1 = /* @__PURE__ */ createBaseVNode("span", null, "UPLOAD FILE", -1);
 const _hoisted_5$1 = /* @__PURE__ */ createBaseVNode("i", { class: "file-tips" }, "Drop files here to upload", -1);
 const _hoisted_6$1 = [
   _hoisted_5$1
 ];
-const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+const _sfc_main$6 = /* @__PURE__ */ defineComponent({
   emits: ["change"],
   setup(__props, { emit }) {
     const fileChange = (event) => {
@@ -4569,7 +4664,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
       const fileList = event.clipboardData.files;
       handleFiles(fileList);
     };
-    const MAX_SIZE = 2 * 1024 * 1024;
+    const MAX_SIZE = 1 * 1024 * 1024;
     const IMAGE_TYPE = /^image\//;
     const handleFiles = (fileList) => {
       if (fileList.length !== 1) {
@@ -4583,7 +4678,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
         return false;
       }
       if (size2 > MAX_SIZE) {
-        toast("\u6587\u4EF6\u8D85\u8FC7\u6700\u5927\u9650\u52362M\uFF0C\u8BF7\u91CD\u65B0\u9009\u62E9");
+        toast("\u6587\u4EF6\u8D85\u8FC7\u6700\u5927\u9650\u52361M\uFF0C\u8BF7\u91CD\u65B0\u9009\u62E9");
         return false;
       }
       const reader = new FileReader();
@@ -4606,15 +4701,16 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
       });
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$3, [
-        createBaseVNode("div", _hoisted_2$1, [
-          _hoisted_3$1,
+      return openBlock(), createElementBlock("div", _hoisted_1$5, [
+        createBaseVNode("div", _hoisted_2$3, [
+          _hoisted_3$3,
           _hoisted_4$1,
           createBaseVNode("input", {
             class: "file-input",
             type: "file",
             name: "file",
             accept: "image/*",
+            title: "",
             onChange: fileChange
           }, null, 32)
         ]),
@@ -4631,6 +4727,98 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
     };
   }
 });
+var DiceButton_vue_vue_type_style_index_0_lang = "";
+const _hoisted_1$4 = {
+  version: "1.1",
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 32 32"
+};
+const _hoisted_2$2 = /* @__PURE__ */ createBaseVNode("title", null, "dice", -1);
+const _hoisted_3$2 = ["fill"];
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  props: {
+    color: {
+      type: String,
+      default: "#FF0000"
+    }
+  },
+  emits: ["click"],
+  setup(__props, { emit }) {
+    const props = __props;
+    const localColor = computed(() => {
+      return ["transparent", "#FFFFFF"].includes(props.color) ? "gray" : props.color;
+    });
+    const change = () => {
+      emit("click");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createBlock(unref(_sfc_main$9), {
+        class: "dice-button",
+        u: "icon",
+        onClick: change
+      }, {
+        default: withCtx(() => [
+          (openBlock(), createElementBlock("svg", _hoisted_1$4, [
+            _hoisted_2$2,
+            createBaseVNode("path", {
+              fill: unref(localColor),
+              d: "M27 6h-16c-2.75 0-5 2.25-5 5v16c0 2.75 2.25 5 5 5h16c2.75 0 5-2.25 5-5v-16c0-2.75-2.25-5-5-5zM13 28c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zM13 16c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zM19 22c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zM25 28c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zM25 16c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zM25.899 4c-0.467-2.275-2.491-4-4.899-4h-16c-2.75 0-5 2.25-5 5v16c0 2.408 1.725 4.432 4 4.899v-19.899c0-1.1 0.9-2 2-2h19.899z"
+            }, null, 8, _hoisted_3$2)
+          ]))
+        ]),
+        _: 1
+      });
+    };
+  }
+});
+var PickerButton_vue_vue_type_style_index_0_lang = "";
+const _hoisted_1$3 = {
+  version: "1.1",
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 32 32"
+};
+const _hoisted_2$1 = /* @__PURE__ */ createBaseVNode("title", null, "picker", -1);
+const _hoisted_3$1 = ["fill"];
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  props: {
+    color: {
+      type: String,
+      default: "#FF0000"
+    }
+  },
+  emits: ["click"],
+  setup(__props, { emit }) {
+    const props = __props;
+    const localColor = computed(() => {
+      return ["transparent", "#FFFFFF"].includes(props.color) ? "gray" : props.color;
+    });
+    const change = () => {
+      emit("click");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createBlock(unref(_sfc_main$9), {
+        class: "picker-button",
+        u: "icon",
+        onClick: change
+      }, {
+        default: withCtx(() => [
+          (openBlock(), createElementBlock("svg", _hoisted_1$3, [
+            _hoisted_2$1,
+            createBaseVNode("path", {
+              fill: unref(localColor),
+              d: "M30.828 1.172c-1.562-1.562-4.095-1.562-5.657 0l-5.379 5.379-3.793-3.793-4.243 4.243 3.326 3.326-14.754 14.754c-0.252 0.252-0.358 0.592-0.322 0.921h-0.008v5c0 0.552 0.448 1 1 1h5c0 0 0.083 0 0.125 0 0.288 0 0.576-0.11 0.795-0.329l14.754-14.754 3.326 3.326 4.243-4.243-3.793-3.793 5.379-5.379c1.562-1.562 1.562-4.095 0-5.657zM5.409 30h-3.409v-3.409l14.674-14.674 3.409 3.409-14.674 14.674z"
+            }, null, 8, _hoisted_3$1)
+          ]))
+        ]),
+        _: 1
+      });
+    };
+  }
+});
 var Property_vue_vue_type_style_index_0_lang = "";
 const _hoisted_1$2 = { class: "property" };
 const _sfc_main$3 = /* @__PURE__ */ defineComponent({
@@ -4640,7 +4828,7 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
     color: { type: String, required: true },
     align: { type: String, required: true }
   },
-  emits: ["change"],
+  emits: ["change", "pick"],
   setup(__props, { emit }) {
     const props = __props;
     const injectTtext = inject("text");
@@ -4659,6 +4847,13 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
       param[type] = ["color", "align"].includes(type) ? value : parseInt(value);
       emit("change", param);
     };
+    const changeColor = () => {
+      const color2 = "#" + Math.floor(Math.random() * 16777215).toString(16);
+      changeValue(color2, "color");
+    };
+    const pickColor = () => {
+      emit("pick");
+    };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1$2, [
         createVNode(unref(MemeInput), {
@@ -4676,14 +4871,22 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
           value: unref(color),
           "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => changeValue($event, "color"))
         }, null, 8, ["value"]),
-        createVNode(unref(_sfc_main$5), {
+        createVNode(_sfc_main$5, {
+          color: unref(color),
+          onClick: changeColor
+        }, null, 8, ["color"]),
+        createVNode(_sfc_main$4, {
+          color: unref(color),
+          onClick: pickColor
+        }, null, 8, ["color"]),
+        createVNode(unref(_sfc_main$7), {
           label: "start",
           name: "align",
           value: "start",
           checked: unref(alignValue),
           onToggle: _cache[3] || (_cache[3] = ($event) => changeValue($event, "align"))
         }, null, 8, ["checked"]),
-        createVNode(unref(_sfc_main$5), {
+        createVNode(unref(_sfc_main$7), {
           label: "end",
           name: "align",
           value: "end",
@@ -4723,6 +4926,22 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
     const updateStatus = ref(true);
     const noImage = ref(true);
     let backStory = null;
+    const pickStatus = ref(false);
+    const showLayer = ref(false);
+    const layerRef = ref(null);
+    const SIZE = 11;
+    const SCALE = 14;
+    const DW = SCALE * SIZE;
+    const DH = SCALE * SIZE;
+    const OFFSET = SCALE;
+    const points = (() => {
+      const list = [];
+      for (let i = 1; i < SIZE; i++) {
+        list.push([i, 0, i, SIZE]);
+        list.push([0, i, SIZE, i]);
+      }
+      return list.map((item) => item.map((num) => num * SCALE));
+    })();
     const text = ref("\u91D1\u9986\u957F");
     const updateText = (value) => {
       text.value = value;
@@ -4753,6 +4972,9 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       const parts = base64.split(";base64,");
       const type2 = ((_a = parts[0].match(/[a-z]+$/g)) == null ? void 0 : _a[0]) || "png";
       return type2;
+    });
+    const localTitle = computed(() => {
+      return `${localStory.value.title}.${type.value}`;
     });
     const img = new Image();
     const makeCanvas = () => {
@@ -4846,7 +5068,12 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       } else {
         updateStatus.value = true;
         noImage.value = true;
-        updateImage(backStory);
+        if (backStory) {
+          updateImage(backStory);
+          backStory = null;
+        } else {
+          makeCanvas();
+        }
       }
     };
     const download = () => {
@@ -4868,6 +5095,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         if (!noImage.value) {
           emit("create", localStory.value);
           updateStatus.value = true;
+          noImage.value = true;
         }
       }
     };
@@ -4903,36 +5131,118 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
     const updateImage = (value) => {
       emit("replace", value);
     };
+    const pick = () => {
+      pickStatus.value = true;
+    };
+    const drawGrid = (ctx) => {
+      ctx.imageSmoothingEnabled = false;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.strokeStyle = "#000000";
+      ctx.arc(SIZE * SCALE / 2, SIZE * SCALE / 2, SIZE * SCALE / 2 - 1, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.clip();
+      ctx.strokeStyle = "#D6D6D6";
+      points.forEach((item) => {
+        const { 0: sx, 1: sy, 2: dx, 3: dy } = item;
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(dx, dy);
+      });
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.strokeStyle = "#FF0000";
+      ctx.rect((SIZE - 1) * SCALE / 2, (SIZE - 1) * SCALE / 2, 1 * SCALE, 1 * SCALE);
+      ctx.stroke();
+    };
+    const drawLayer = (x, y) => {
+      const canvas = canvasRef.value;
+      const targetCanvas = layerRef.value;
+      targetCanvas.style.left = `${x + OFFSET}px`;
+      targetCanvas.style.top = `${y + OFFSET}px`;
+      const ctx = targetCanvas.getContext("2d");
+      const sx = Math.min(Math.max(0, x - 5), canvas.width - SIZE);
+      const sy = Math.min(Math.max(0, y - 5), canvas.height - SIZE);
+      ctx.clearRect(0, 0, DW, DH);
+      ctx.drawImage(canvas, sx, sy, SIZE, SIZE, 0, 0, DW, DH);
+      drawGrid(ctx);
+    };
+    const pickMousemove = async (event) => {
+      if (!pickStatus.value) {
+        return false;
+      }
+      const { offsetX, offsetY } = event;
+      if (offsetX < 0 || offsetY < 0) {
+        return;
+      }
+      showLayer.value = true;
+      drawLayer(offsetX, offsetY);
+    };
+    const pickMouseleave = () => {
+      if (!pickStatus.value) {
+        return false;
+      }
+      showLayer.value = false;
+    };
+    const hexConvert = (imageData) => {
+      const hex = (num) => num.toString(16).padStart(2, "0");
+      const { 0: r, 1: g, 2: b, 3: a } = imageData.data;
+      return `#${hex(r)}${hex(g)}${hex(b)}${hex(a)}`.toUpperCase();
+    };
+    const computedData = (x, y) => {
+      const canvas = canvasRef.value;
+      const ctx = canvas.getContext("2d");
+      const imageData = ctx.getImageData(x, y, 1, 1);
+      return hexConvert(imageData);
+    };
+    const pickColor = (event) => {
+      if (!pickStatus.value) {
+        return false;
+      }
+      const { offsetX, offsetY } = event;
+      if (offsetX < 0 || offsetY < 0) {
+        return;
+      }
+      const color = computedData(offsetX, offsetY);
+      localStory.value.color = color;
+      showLayer.value = false;
+      pickStatus.value = false;
+    };
     onMounted(() => {
       makeCanvas();
     });
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1$1, [
         createBaseVNode("div", _hoisted_2, [
-          createBaseVNode("div", _hoisted_3, toDisplayString(`${unref(localStory).title}.${unref(type)}`), 1),
-          createVNode(unref(MemeButton), {
+          createBaseVNode("div", _hoisted_3, toDisplayString(unref(localTitle)), 1),
+          createVNode(unref(_sfc_main$9), {
             label: updateStatus.value ? "\u6DFB\u52A0" : "\u53D6\u6D88\u6DFB\u52A0",
             u: "primary",
             onClick: toggleAdd
           }, null, 8, ["label"]),
-          createVNode(unref(MemeButton), {
+          createVNode(unref(_sfc_main$9), {
             label: "\u4E0B\u8F7D",
             u: "primary",
             onClick: download
           })
         ]),
         !updateStatus.value && noImage.value ? (openBlock(), createElementBlock("div", _hoisted_4, [
-          createVNode(unref(_sfc_main$4), { onChange: fileChange })
+          createVNode(unref(_sfc_main$6), { onChange: fileChange })
         ])) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
           createBaseVNode("div", _hoisted_5, [
             createBaseVNode("canvas", {
-              class: "container-canvas",
               ref: (_value, _refs) => {
                 _refs["canvasRef"] = _value;
                 canvasRef.value = _value;
-              }
-            }, null, 512),
-            createBaseVNode("div", {
+              },
+              class: normalizeClass({
+                "container-canvas": true,
+                "container-pointer": pickStatus.value
+              }),
+              onMousemove: pickMousemove,
+              onMouseleave: pickMouseleave,
+              onClick: pickColor
+            }, null, 34),
+            withDirectives(createBaseVNode("div", {
               class: "container-area",
               ref: (_value, _refs) => {
                 _refs["areaRef"] = _value;
@@ -4949,18 +5259,35 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
                 },
                 onMousedown: mousedown
               }, null, 544)
-            ], 544)
+            ], 544), [
+              [vShow, !pickStatus.value]
+            ]),
+            withDirectives(createBaseVNode("canvas", {
+              ref: (_value, _refs) => {
+                _refs["layerRef"] = _value;
+                layerRef.value = _value;
+              },
+              class: "container-layer",
+              style: normalizeStyle({
+                borderRadius: `${SIZE * SCALE}px`
+              }),
+              width: DW,
+              height: DH
+            }, null, 4), [
+              [vShow, pickStatus.value && showLayer.value]
+            ])
           ]),
           createVNode(_sfc_main$3, {
             max: unref(localStory).max,
             color: unref(localStory).color,
             size: unref(size2),
             align: unref(localStory).align,
-            onChange: propertyChange
+            onChange: propertyChange,
+            onPick: pick
           }, null, 8, ["max", "color", "size", "align"])
         ], 64)),
         createBaseVNode("footer", _hoisted_6, [
-          createVNode(unref(MemeButton), {
+          createVNode(unref(_sfc_main$9), {
             label: updateStatus.value ? "\u66F4\u65B0" : "\u786E\u8BA4",
             u: "primary",
             onClick: updateData
@@ -6169,7 +6496,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     });
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1, [
-        createVNode(_sfc_main$8, {
+        createVNode(_sfc_main$a, {
           current: current.value,
           "catalog-list": catalogList.value,
           onChange: imageChange
