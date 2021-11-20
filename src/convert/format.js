@@ -24,7 +24,12 @@ const formatNull = () => {
   return unescape(warns[index]);
 };
 
+const formatHelp = () => {
+  // 帮助文档，介绍如何使用机器人
+};
+
 export {
   formatMenu,
-  formatNull
+  formatNull,
+  formatHelp
 };

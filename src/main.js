@@ -57,6 +57,7 @@ const control = encryption => {
 
     send(toid, content, 'MD');
   } else {
+    // TODO 增加对help指令的响应，给出帮助内容清单
     const commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
     if (commands.length > 1) {
       const commandList = commands.map(item => item.title);
@@ -76,6 +77,10 @@ const control = encryption => {
     } else {
       const content = formatNull();
       send(toid, content, 'TEXT');
+      // TODO 小概率事件，20%
+      // 随机触发其他机器人对话，否认自己的能力
+      // 让其他机器人给图
+      // 增加配置内容，开启和关闭
 
       insertLog({
         fromid,
