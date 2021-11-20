@@ -25,7 +25,13 @@ const formatNull = () => {
 };
 
 const formatHelp = () => {
-  // 帮助文档，介绍如何使用机器人
+  const list = [
+    '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
+    '- 菜单：`@imeme`，查询命令列表',
+    '- 使用：`@imeme 命令`，获取原始表情',
+    '- 文字：`@imeme 命令 文字`，返回拼接文字的表情'
+  ];
+  return list.join('\n');
 };
 
 export {

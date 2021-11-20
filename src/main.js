@@ -11,8 +11,10 @@ import {
   insertLog
 } from './db/index.js';
 import { make } from './convert/make.js';
-import { formatMenu, formatNull } from './convert/format.js';
+import { formatMenu, formatNull, formatHelp } from './convert/format.js';
 import { send } from './service/index.js';
+import {COMMAND_LIST} from './config/constant.js';
+
 export * from './service/router.js';
 export * from './export/backup.js';
 
@@ -57,7 +59,17 @@ const control = encryption => {
 
     send(toid, content, 'MD');
   } else {
-    // TODO 增加对help指令的响应，给出帮助内容清单
+    if (COMMAND_LIST.includes(command)) {
+      let content = '';
+      if (command === 'help') {
+        content = formatHelp();
+      } else if (command === 'special') { // 特殊节日、彩蛋命令
+        content = '彩蛋or💣';
+      }
+      send(toid, content, 'MD');
+      return;
+    }
+
     const commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
     if (commands.length > 1) {
       const commandList = commands.map(item => item.title);
