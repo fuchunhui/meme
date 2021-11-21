@@ -4,5 +4,6 @@ export const CREATE_REPEAT_TITLE = '已经存在相同标题的内容，你需�
 export const COMMAND_LIST = [
   'special', // 彩蛋菜单
   'help', // 帮助指令
-  'release' // 最近版本发布changelog
+  'release', // 最近版本发布changelog
+  '中秋'
 ];

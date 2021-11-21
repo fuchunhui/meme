@@ -5,6 +5,8 @@ import {
   updateText
 } from './data.js';
 
+import {COMMAND_LIST} from '../config/constant.js';
+
 const listen = app => {
   app.get('/image/catalog', (req, res) => {
     const data = getCatalog();
@@ -45,6 +47,14 @@ const listen = app => {
 
   app.get('/image/export', (req, res) => {
     console.log('备用接口');
+  });
+
+  app.get('/image/commands', (req, res) => {
+    res.send({
+      data: COMMAND_LIST,
+      errNo: 0,
+      message: 'success'
+    });
   });
 };
 
