@@ -4637,6 +4637,7 @@ const _hoisted_6$1 = [
 const _sfc_main$6 = /* @__PURE__ */ defineComponent({
   emits: ["change"],
   setup(__props, { emit }) {
+    const commands = inject("commands");
     const fileChange = (event) => {
       const fileList = event.target.files;
       if (!fileList) {
@@ -4675,6 +4676,11 @@ const _sfc_main$6 = /* @__PURE__ */ defineComponent({
       const { name: name2, size: size2, type } = file;
       if (!IMAGE_TYPE.test(type)) {
         toast(`\u5F53\u524D\u6587\u4EF6\u7C7B\u578B\u4E3A${type}\uFF0C\u7C7B\u578B\u4E0D\u7B26\uFF0C\u8BF7\u9009\u62E9\u56FE\u7247\u7C7B\u578B\uFF01`);
+        return false;
+      }
+      const fileName = name2.replace(/\.\w*$/g, "");
+      if (commands.value.includes(fileName)) {
+        toast(`\u5F53\u524D\u6587\u4EF6\u540D\u79F0\u3010${name2}\u3011\u4E0E\u7CFB\u7EDF\u9ED8\u8BA4\u5173\u952E\u6307\u4EE4\u3010${fileName}\u3011\u51B2\u7A81\uFF0C\u8BF7\u91CD\u547D\u540D\u4E0A\u4F20\u6587\u4EF6\uFF01`);
         return false;
       }
       if (size2 > MAX_SIZE) {
@@ -4826,25 +4832,24 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
     max: { type: Number, required: true },
     size: { type: Number, required: true },
     color: { type: String, required: true },
-    align: { type: String, required: true }
+    align: { type: String, required: true },
+    direction: { type: String, required: true }
   },
   emits: ["change", "pick"],
   setup(__props, { emit }) {
     const props = __props;
     const injectTtext = inject("text");
     const injectUpdateText = inject("updateText");
-    const { max, size: size2, color, align } = toRefs(props);
-    const alignValue = computed(() => {
-      return align.value === "start";
-    });
+    const { max, size: size2, color, align, direction } = toRefs(props);
     const changeValue = (value, type) => {
       const param = {
         max: max.value,
         size: size2.value,
         color: color.value,
-        align: align.value
+        align: align.value,
+        direction: direction.value
       };
-      param[type] = ["color", "align"].includes(type) ? value : parseInt(value);
+      param[type] = ["color", "align", "direction"].includes(type) ? value : parseInt(value);
       emit("change", param);
     };
     const changeColor = () => {
@@ -4883,25 +4888,76 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
           label: "start",
           name: "align",
           value: "start",
-          checked: unref(alignValue),
+          checked: unref(align) === "start",
           onToggle: _cache[3] || (_cache[3] = ($event) => changeValue($event, "align"))
+        }, null, 8, ["checked"]),
+        createVNode(unref(_sfc_main$7), {
+          label: "center",
+          name: "align",
+          value: "center",
+          checked: unref(align) === "center",
+          onToggle: _cache[4] || (_cache[4] = ($event) => changeValue($event, "align"))
         }, null, 8, ["checked"]),
         createVNode(unref(_sfc_main$7), {
           label: "end",
           name: "align",
           value: "end",
-          checked: !unref(alignValue),
-          onToggle: _cache[4] || (_cache[4] = ($event) => changeValue($event, "align"))
+          checked: unref(align) === "end",
+          onToggle: _cache[5] || (_cache[5] = ($event) => changeValue($event, "align"))
         }, null, 8, ["checked"]),
         createVNode(unref(MemeInput), {
           class: "property-text",
           value: unref(injectTtext),
           "onUpdate:modelValue": unref(injectUpdateText)
-        }, null, 8, ["value", "onUpdate:modelValue"])
+        }, null, 8, ["value", "onUpdate:modelValue"]),
+        createVNode(unref(_sfc_main$7), {
+          label: "up",
+          name: "direction",
+          value: "up",
+          checked: unref(direction) === "up",
+          onToggle: _cache[6] || (_cache[6] = ($event) => changeValue($event, "direction"))
+        }, null, 8, ["checked"]),
+        createVNode(unref(_sfc_main$7), {
+          label: "down",
+          name: "direction",
+          value: "down",
+          checked: unref(direction) === "down",
+          onToggle: _cache[7] || (_cache[7] = ($event) => changeValue($event, "direction"))
+        }, null, 8, ["checked"])
       ]);
     };
   }
 });
+const _findBreakPoint = (text, width, ctx) => {
+  let min = 0;
+  let max = text.length - 1;
+  while (min <= max) {
+    const middle = Math.floor((min + max) / 2);
+    const startWidth = ctx.measureText(text.substring(0, middle)).width;
+    const surplusWidth = ctx.measureText(text.substring(0, middle + 1)).width;
+    if (startWidth <= width && surplusWidth > width) {
+      return middle;
+    }
+    if (startWidth < width) {
+      min = middle + 1;
+    } else {
+      max = middle - 1;
+    }
+  }
+  return -1;
+};
+const breakLines = (text, width, ctx) => {
+  const lines = [];
+  let breakPoint = 0;
+  while ((breakPoint = _findBreakPoint(text, width, ctx)) !== -1) {
+    lines.push(text.substring(0, breakPoint));
+    text = text.substring(breakPoint);
+  }
+  if (text) {
+    lines.push(text);
+  }
+  return lines;
+};
 var Container_vue_vue_type_style_index_0_lang = "";
 const _hoisted_1$1 = { class: "container" };
 const _hoisted_2 = { class: "container-header" };
@@ -4919,6 +4975,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
   emits: ["change", "create", "replace"],
   setup(__props, { emit }) {
     const props = __props;
+    const LINE_HEIGHT = 1.2;
     const localStory = toRefs(props).story;
     const canvasRef = ref(null);
     const areaRef = ref(null);
@@ -4956,15 +5013,16 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       localStory.value.y = y;
     };
     const propertyChange = (value) => {
-      const { max, size: size22, color, align } = value;
+      const { max, size: size22, color, align, direction } = value;
       localStory.value.max = max;
       localStory.value.font = `${size22}px sans-serif`;
       localStory.value.color = color;
       localStory.value.align = align;
+      localStory.value.direction = direction;
     };
     const size2 = computed(() => {
       const fontSize = localStory.value.font.match(/(\d{1,3})px/) || ["", "32"];
-      return Number(fontSize[1]) * 1;
+      return Number(fontSize[1]);
     });
     const type = computed(() => {
       var _a;
@@ -4974,7 +5032,16 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       return type2;
     });
     const localTitle = computed(() => {
-      return `${localStory.value.title}.${type.value}`;
+      return `${localStory.value.title}.${type.value} ${width.value} * ${height.value} (${localStory.value.x}, ${localStory.value.y})`;
+    });
+    const offsetWidth = computed(() => {
+      const max = localStory.value.max || width.value;
+      const alignMap = {
+        "start": 0,
+        "center": Math.floor(max / 2),
+        "end": max
+      };
+      return alignMap[localStory.value.align];
     });
     const img = new Image();
     const makeCanvas = () => {
@@ -5002,19 +5069,24 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       const canvas = canvasRef.value;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0);
-      const { x, y, font, color, align, max } = localStory.value;
+      const { x, y, font, color, align, max, direction } = localStory.value;
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textAlign = align;
-      ctx.fillText(text.value, x, y, max || canvas.width);
+      const maxWidth = max || canvas.width;
+      const lines = breakLines(text.value, maxWidth, ctx);
+      lines.forEach((item, index2) => {
+        const dy = direction === "down" ? index2 : index2 - (lines.length - 1);
+        ctx.fillText(item, x, y + dy * size2.value * LINE_HEIGHT, maxWidth);
+      });
     };
     const renderDragLayer = () => {
-      const { x, y, max, align } = localStory.value;
+      const { x, y, max } = localStory.value;
       const dragEle = dragRef.value;
       dragEle.style.width = `${max}px`;
-      dragEle.style.height = `${size2.value}px`;
+      dragEle.style.height = `${size2.value * LINE_HEIGHT}px`;
       dragEle.style.top = `${y - size2.value + 2}px`;
-      dragEle.style.left = align === "start" ? `${x}px` : `${x - max}px`;
+      dragEle.style.left = `${x - offsetWidth.value}px`;
     };
     watch(localStory, (nv, ov) => {
       if (nv.mid !== ov.mid) {
@@ -5051,8 +5123,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       }
       x = Math.max(Math.min(x, width.value - dragWidth + buffer), -buffer);
       y = Math.max(Math.min(y, height.value - dragHeight + buffer), -buffer);
-      const { align, max } = localStory.value;
-      x += align === "end" ? max : 0;
+      x += offsetWidth.value;
       y += size2.value - 2;
       locationChange(x, y);
     };
@@ -5101,7 +5172,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
     };
     const fileChange = ({ name: name2, base64 }) => {
       noImage.value = false;
-      const { mid, title, feature, image, x, y, max, font, color, align } = localStory.value;
+      const { mid, title, feature, image, x, y, max, font, color, align, direction } = localStory.value;
       backStory = {
         mid,
         title,
@@ -5112,7 +5183,8 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         max,
         font,
         color,
-        align
+        align,
+        direction
       };
       const ntitle = name2.slice(0, name2.lastIndexOf("."));
       updateImage({
@@ -5125,7 +5197,8 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         max: 100,
         font: "32px sans-serif",
         color: "#FF0000",
-        align: "start"
+        align: "start",
+        direction: "down"
       });
     };
     const updateImage = (value) => {
@@ -5282,9 +5355,10 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
             color: unref(localStory).color,
             size: unref(size2),
             align: unref(localStory).align,
+            direction: unref(localStory).direction,
             onChange: propertyChange,
             onPick: pick
-          }, null, 8, ["max", "color", "size", "align"])
+          }, null, 8, ["max", "color", "size", "align", "direction"])
         ], 64)),
         createBaseVNode("footer", _hoisted_6, [
           createVNode(unref(_sfc_main$9), {
@@ -5313,6 +5387,10 @@ const urlMap = {
   createImage: {
     url: "/image/create",
     method: "post"
+  },
+  getCommands: {
+    url: "/image/commands",
+    method: "get"
   }
 };
 var axios$2 = { exports: {} };
@@ -6456,7 +6534,8 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       max: 100,
       font: "32px sans-serif",
       color: "#FFFFFF",
-      align: "start"
+      align: "start",
+      direction: "down"
     });
     const getCatalog = async () => {
       const res = await Api.getCatalog({});
@@ -6487,12 +6566,21 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       story.value = value;
     };
     const createImage = async (value) => {
-      const res = await Api.createImage(value);
+      const res = await Api.createImage(value).catch((response) => {
+        alert(response.message);
+      });
       await getCatalog();
       current.value = res.mid;
     };
+    const commands = ref([]);
+    provide("commands", commands);
+    const getCommands = async () => {
+      const res = await Api.getCommands({});
+      commands.value = res;
+    };
     onMounted(() => {
       getCatalog();
+      getCommands();
     });
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1, [
