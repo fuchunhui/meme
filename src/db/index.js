@@ -95,7 +95,8 @@ const getTable = (tableName = TABLE_NAME, join = true) => {
 };
 
 const insertTable = (options, write = true, special = false) => {
-  const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start', direction = 'down'} = options;
+  const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
+    color = 'black', align = 'start', direction = 'down'} = options;
   const mid = uuid();
   const sql = `INSERT INTO ${special ? SPECIAL_TABLE : TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction) `
@@ -129,9 +130,10 @@ const updateTable = (options, tableName = TABLE_NAME) => {
 };
 
 const updateTextTable = (options) => {
-  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start', direction = 'down'} = options;
-  const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}', color = '${color}', align = '${align}', direction = '${direction}' `
-    + `WHERE mid = '${mid}';`;
+  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif',
+    color = 'black', align = 'start', direction = 'down'} = options;
+  const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}',`
+    + ` color = '${color}', align = '${align}', direction = '${direction}' WHERE mid = '${mid}';`;
   try {
     getDB().run(text);
 

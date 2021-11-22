@@ -78,9 +78,9 @@ const _findBreakPoint = (text, width, ctx) => {
 
 /**
  * 按照给定的宽度，文本截取处理。需要提前设置好ctx的字体大小。
- * @param {string} text 
- * @param {number} width 
- * @param {CanvasRenderingContext2D} ctx 
+ * @param {string} text
+ * @param {number} width
+ * @param {CanvasRenderingContext2D} ctx
  * @returns 截取后的文本数组
  */
 const _breakLines = (text, width, ctx) => {
