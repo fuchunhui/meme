@@ -29,7 +29,7 @@ const make = (text, options) => {
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textAlign = align;
-      
+
       const maxWidth = max || width;
       const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
       const size = Number(fontSize[1]);
