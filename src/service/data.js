@@ -70,9 +70,9 @@ const getCatalog = () => {
 const open = (mid, type) => {
   const tabName = TabMap[type];
   const data = getDataByColumn(mid, 'mid', tabName);
-  const {title, feature, image, x, y, max, font, color, align} = data;
+  const {title, feature, image, x, y, max, font, color, align, direction} = data;
 
-  return {mid, title, feature, image, x, y, max, font, color, align};
+  return {mid, title, feature, image, x, y, max, font, color, align, direction};
 };
 
 const create = (options) => {

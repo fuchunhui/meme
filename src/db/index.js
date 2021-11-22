@@ -44,7 +44,8 @@ const _initTable = () => {
     max INT DEFAULT 100,
     font CHAR(50) NOT NULL,
     color CHAR(20) NOT NULL,
-    align CHAR(10) NOT NULL
+    align CHAR(10) NOT NULL,
+    direction CHAR(10) NOT NULL
   );`
   const logger = `CREATE TABLE ${LOG_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,11 +95,11 @@ const getTable = (tableName = TABLE_NAME, join = true) => {
 };
 
 const insertTable = (options, write = true, special = false) => {
-  const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start'} = options;
+  const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start', direction = 'down'} = options;
   const mid = uuid();
   const sql = `INSERT INTO ${special ? SPECIAL_TABLE : TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
-  const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align) `
-    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}');`;
+  const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction) `
+    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}');`;
 
   try {
     getDB().run(sql + text);
@@ -128,8 +129,8 @@ const updateTable = (options, tableName = TABLE_NAME) => {
 };
 
 const updateTextTable = (options) => {
-  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start'} = options;
-  const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}', color = '${color}', align = '${align}' `
+  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start', direction = 'down'} = options;
+  const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}', color = '${color}', align = '${align}', direction = '${direction}' `
     + `WHERE mid = '${mid}';`;
   try {
     getDB().run(text);

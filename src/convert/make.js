@@ -24,11 +24,12 @@ const make = (text, options) => {
     img.onload = () => {
       ctx.drawImage(img, 0, 0);
 
-      const {x, y, font, color, align, max} = options;
+      const {x, y, font, color, align, max, direction} = options;
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textAlign = align;
       ctx.fillText(text, x, y, max || width);
+      console.log('direction------>', direction);
 
       base64 = canvas.toDataURL(type);
     };

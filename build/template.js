@@ -7,6 +7,7 @@ export default {
   font: '32px sans-serif',
   color: '#FF0000',
   align: 'start',
+  direction: 'down',
   max: 100
 };
 
