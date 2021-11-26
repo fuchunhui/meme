@@ -6,12 +6,16 @@ import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
 import information from '../config/common.js';
+import seriesData from '../config/series/index.js';
+import featureData from '../config/feature.js';
 import special from '../config/special/index.js';
 
 export const TABLE_NAME = 'STORY';
 export const TEXT_TABLE = 'TEXT';
 export const LOG_TABLE = 'LOGGER';
 export const SPECIAL_TABLE = 'SPECIAL';
+export const SERIES_TABLE = 'SERIES';
+export const FEATURE_TABLE = 'FEATURE';
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
@@ -62,6 +66,7 @@ const initDB = () => {
   information.forEach(item => {
     insertTable(item, false);
   });
+  _initSeriesTable();
   _initSpecialTable();
   writeDB();
 };
@@ -94,11 +99,11 @@ const getTable = (tableName = TABLE_NAME, join = true) => {
   return contents;
 };
 
-const insertTable = (options, write = true, special = false) => {
+const insertTable = (options, write = true, tableName = TABLE_NAME) => {
   const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down'} = options;
   const mid = uuid();
-  const sql = `INSERT INTO ${special ? SPECIAL_TABLE : TABLE_NAME} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
+  const sql = `INSERT INTO ${tableName} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}');`;
 
@@ -195,7 +200,7 @@ const _initSpecialTable = () => {
   getDB().run(sql);
 
   special.forEach((item, index) => {
-    insertTable(item, false, true);
+    insertTable(item, false, SPECIAL_TABLE);
   });
 }
 
@@ -208,6 +213,54 @@ const getSpecialDataListByColumn = (value, column = 'feature') => {
   }
   stmt.free();
   return contents;
+};
+
+const _initSeriesTable = () => {
+  const sql = `CREATE TABLE ${SERIES_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
+    title CHAR(100) COLLATE NOCASE,
+    feature CHAR(100) COLLATE NOCASE,
+    image TEXT NOT NULL
+  );`
+  const feature = `CREATE TABLE ${FEATURE_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    feature CHAR(100) COLLATE NOCASE,
+    type CHAR(50) CHECK(type IN ('TEXT', 'IMAGE')) NOT NULL DEFAULT 'TEXT',
+    x INT DEFAULT 0,
+    y INT DEFAULT 0,
+    width INT DEFAULT 100,
+    height INT DEFAULT 100
+  );`
+  getDB().run(sql + feature);
+
+  seriesData.forEach((item, index) => {
+    insertTable(item, false, SERIES_TABLE);
+  });
+
+  featureData.forEach((item, index) => {
+    insertFeatureTable(item);
+  });
+}
+
+const insertFeatureTable = (options) => {
+  const {feature, type, x = 0, y = 0, width = 100, height = 100} = options;
+  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height) `
+    + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height});`;
+
+  try {
+    getDB().run(sql);
+    write && writeDB();
+    return {
+      error: false,
+      data: feature
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error.toString()
+    };
+  }
 };
 
 export {
