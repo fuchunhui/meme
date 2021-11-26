@@ -85,7 +85,7 @@ const open = (mid, type) => {
 };
 
 const create = (options) => {
-  const result = getDataByColumn(options.title, 'title', STORY_TABLE);
+  const result = getDataByColumn(options.title, 'title', STORY_TABLE); // TODO 新建的去重判断，目前只处理了story表，还需要检测feature表内容
   if (result.mid) {
     return error({
       title: options.title

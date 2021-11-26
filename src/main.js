@@ -8,7 +8,10 @@ import {
   getDataByColumn,
   getDataListByColumn,
   getSpecialDataListByColumn,
-  insertLog
+  insertLog,
+  getSingleTable,
+  SERIES_TABLE,
+  FEATURE_TABLE
 } from './db/index.js';
 import { make } from './convert/make.js';
 import { formatMenu, formatNull, formatHelp } from './convert/format.js';
@@ -72,10 +75,28 @@ const control = encryption => {
     return;
   }
 
-  const commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
+  const commands = getDataListByColumn(command, 'feature', SERIES_TABLE); // 当成 feature，查询是否多个 feature
   if (commands.length > 1) {
     const commandList = commands.map(item => item.title);
-    const composeContent = formatMenu(commandList, commands[0].feature);
+    if (params.length && commandList.includes(params[0])) {
+      const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
+      console.log('singleList: ', singleList);
+      const {type, x, y, width, height} = singleList[0];
+      
+      if (type === 'TEXT') {
+        const textData = getDataByColumn(params[0], 'title', SERIES_TABLE);
+        if (textData.image) {
+          const base64 = make(text, textData);
+          send(toid, base64);
+        }
+      } else if (type === 'IMAGE') {
+        // 图片的话，组合绘图
+      }
+
+      return;
+    }
+
+    const composeContent = formatMenu(commandList, command);
     send(toid, composeContent, 'MD');
     return;
   }

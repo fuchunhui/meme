@@ -2,7 +2,7 @@ const formatMenu = (data, title = '常用菜单') => {
   const list = data.map(item => {
     return `- ${item}`;
   });
-  const menu = `### ${title}：\n` + list.join('\n');
+  const menu = `#### ${title}：\n` + list.join('\n');
   return menu;
 };
 
