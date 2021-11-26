@@ -5,7 +5,8 @@ import {
   updateTextTable,
   getDataByColumn,
   STORY_TABLE,
-  SPECIAL_TABLE
+  SPECIAL_TABLE,
+  SERIES_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {
@@ -17,10 +18,38 @@ const COMMON_ID = 'meme_common';
 const COMMON_TEXT = '常用';
 const COMMON_TYPE = 'COMMON';
 const SPECIAL_TYPE = 'SPECIAL';
+const SERIES_TYPE = 'SERIES';
 
 const TabMap = {
   [COMMON_TYPE]: STORY_TABLE,
-  [SPECIAL_TABLE]: SPECIAL_TYPE
+  [SPECIAL_TABLE]: SPECIAL_TYPE,
+  [SERIES_TABLE]: SERIES_TYPE
+};
+
+const _getFeature = (tabName = SERIES_TABLE, target = []) => {
+  const list = getTable(tabName, false);
+  if (list.length) {
+    const map = new Map();
+    list.forEach(({mid, title, feature}) => {
+      let value = [{
+        mid,
+        title
+      }];
+      if (map.has(feature)) {
+        value = [...map.get(feature), ...value];
+      }
+      map.set(feature, value);
+    });
+
+    map.forEach((value, key) => {
+      target.push({
+        id: key,
+        text: key,
+        type: TabMap[tabName],
+        children: value
+      });
+    });
+  }
 };
 
 const getCatalog = () => {
@@ -41,29 +70,9 @@ const getCatalog = () => {
     });
   }
 
-  const specialList = getTable(SPECIAL_TABLE, false);
-  if (specialList.length) {
-    const specialMap = new Map();
-    specialList.forEach(({mid, title, feature}) => {
-      let value = [{
-        mid,
-        title
-      }];
-      if (specialMap.has(feature)) {
-        value = [...specialMap.get(feature), ...value];
-      }
-      specialMap.set(feature, value);
-    });
+  _getFeature(SERIES_TABLE, result);
+  _getFeature(SPECIAL_TABLE, result);
 
-    specialMap.forEach((value, key) => {
-      result.push({
-        id: key,
-        text: key,
-        type: SPECIAL_TYPE,
-        children: value
-      });
-    });
-  }
   return result;
 };
 
