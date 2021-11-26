@@ -5,10 +5,10 @@
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
-import information from '../config/common.js';
+import informationData from '../config/common.js';
 import seriesData from '../config/series/index.js';
 import featureData from '../config/feature.js';
-import special from '../config/special/index.js';
+import specialData from '../config/special/index.js';
 
 export const TABLE_NAME = 'STORY';
 export const TEXT_TABLE = 'TEXT';
@@ -58,14 +58,15 @@ const _initTable = () => {
     date Date
   );`;
   getDB().run(sql + text + logger);
+
+  informationData.forEach(item => {
+    insertTable(item, false);
+  });
 };
 
 const initDB = () => {
   _resetDB();
   _initTable();
-  information.forEach(item => {
-    insertTable(item, false);
-  });
   _initSeriesTable();
   _initSpecialTable();
   writeDB();
@@ -78,7 +79,14 @@ const writeDB = () => {
 };
 
 const _resetDB = () => {
-  const nameList = [TABLE_NAME, TEXT_TABLE, LOG_TABLE, SPECIAL_TABLE];
+  const nameList = [
+    TABLE_NAME,
+    TEXT_TABLE,
+    LOG_TABLE,
+    SPECIAL_TABLE,
+    SERIES_TABLE,
+    FEATURE_TABLE
+  ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getDB().run(sql);
 };
@@ -199,7 +207,7 @@ const _initSpecialTable = () => {
   );`
   getDB().run(sql);
 
-  special.forEach((item, index) => {
+  specialData.forEach((item, index) => {
     insertTable(item, false, SPECIAL_TABLE);
   });
 }
@@ -263,6 +271,17 @@ const insertFeatureTable = (options) => {
   }
 };
 
+const getFeatureTable = () => {
+  const contents = [];
+  const stmt = getDB().prepare(`SELECT * FROM ${FEATURE_TABLE};`);
+  while (stmt.step()) {
+    const cell = stmt.getAsObject();
+    contents.push(cell);
+  }
+  stmt.free();
+  return contents;
+};
+
 export {
   initDB,
   writeDB,
@@ -276,5 +295,6 @@ export {
   getDataListByColumn,
   getSpecialDataListByColumn,
   updateTextTable,
-  insertLog
+  insertLog,
+  getFeatureTable
 };

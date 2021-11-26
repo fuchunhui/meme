@@ -2,8 +2,10 @@ import path from 'path';
 import fs from 'fs';
 import {
   getTable,
+  getFeatureTable,
   TABLE_NAME,
-  SPECIAL_TABLE
+  SPECIAL_TABLE,
+  SERIES_TABLE
 } from '../db/index.js';
 
 const getData = (tableName) => {
@@ -44,6 +46,30 @@ const save = (base, fileName, tableName) => {
 const backup = base => {
   save(base, 'common', TABLE_NAME);
   save(base, 'special', SPECIAL_TABLE);
+  save(base, 'series', SERIES_TABLE);
+  saveSingle(base, 'feature', getFeatureData);
+};
+
+const getFeatureData = () => {
+  const list = getFeatureTable();
+  const result = list.map(({feature, type, x, y, width, height}) => {
+    return {
+      feature,
+      type,
+      x,
+      y,
+      width,
+      height
+    };
+  });
+
+  return result;
+};
+
+const saveSingle = (base, fileName, funcName) => {
+  const list = funcName();
+  const targetFile = path.resolve(base, `${fileName}.js`);
+  saveData(targetFile, list);
 };
 
 export {
