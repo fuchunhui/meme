@@ -56,50 +56,51 @@ const control = encryption => {
     });
 
     const content = formatMenu(comList);
+    send(toid, content, 'MD');
+    return;
+  }
+
+  if (COMMAND_LIST.includes(command)) {
+    let content = '';
+    if (command === 'help') {
+      content = formatHelp();
+    } else if (command === 'special') { // 特殊节日、彩蛋命令
+      content = '彩蛋or💣';
+    }
 
     send(toid, content, 'MD');
+    return;
+  }
+
+  const commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
+  if (commands.length > 1) {
+    const commandList = commands.map(item => item.title);
+    const composeContent = formatMenu(commandList, commands[0].feature);
+    send(toid, composeContent, 'MD');
+    return;
+  }
+
+  if (special(command, toid, text)) {
+    return;
+  }
+
+  const data = getDataByColumn(command);
+  if (data.image) {
+    const base64 = make(text, data);
+    send(toid, base64);
   } else {
-    if (COMMAND_LIST.includes(command)) {
-      let content = '';
-      if (command === 'help') {
-        content = formatHelp();
-      } else if (command === 'special') { // 特殊节日、彩蛋命令
-        content = '彩蛋or💣';
-      }
-      send(toid, content, 'MD');
-      return;
-    }
+    const content = formatNull();
+    send(toid, content, 'TEXT');
+    // TODO 小概率事件，20%
+    // 随机触发其他机器人对话，否认自己的能力
+    // 让其他机器人给图
+    // 增加配置内容，开启和关闭
 
-    const commands = getDataListByColumn(command, 'feature'); // 当成 feature，查询是否多个 feature
-    if (commands.length > 1) {
-      const commandList = commands.map(item => item.title);
-      const composeContent = formatMenu(commandList, commands[0].feature);
-      send(toid, composeContent, 'MD');
-      return;
-    }
-
-    if (special(command, toid, text)) {
-      return;
-    }
-
-    const data = getDataByColumn(command);
-    if (data.image) {
-      const base64 = make(text, data);
-      send(toid, base64);
-    } else {
-      const content = formatNull();
-      send(toid, content, 'TEXT');
-      // TODO 小概率事件，20%
-      // 随机触发其他机器人对话，否认自己的能力
-      // 让其他机器人给图
-      // 增加配置内容，开启和关闭
-
-      insertLog({
-        fromid,
-        text: command,
-        date: new Date()
-      });
-    }
+    insertLog({
+      fromid,
+      text: command,
+      date: new Date()
+    });
   }
 };
 
