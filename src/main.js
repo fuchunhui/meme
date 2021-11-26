@@ -35,7 +35,7 @@ const special = (command, toid, text) => {
 };
 
 const control = encryption => {
-  const {fromid, toid, command, text} = parser(encryption);
+  const {fromid, toid, command, text, params} = parser(encryption);
 
   if (command === '') {
     const list = getTable();

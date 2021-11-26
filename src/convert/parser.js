@@ -1,5 +1,6 @@
 import crypto from 'crypto-js';
 import config from '../config/index.js';
+import {matchText} from '../utils/regex.js';
 
 const {enc, mode, pad, AES} = crypto;
 const {key} = config;
@@ -42,23 +43,41 @@ const _decode = encryption => {
 const parser = encryption => {
   const content = _decode(encryption);
   const {header, body} = content.message;
+  console.log(header, body);
   const {fromuserid: fromid, toid} = header;
   const cell = body.find(({type, content}) => type === 'TEXT' && content.trim());
-  const message =  cell ? cell.content.trim() : '';
+  let message = cell ? cell.content.trim() : '';
 
   let command = '';
+  let params = [];
   let text = '';
   if (message) {
+    const quotationText = matchText(message);
+    if (quotationText) {
+      message = message.replace(quotationText, '').trim();
+    }
+
+    console.log('quotationText: ', quotationText);
     const info = message.split(' ');
-    command = info[0];
-    text = info.length > 1 ? info[1] : '';
+    command = info.shift();
+    if (quotationText) {
+      text = quotationText.slice(1, quotationText.length - 1);
+    } else {
+      text = info.pop() || '';
+    }
+    params = info;
+
+    // console.log('command--->', command);
+    // console.log('text--->', text);
+    // console.log('params--->', params);
   }
 
   return {
     fromid,
     toid,
     command,
-    text
+    text,
+    params
   };
 };
 
