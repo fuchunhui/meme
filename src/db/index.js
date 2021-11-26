@@ -10,7 +10,7 @@ import seriesData from '../config/series/index.js';
 import featureData from '../config/feature.js';
 import specialData from '../config/special/index.js';
 
-export const TABLE_NAME = 'STORY';
+export const STORY_TABLE = 'STORY';
 export const TEXT_TABLE = 'TEXT';
 export const LOG_TABLE = 'LOGGER';
 export const SPECIAL_TABLE = 'SPECIAL';
@@ -33,7 +33,7 @@ const getDB = () => {
  * 保留建表语句
  */
 const _initTable = () => {
-  const sql = `CREATE TABLE ${TABLE_NAME} (
+  const sql = `CREATE TABLE ${STORY_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mid CHAR(50) NOT NULL,
     title CHAR(100) COLLATE NOCASE,
@@ -80,7 +80,7 @@ const writeDB = () => {
 
 const _resetDB = () => {
   const nameList = [
-    TABLE_NAME,
+    STORY_TABLE,
     TEXT_TABLE,
     LOG_TABLE,
     SPECIAL_TABLE,
@@ -95,7 +95,7 @@ const queryAllTables = () => {
   return getDB().exec('SELECT name, sql FROM sqlite_master');
 };
 
-const getTable = (tableName = TABLE_NAME, join = true) => {
+const getTable = (tableName = STORY_TABLE, join = true) => {
   const contents = [];
   const sqlplus = join ? ` INNER JOIN ${TEXT_TABLE} USING(mid)` : '';
   const stmt = getDB().prepare(`SELECT * FROM ${tableName}${sqlplus};`);
@@ -107,7 +107,7 @@ const getTable = (tableName = TABLE_NAME, join = true) => {
   return contents;
 };
 
-const insertTable = (options, write = true, tableName = TABLE_NAME) => {
+const insertTable = (options, write = true, tableName = STORY_TABLE) => {
   const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down'} = options;
   const mid = uuid();
@@ -130,7 +130,7 @@ const insertTable = (options, write = true, tableName = TABLE_NAME) => {
   }
 };
 
-const updateTable = (options, tableName = TABLE_NAME) => {
+const updateTable = (options, tableName = STORY_TABLE) => {
   const {mid, title, feature, image} = options;
   const sql = `UPDATE ${tableName} SET title = '${title}', feature = '${feature}', image = '${image}' WHERE mid = '${mid}';`;
 
@@ -157,22 +157,22 @@ const updateTextTable = (options) => {
 };
 
 const deleteTable = like => {
-  const text = `DELETE FROM ${TEXT_TABLE} WHERE mid in (SELECT mid FROM ${TABLE_NAME} WHERE title NOT LIKE '${like}');`;
-  const sql = `DELETE FROM ${TABLE_NAME} WHERE title NOT LIKE '${like}';`;
+  const text = `DELETE FROM ${TEXT_TABLE} WHERE mid in (SELECT mid FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}');`;
+  const sql = `DELETE FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}';`;
   getDB().run(text);
   getDB().run(sql);
 
   writeDB();
 };
 
-const getDataByColumn = (value, column = 'title', name = TABLE_NAME) => {
+const getDataByColumn = (value, column = 'title', name = STORY_TABLE) => {
   const stmt = getDB().prepare(`SELECT * FROM ${name} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;
 };
 
-const getDataListByColumn = (value, column = 'title', name = TABLE_NAME) => {
+const getDataListByColumn = (value, column = 'title', name = STORY_TABLE) => {
   const contents = [];
   const stmt = getDB().prepare(`SELECT * FROM ${name} WHERE ${column} = '${value}'`);
   while (stmt.step()) {
@@ -271,9 +271,9 @@ const insertFeatureTable = (options) => {
   }
 };
 
-const getFeatureTable = () => {
+const getSingleTable = (tableName = STORY_TABLE) => {
   const contents = [];
-  const stmt = getDB().prepare(`SELECT * FROM ${FEATURE_TABLE};`);
+  const stmt = getDB().prepare(`SELECT * FROM ${tableName};`);
   while (stmt.step()) {
     const cell = stmt.getAsObject();
     contents.push(cell);
@@ -296,5 +296,5 @@ export {
   getSpecialDataListByColumn,
   updateTextTable,
   insertLog,
-  getFeatureTable
+  getSingleTable
 };

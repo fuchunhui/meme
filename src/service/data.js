@@ -4,7 +4,7 @@ import {
   updateTable,
   updateTextTable,
   getDataByColumn,
-  TABLE_NAME,
+  STORY_TABLE,
   SPECIAL_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
@@ -19,13 +19,13 @@ const COMMON_TYPE = 'COMMON';
 const SPECIAL_TYPE = 'SPECIAL';
 
 const TabMap = {
-  [COMMON_TYPE]: TABLE_NAME,
+  [COMMON_TYPE]: STORY_TABLE,
   [SPECIAL_TABLE]: SPECIAL_TYPE
 };
 
 const getCatalog = () => {
   const result = [];
-  const list = getTable(TABLE_NAME, false);
+  const list = getTable(STORY_TABLE, false);
   if (list.length) {
     const children = list.map(({mid, title}) => {
       return {
@@ -76,7 +76,7 @@ const open = (mid, type) => {
 };
 
 const create = (options) => {
-  const result = getDataByColumn(options.title, 'title', TABLE_NAME);
+  const result = getDataByColumn(options.title, 'title', STORY_TABLE);
   if (result.mid) {
     return error({
       title: options.title
