@@ -4,9 +4,11 @@ import {
   updateTable,
   updateTextTable,
   getDataByColumn,
+  getDataListByColumn,
   STORY_TABLE,
   SPECIAL_TABLE,
-  SERIES_TABLE
+  SERIES_TABLE,
+  FEATURE_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {
@@ -42,12 +44,20 @@ const _getFeature = (tabName = SERIES_TABLE, target = []) => {
     });
 
     map.forEach((value, key) => {
-      target.push({
+      const type = TabMap[tabName];
+      let cell = {
         id: key,
         text: key,
-        type: TabMap[tabName],
+        type,
         children: value
-      });
+      }
+      if (type === SERIES_TYPE) {
+        // 补充series相关内容
+        const singleList = getDataListByColumn(key, 'feature', FEATURE_TABLE);
+        const {type: seriesType, x, y, width, height} = singleList[0];
+        cell = Object.assign(cell, {seriesType, x, y, width, height});
+      }
+      target.push(cell);
     });
   }
 };
