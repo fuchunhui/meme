@@ -6,9 +6,10 @@ import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
 import informationData from '../config/common.js';
+import specialData from '../config/special/index.js';
 import seriesData from '../config/series/index.js';
 import featureData from '../config/feature.js';
-import specialData from '../config/special/index.js';
+import materialData from '../config/material.js';
 
 export const STORY_TABLE = 'STORY';
 export const TEXT_TABLE = 'TEXT';
@@ -16,6 +17,7 @@ export const LOG_TABLE = 'LOGGER';
 export const SPECIAL_TABLE = 'SPECIAL';
 export const SERIES_TABLE = 'SERIES';
 export const FEATURE_TABLE = 'FEATURE';
+export const MATERIAL_TABLE = 'MATERIAL';
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
@@ -69,6 +71,7 @@ const initDB = () => {
   _initTable();
   _initSeriesTable();
   _initSpecialTable();
+  _initMaterialTable();
   writeDB();
 };
 
@@ -85,7 +88,8 @@ const _resetDB = () => {
     LOG_TABLE,
     SPECIAL_TABLE,
     SERIES_TABLE,
-    FEATURE_TABLE
+    FEATURE_TABLE,
+    MATERIAL_TABLE
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getDB().run(sql);
@@ -208,7 +212,7 @@ const _initSpecialTable = () => {
   );`
   getDB().run(sql);
 
-  specialData.forEach((item, index) => {
+  specialData.forEach(item => {
     insertTable(item, false, SPECIAL_TABLE);
   });
 }
@@ -244,16 +248,16 @@ const _initSeriesTable = () => {
   );`
   getDB().run(sql + feature);
 
-  seriesData.forEach((item, index) => {
+  seriesData.forEach(item => {
     insertTable(item, false, SERIES_TABLE);
   });
 
-  featureData.forEach((item, index) => {
-    insertFeatureTable(item);
+  featureData.forEach(item => {
+    insertFeatureTable(item, false);
   });
 }
 
-const insertFeatureTable = (options) => {
+const insertFeatureTable = (options, write = true) => {
   const {feature, type, x = 0, y = 0, width = 100, height = 100, sid = ''} = options;
   const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height, sid) `
     + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height}, '${sid}');`;
@@ -282,6 +286,41 @@ const getSingleTable = (tableName = STORY_TABLE) => {
   }
   stmt.free();
   return contents;
+};
+
+const _initMaterialTable = () => {
+  const sql = `CREATE TABLE ${MATERIAL_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
+    title CHAR(100) COLLATE NOCASE,
+    image TEXT NOT NULL
+  );`
+  getDB().run(sql);
+
+  materialData.forEach(item => {
+    insertMaterialTable(item, false, MATERIAL_TABLE);
+  });
+}
+
+const insertMaterialTable = (options, write = true) => {
+  const {mid: _mid, title, image} = options;
+  const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
+
+  const sql = `INSERT INTO ${MATERIAL_TABLE} (mid, title, image) VALUES ('${mid}', '${title}','${image}');`;
+
+  try {
+    getDB().run(sql);
+    write && writeDB();
+    return {
+      error: false,
+      data: `Material: ${title}`
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error.toString()
+    };
+  }
 };
 
 export {

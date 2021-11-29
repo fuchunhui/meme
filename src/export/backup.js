@@ -6,7 +6,8 @@ import {
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
-  FEATURE_TABLE
+  FEATURE_TABLE,
+  MATERIAL_TABLE
 } from '../db/index.js';
 
 const getData = (tableName) => {
@@ -49,6 +50,7 @@ const backup = base => {
   save(base, 'common', STORY_TABLE);
   save(base, 'special', SPECIAL_TABLE);
   save(base, 'series', SERIES_TABLE);
+  save(base, 'material', MATERIAL_TABLE);
   saveSingle(base, 'feature', getFeatureData);
 };
 
