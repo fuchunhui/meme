@@ -23,3 +23,7 @@ way2: by http, get img.
 
 ### 数据导出
 1. `npm run backup` 数据备份到本地。
+
+### 新增支持
+1. 引入logo svg资源。
+2. 
