@@ -5,13 +5,15 @@ import {
   getSingleTable,
   STORY_TABLE,
   SPECIAL_TABLE,
-  SERIES_TABLE
+  SERIES_TABLE,
+  FEATURE_TABLE
 } from '../db/index.js';
 
 const getData = (tableName) => {
   const list = getTable(tableName);
-  const result = list.map(({title, feature, image, x, y, font, color, align, max, direction}) => {
+  const result = list.map(({mid, title, feature, image, x, y, font, color, align, max, direction}) => {
     return {
+      mid,
       title,
       feature,
       image,
@@ -51,15 +53,16 @@ const backup = base => {
 };
 
 const getFeatureData = () => {
-  const list = getSingleTable(SERIES_TABLE);
-  const result = list.map(({feature, type, x, y, width, height}) => {
+  const list = getSingleTable(FEATURE_TABLE);
+  const result = list.map(({feature, type, x, y, width, height, sid}) => {
     return {
       feature,
       type,
       x,
       y,
       width,
-      height
+      height,
+      sid
     };
   });
 

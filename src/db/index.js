@@ -108,9 +108,10 @@ const getTable = (tableName = STORY_TABLE, join = true) => {
 };
 
 const insertTable = (options, write = true, tableName = STORY_TABLE) => {
-  const {title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
+  const {mid: _mid, title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down'} = options;
-  const mid = uuid();
+  const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
+
   const sql = `INSERT INTO ${tableName} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}');`;
@@ -253,9 +254,9 @@ const _initSeriesTable = () => {
 }
 
 const insertFeatureTable = (options) => {
-  const {feature, type, x = 0, y = 0, width = 100, height = 100} = options;
-  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height) `
-    + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height});`;
+  const {feature, type, x = 0, y = 0, width = 100, height = 100, sid = ''} = options;
+  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height, sid) `
+    + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height}, '${sid}');`;
 
   try {
     getDB().run(sql);
