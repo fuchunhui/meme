@@ -75,7 +75,11 @@ const control = encryption => {
     return;
   }
 
-  const commands = getDataListByColumn(command, 'feature', SERIES_TABLE); // 当成 feature，查询是否多个 feature
+  const commands = getDataListByColumn(command, 'feature', SERIES_TABLE); // TODO 应更改为，先查询feature表，检测是否存在这样的内容
+  // 然后，再判断属于哪种feature
+  // command 判断是否大于2，是否返回列表，是否与参数
+  // text 组合文本，带参数
+  // image 组合图片，绘制带图片内容
   if (commands.length > 1) {
     const commandList = commands.map(item => item.title);
     if (params.length && commandList.includes(params[0])) {

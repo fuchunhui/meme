@@ -234,11 +234,12 @@ const _initSeriesTable = () => {
   const feature = `CREATE TABLE ${FEATURE_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     feature CHAR(100) COLLATE NOCASE,
-    type CHAR(50) CHECK(type IN ('TEXT', 'IMAGE')) NOT NULL DEFAULT 'TEXT',
+    type CHAR(50) CHECK(type IN ('TEXT', 'IMAGE', 'COMMAND')) NOT NULL DEFAULT 'COMMAND',
     x INT DEFAULT 0,
     y INT DEFAULT 0,
     width INT DEFAULT 100,
-    height INT DEFAULT 100
+    height INT DEFAULT 100,
+    sid INTEGER CHAR(50) DEFAULT NULL
   );`
   getDB().run(sql + feature);
 

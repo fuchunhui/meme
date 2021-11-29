@@ -44,15 +44,13 @@ const _getFeature = (tabName = SERIES_TABLE, target = []) => {
     });
 
     map.forEach((value, key) => {
-      const type = TabMap[tabName];
       let cell = {
         id: key,
         text: key,
-        type,
+        type: TabMap[tabName],
         children: value
-      }
-      if (type === SERIES_TYPE) {
-        // 补充series相关内容
+      };
+      if (tabName === SERIES_TABLE) {
         const singleList = getDataListByColumn(key, 'feature', FEATURE_TABLE);
         const {type: seriesType, x, y, width, height} = singleList[0];
         cell = Object.assign(cell, {seriesType, x, y, width, height});
