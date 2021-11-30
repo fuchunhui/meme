@@ -11,7 +11,8 @@ import {
   insertLog,
   getSingleTable,
   SERIES_TABLE,
-  FEATURE_TABLE
+  FEATURE_TABLE,
+  FEATURE_TYPE
 } from './db/index.js';
 import { make } from './convert/make.js';
 import { formatMenu, formatNull, formatHelp } from './convert/format.js';
@@ -36,6 +37,8 @@ const special = (command, toid, text) => {
 
   return specialCommand;
 };
+
+// const send
 
 const control = encryption => {
   const {fromid, toid, command, text, params} = parser(encryption);
@@ -75,34 +78,52 @@ const control = encryption => {
     return;
   }
 
-  const commands = getDataListByColumn(command, 'feature', SERIES_TABLE); // TODO 应更改为，先查询feature表，检测是否存在这样的内容
+  // 周报 张飞 大家
+  const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
+  console.log('singleList: ', singleList);
   // 然后，再判断属于哪种feature
-  // command 判断是否大于2，是否返回列表，是否与参数
+  // command 判断是否大于2，是否返回列表，是否有参数
   // text 组合文本，带参数
   // image 组合图片，绘制带图片内容
-  if (commands.length > 1) {
-    const commandList = commands.map(item => item.title);
-    if (params.length && commandList.includes(params[0])) {
-      const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
-      console.log('singleList: ', singleList);
-      const {type, x, y, width, height} = singleList[0];
-      
-      if (type === 'TEXT') {
-        const textData = getDataByColumn(params[0], 'title', SERIES_TABLE);
-        if (textData.image) {
-          const base64 = make(text, textData);
-          send(toid, base64);
-        }
-      } else if (type === 'IMAGE') {
-        // 图片的话，组合绘图
-      }
 
+  // 如果存在，走内部逻辑
+  // 如果是是IMAGE或者TEXT类型
+  // 此时判断，是否有参数
+  // 有参数，执行绘图逻辑
+  // 没有参数，跳过，执行后续单图逻辑
+
+  if (singleList.length) { // 有内容
+    const {type, x, y, width, height, sid} = singleList[0];
+    const param = params.length ? params[0] : '';
+    // const param = '李四';
+
+    if (type === FEATURE_TYPE.COMMAND) {
+      const commands = getDataListByColumn(command, 'feature', SERIES_TABLE);
+      const commandList = commands.map(item => item.title);
+      if (param && commandList.includes(param)) {
+        const commandData = getDataByColumn(param, 'title', SERIES_TABLE);
+        const base64 = make(text, commandData);
+        send(toid, base64);
+        return;
+      }
+      const composeContent = formatMenu(commandList, command);
+      send(toid, composeContent, 'MD');
       return;
     }
 
-    const composeContent = formatMenu(commandList, command);
-    send(toid, composeContent, 'MD');
-    return;
+    if (type === FEATURE_TYPE.TEXT && param) {
+      // 绘图，带新增文字版本
+      
+      return;
+    }
+
+    if (type === FEATURE_TYPE.IMAGE && param) {
+      // 绘图，带新增文字版本
+      // 获取对应的路径，是否为SVG / Material 等内容，然后判断是否存在
+      // 存在，绘制图形
+      // 不存在，绘制文本，
+      return;
+    }
   }
 
   if (special(command, toid, text)) {

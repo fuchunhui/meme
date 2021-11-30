@@ -18,6 +18,11 @@ export const SPECIAL_TABLE = 'SPECIAL';
 export const SERIES_TABLE = 'SERIES';
 export const FEATURE_TABLE = 'FEATURE';
 export const MATERIAL_TABLE = 'MATERIAL';
+export const FEATURE_TYPE = {
+  'COMMAND': 'COMMAND',
+  'TEXT': 'TEXT',
+  'IMAGE': 'IMAGE'
+};
 
 const DB_PATH = './public/db/meme.db';
 
@@ -244,13 +249,14 @@ const _initSeriesTable = () => {
   const feature = `CREATE TABLE ${FEATURE_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     feature CHAR(100) COLLATE NOCASE,
-    type CHAR(50) CHECK(type IN ('TEXT', 'IMAGE', 'COMMAND')) NOT NULL DEFAULT 'COMMAND',
+    type CHAR(50) CHECK(type IN ('${FEATURE_TYPE.COMMAND}', '${FEATURE_TYPE.IMAGE}', `
+      + `'${FEATURE_TYPE.TEXT}')) NOT NULL DEFAULT '${FEATURE_TYPE.COMMAND}',
     x INT DEFAULT 0,
     y INT DEFAULT 0,
     width INT DEFAULT 100,
     height INT DEFAULT 100,
     sid INTEGER CHAR(50) DEFAULT NULL
-  );`
+  );` // TODO 补充存储路径类型
   getDB().run(sql + feature);
 
   seriesData.forEach(item => {
