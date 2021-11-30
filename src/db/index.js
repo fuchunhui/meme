@@ -23,10 +23,15 @@ export const FEATURE_TYPE = {
   'TEXT': 'TEXT',
   'IMAGE': 'IMAGE'
 };
-export const FEATURE_SOURCE_NAME = {
+const FEATURE_SOURCE_NAME = {
   'COMMON': 'STORY_TABLE',
   'SPECIAL': 'SPECIAL_TABLE',
   'SERIES': 'SERIES_TABLE'
+};
+export const FEATURE_IMAGE_TYPE = {
+  'SVG': 'SVG',
+  'PNG': 'PNG',
+  'DB': 'DB'
 };
 
 const DB_PATH = './public/db/meme.db';
@@ -260,10 +265,12 @@ const _initSeriesTable = () => {
     y INT DEFAULT 0,
     width INT DEFAULT 100,
     height INT DEFAULT 100,
-    sid INTEGER CHAR(50) DEFAULT NULL
+    sid INTEGER CHAR(50) DEFAULT NULL,
+    sname CHAR(50) CHECK(sname IN ('${FEATURE_SOURCE_NAME.COMMON}', '${FEATURE_SOURCE_NAME.SERIES}', `
+      + `'${FEATURE_SOURCE_NAME.SPECIAL}')) NOT NULL DEFAULT '${FEATURE_SOURCE_NAME.COMMON}',
+    ipath CHAR(50) CHECK(ipath IN ('${FEATURE_IMAGE_TYPE.DB}', '${FEATURE_IMAGE_TYPE.SVG}', `
+      + `'${FEATURE_IMAGE_TYPE.PNG}')) NOT NULL DEFAULT '${FEATURE_IMAGE_TYPE.DB}'
   );`
-  // TODO 补充存储路径类型
-  // 补充sid对应的stype 表类型
   getDB().run(sql + feature);
 
   seriesData.forEach(item => {
@@ -276,9 +283,10 @@ const _initSeriesTable = () => {
 }
 
 const insertFeatureTable = (options, write = true) => {
-  const {feature, type = 'COMMAND', x = 0, y = 0, width = 100, height = 100, sid = ''} = options;
-  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height, sid) `
-    + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height}, '${sid}');`;
+  const {feature, type = 'COMMAND', x = 0, y = 0, width = 100, height = 100, sid = '',
+    sname = FEATURE_SOURCE_NAME.COMMON, ipath = FEATURE_IMAGE_TYPE.DB} = options;
+  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height, sid, sname, ipath) `
+    + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height}, '${sid}', '${sname}', '${ipath}');`;
 
   try {
     getDB().run(sql);
