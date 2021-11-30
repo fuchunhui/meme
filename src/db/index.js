@@ -23,6 +23,11 @@ export const FEATURE_TYPE = {
   'TEXT': 'TEXT',
   'IMAGE': 'IMAGE'
 };
+export const FEATURE_SOURCE_NAME = {
+  'COMMON': 'STORY_TABLE',
+  'SPECIAL': 'SPECIAL_TABLE',
+  'SERIES': 'SERIES_TABLE'
+};
 
 const DB_PATH = './public/db/meme.db';
 
@@ -256,7 +261,9 @@ const _initSeriesTable = () => {
     width INT DEFAULT 100,
     height INT DEFAULT 100,
     sid INTEGER CHAR(50) DEFAULT NULL
-  );` // TODO 补充存储路径类型
+  );`
+  // TODO 补充存储路径类型
+  // 补充sid对应的stype 表类型
   getDB().run(sql + feature);
 
   seriesData.forEach(item => {

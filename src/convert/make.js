@@ -1,11 +1,12 @@
 import pkg from 'canvas';
-import { getSize } from './size.js';
+import {getSize} from './size.js';
+import {writeImg} from './write.js';
 
 const { createCanvas, Image } = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
 const LINE_HEIGHT = 1.2;
 
-const make = (text, options) => {
+const make = (text, options, extensions) => {
   const base64Img = options.image;
   const parts = base64Img.split(';base64,');
   const type = parts[0].split(':').pop();
@@ -24,22 +25,22 @@ const make = (text, options) => {
 
     img.onload = () => {
       ctx.drawImage(img, 0, 0);
+      ctx.save();
 
-      const {x, y, font, color, align, max, direction} = options;
-      ctx.font = font;
-      ctx.fillStyle = color;
-      ctx.textAlign = align;
+      fillText(ctx, width, text, options);
 
-      const maxWidth = max || width;
-      const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
-      const size = Number(fontSize[1]);
-      const lines = _breakLines(text, maxWidth, ctx);
-      lines.forEach((item, index) => {
-        const dy = direction === 'down' ? index : index - (lines.length - 1);
-        ctx.fillText(item, x, y + dy * size * LINE_HEIGHT, maxWidth);
-      });
+      if (extensions) {
+        const {picture, text: eText, options: eOptions} = extensions;
+        if (picture) {
+          // 画图
+        } else {
+          ctx.restore();
+          fillText(ctx, width, eText, eOptions);
+        }
+      }
 
       base64 = canvas.toDataURL(type);
+      writeImg(base64); // TODO
     };
     img.onerror = err => {
       console.error(err);
@@ -47,6 +48,22 @@ const make = (text, options) => {
     img.src = base64Img;
   }
   return base64;
+};
+
+const fillText = (ctx, width, text, options) => {
+  const {x, y, font, color, align, max, direction} = options;
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+
+  const maxWidth = max || width;
+  const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
+  const size = Number(fontSize[1]);
+  const lines = _breakLines(text, maxWidth, ctx);
+  lines.forEach((item, index) => {
+    const dy = direction === 'down' ? index : index - (lines.length - 1);
+    ctx.fillText(item, x, y + dy * size * LINE_HEIGHT, maxWidth);
+  });
 };
 
 const cook = () => {

@@ -12,7 +12,8 @@ import {
   getSingleTable,
   SERIES_TABLE,
   FEATURE_TABLE,
-  FEATURE_TYPE
+  FEATURE_TYPE,
+  FEATURE_SOURCE_NAME
 } from './db/index.js';
 import { make } from './convert/make.js';
 import { formatMenu, formatNull, formatHelp } from './convert/format.js';
@@ -112,8 +113,10 @@ const control = encryption => {
     }
 
     if (type === FEATURE_TYPE.TEXT && param) {
+      // FEATURE_SOURCE_NAME
       // 绘图，带新增文字版本
-      
+      // 根据sid, sname找到这个图的原始内容
+      // 正常绘图
       return;
     }
 
