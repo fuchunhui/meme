@@ -7,7 +7,7 @@ import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
 import informationData from '../config/common.js';
 import specialData from '../config/special/index.js';
-import seriesData from '../config/series/index.js';
+import seriesData from '../config/series.js';
 import featureData from '../config/feature.js';
 import materialData from '../config/material.js';
 
@@ -41,7 +41,8 @@ const _initTable = () => {
     mid CHAR(50) NOT NULL,
     title CHAR(100) COLLATE NOCASE,
     feature CHAR(100) COLLATE NOCASE,
-    image TEXT NOT NULL
+    image TEXT NOT NULL,
+    senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
   );`
   const text = `CREATE TABLE ${TEXT_TABLE} (
     tid INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,7 +98,7 @@ const _resetDB = () => {
 };
 
 const queryAllTables = () => {
-  return getDB().exec('SELECT name, sql FROM sqlite_master');
+  return getDB().exec('SELECT name, sql FROM sqlite_master;');
 };
 
 const getTable = (tableName = STORY_TABLE, join = true) => {
@@ -113,11 +114,12 @@ const getTable = (tableName = STORY_TABLE, join = true) => {
 };
 
 const insertTable = (options, write = true, tableName = STORY_TABLE) => {
-  const {mid: _mid, title, feature, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
+  const {mid: _mid, title, feature, image, senior = 0, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down'} = options;
   const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
 
-  const sql = `INSERT INTO ${tableName} (mid, title, feature, image) VALUES ('${mid}', '${title}', '${feature}', '${image}');`;
+  const sql = `INSERT INTO ${tableName} (mid, title, feature, image, senior) `
+    + `VALUES ('${mid}', '${title}', '${feature}', '${image}', '${senior}');`;
   const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction) `
     + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}');`;
 
@@ -209,7 +211,8 @@ const _initSpecialTable = () => {
     mid CHAR(50) NOT NULL,
     title CHAR(100) COLLATE NOCASE,
     feature CHAR(100) COLLATE NOCASE,
-    image TEXT NOT NULL
+    image TEXT NOT NULL,
+    senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
   );`
   getDB().run(sql);
 
@@ -235,7 +238,8 @@ const _initSeriesTable = () => {
     mid CHAR(50) NOT NULL,
     title CHAR(100) COLLATE NOCASE,
     feature CHAR(100) COLLATE NOCASE,
-    image TEXT NOT NULL
+    image TEXT NOT NULL,
+    senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
   );`
   const feature = `CREATE TABLE ${FEATURE_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -259,7 +263,7 @@ const _initSeriesTable = () => {
 }
 
 const insertFeatureTable = (options, write = true) => {
-  const {feature, type, x = 0, y = 0, width = 100, height = 100, sid = ''} = options;
+  const {feature, type = 'COMMAND', x = 0, y = 0, width = 100, height = 100, sid = ''} = options;
   const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height, sid) `
     + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height}, '${sid}');`;
 
@@ -307,7 +311,7 @@ const insertMaterialTable = (options, write = true) => {
   const {mid: _mid, title, image} = options;
   const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
 
-  const sql = `INSERT INTO ${MATERIAL_TABLE} (mid, title, image) VALUES ('${mid}', '${title}','${image}');`;
+  const sql = `INSERT INTO ${MATERIAL_TABLE} (mid, title, image) VALUES ('${mid}', '${title}', '${image}');`;
 
   try {
     getDB().run(sql);
