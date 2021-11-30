@@ -50,8 +50,8 @@ const backup = base => {
   save(base, 'common', STORY_TABLE);
   save(base, 'special', SPECIAL_TABLE);
   save(base, 'series', SERIES_TABLE);
-  save(base, 'material', MATERIAL_TABLE);
   saveSingle(base, 'feature', getFeatureData);
+  saveSingle(base, 'material', getMaterialData);
 };
 
 const getFeatureData = () => {
@@ -65,6 +65,20 @@ const getFeatureData = () => {
       width,
       height,
       sid
+    };
+  });
+
+  return result;
+};
+
+const getMaterialData = () => {
+  const list = getSingleTable(MATERIAL_TABLE);
+  const result = list.map(({mid, feature, title, image}) => {
+    return {
+      mid,
+      feature,
+      title,
+      image
     };
   });
 

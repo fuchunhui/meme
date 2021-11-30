@@ -18,6 +18,7 @@ export const SPECIAL_TABLE = 'SPECIAL';
 export const SERIES_TABLE = 'SERIES';
 export const FEATURE_TABLE = 'FEATURE';
 export const MATERIAL_TABLE = 'MATERIAL';
+
 const DB_PATH = './public/db/meme.db';
 
 const SQL = await initSqlJs({
