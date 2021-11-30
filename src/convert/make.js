@@ -28,7 +28,7 @@ const make = (text, options, extensions) => {
       ctx.save();
 
       fillText(ctx, width, text, options);
-
+      // console.log('extensions: ------>', extensions);
       if (extensions) {
         const {picture, text: eText, options: eOptions} = extensions;
         if (picture) {

@@ -24,9 +24,9 @@ export const FEATURE_TYPE = {
   'IMAGE': 'IMAGE'
 };
 const FEATURE_SOURCE_NAME = {
-  'COMMON': 'STORY_TABLE',
-  'SPECIAL': 'SPECIAL_TABLE',
-  'SERIES': 'SERIES_TABLE'
+  'COMMON': STORY_TABLE,
+  'SPECIAL': SPECIAL_TABLE,
+  'SERIES': SERIES_TABLE
 };
 export const FEATURE_IMAGE_TYPE = {
   'SVG': 'SVG',
@@ -261,13 +261,14 @@ const _initSeriesTable = () => {
     feature CHAR(100) COLLATE NOCASE,
     type CHAR(50) CHECK(type IN ('${FEATURE_TYPE.COMMAND}', '${FEATURE_TYPE.IMAGE}', `
       + `'${FEATURE_TYPE.TEXT}')) NOT NULL DEFAULT '${FEATURE_TYPE.COMMAND}',
+    sid INTEGER CHAR(50) DEFAULT NULL,
+    sname CHAR(50) CHECK(sname IN ('${FEATURE_SOURCE_NAME.COMMON}', '${FEATURE_SOURCE_NAME.SERIES}', `
+      + `'${FEATURE_SOURCE_NAME.SPECIAL}')) NOT NULL DEFAULT '${FEATURE_SOURCE_NAME.COMMON}',
+    tid INTEGER CHAR(50) DEFAULT NULL,
     x INT DEFAULT 0,
     y INT DEFAULT 0,
     width INT DEFAULT 100,
     height INT DEFAULT 100,
-    sid INTEGER CHAR(50) DEFAULT NULL,
-    sname CHAR(50) CHECK(sname IN ('${FEATURE_SOURCE_NAME.COMMON}', '${FEATURE_SOURCE_NAME.SERIES}', `
-      + `'${FEATURE_SOURCE_NAME.SPECIAL}')) NOT NULL DEFAULT '${FEATURE_SOURCE_NAME.COMMON}',
     ipath CHAR(50) CHECK(ipath IN ('${FEATURE_IMAGE_TYPE.DB}', '${FEATURE_IMAGE_TYPE.SVG}', `
       + `'${FEATURE_IMAGE_TYPE.PNG}')) NOT NULL DEFAULT '${FEATURE_IMAGE_TYPE.DB}'
   );`
@@ -283,10 +284,10 @@ const _initSeriesTable = () => {
 }
 
 const insertFeatureTable = (options, write = true) => {
-  const {feature, type = 'COMMAND', x = 0, y = 0, width = 100, height = 100, sid = '',
-    sname = FEATURE_SOURCE_NAME.COMMON, ipath = FEATURE_IMAGE_TYPE.DB} = options;
-  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, x, y, width, height, sid, sname, ipath) `
-    + `VALUES ('${feature}', '${type}', ${x}, ${y}, ${width}, ${height}, '${sid}', '${sname}', '${ipath}');`;
+  const {feature, type = 'COMMAND', sid = '', sname = FEATURE_SOURCE_NAME.COMMON, tid = '',
+    x = 0, y = 0, width = 100, height = 100, ipath = FEATURE_IMAGE_TYPE.DB} = options;
+  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, sid, sname, tid, x, y, width, height, ipath) `
+    + `VALUES ('${feature}', '${type}', '${sid}', '${sname}', '${tid}', ${x}, ${y}, ${width}, ${height}, '${ipath}');`;
 
   try {
     getDB().run(sql);
