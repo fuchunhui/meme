@@ -43,7 +43,6 @@ const _decode = encryption => {
 const parser = encryption => {
   const content = _decode(encryption);
   const {header, body} = content.message;
-  console.log(header, body); // TODO
   const {fromuserid: fromid, toid} = header;
   const cell = body.find(({type, content}) => type === 'TEXT' && content.trim());
   let message = cell ? cell.content.trim() : '';
@@ -51,13 +50,13 @@ const parser = encryption => {
   let command = '';
   let params = [];
   let text = '';
+
   if (message) {
     const quotationText = matchText(message);
     if (quotationText) {
       message = message.replace(quotationText, '').trim();
     }
 
-    console.log('quotationText: ', quotationText);
     const info = message.split(' ');
     command = info.shift();
     if (quotationText) {
@@ -66,10 +65,6 @@ const parser = encryption => {
       text = info.pop() || '';
     }
     params = info;
-
-    // console.log('command--->', command);
-    // console.log('text--->', text);
-    // console.log('params--->', params);
   }
 
   return {

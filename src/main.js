@@ -80,18 +80,12 @@ const control = encryption => {
     return;
   }
 
-  // 周报 张飞 大家
   const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
   console.log('singleList: ', singleList);
 
-  if (singleList.length) { // 有内容
-    // const {type, sid, sname, tid} = singleList[0];
-    // const param = params.length ? params[0] : '';
-    const param = 'vscode';
-    const type = 'IMAGE';
-    const sid = 'meme_1638242413038';
-    const sname = 'STORY';
-    const tid = 'meme_1638188661236';
+  if (singleList.length) {
+    const {type, sid, sname, tid} = singleList[0];
+    const param = params.length ? params[0] : '';
 
     if (type === FEATURE_TYPE.COMMAND) {
       const commands = getDataListByColumn(command, 'feature', SERIES_TABLE);

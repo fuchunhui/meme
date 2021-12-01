@@ -1,6 +1,5 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
-import {writeImg} from './write.js';
 
 const { createCanvas, Image } = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
@@ -40,7 +39,6 @@ const make = (text, options, extensions) => {
           extImg.onload = () => {
             ctx.drawImage(extImg, ex, ey, ewidth, eheight);
             base64 = canvas.toDataURL(type);
-            // writeImg(base64); // DELETE
             return base64;
           };
           extImg.src = eBase64;
@@ -50,7 +48,6 @@ const make = (text, options, extensions) => {
         }
       }
       base64 = canvas.toDataURL(type);
-      // writeImg(base64); // DELETE
     };
     img.onerror = err => {
       console.error(err);
