@@ -73,7 +73,7 @@ const _initTable = () => {
   const logger = `CREATE TABLE ${LOG_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fromid CHAR(100) NOT NULL,
-    text CHAR(100) NOT NULL,
+    text CHAR(200) NOT NULL,
     date Date
   );`;
   getDB().run(sql + text + logger);

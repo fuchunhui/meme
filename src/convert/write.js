@@ -1,4 +1,7 @@
 import * as fs from 'fs';
+import path from 'path';
+
+const __dirname = path.resolve();
 
 const named = () => {
   return `meme_${new Date().getTime()}`.padEnd(18, '0');
@@ -18,8 +21,14 @@ const removeImg = path => {
   fs.rmSync(path);
 }
 
+const testFile = (ipath = 'svg', name = '', targetDir = 'lib') => {
+  const filePath = path.resolve(__dirname, targetDir, ipath, `${name}.${ipath}`);
+  return fs.existsSync(filePath) ? filePath : false;
+}
+
 export {
   named,
   writeImg,
-  removeImg
+  removeImg,
+  testFile
 };
