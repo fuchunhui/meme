@@ -1,12 +1,13 @@
 {
   "name": "meme",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "a robot",
   "main": "app.js",
   "scripts": {
     "tsh": "sh .draft/test.sh",
     "tjs": "node .draft/test.js",
     "tsvg": "node .draft/test-svg.js",
+    "t64":  "node .draft/convert.js",
     "db": "sh .draft/db.sh",
     "test": "cross-env NODE_ENV=test node app.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
