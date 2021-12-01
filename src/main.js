@@ -81,7 +81,6 @@ const control = encryption => {
   }
 
   const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
-  console.log('singleList: ', singleList);
 
   if (singleList.length) {
     const {type, sid, sname, tid} = singleList[0];
