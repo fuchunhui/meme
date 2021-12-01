@@ -6,6 +6,11 @@ const { createCanvas, Image } = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
 const LINE_HEIGHT = 1.2;
 
+const extImg = new Image();
+extImg.onerror = err => {
+  console.error(err);
+};
+
 const make = (text, options, extensions) => {
   const base64Img = options.image;
   const parts = base64Img.split(';base64,');
@@ -28,19 +33,24 @@ const make = (text, options, extensions) => {
       ctx.save();
 
       fillText(ctx, width, text, options);
-      // console.log('extensions: ------>', extensions);
       if (extensions) {
         const {picture, text: eText, options: eOptions} = extensions;
         if (picture) {
-          // 画图
+          const {image: eBase64, x: ex, y: ey, width: ewidth, height: eheight} = eOptions;
+          extImg.onload = () => {
+            ctx.drawImage(extImg, ex, ey, ewidth, eheight);
+            base64 = canvas.toDataURL(type);
+            // writeImg(base64); // DELETE
+            return base64;
+          };
+          extImg.src = eBase64;
         } else {
           ctx.restore();
           fillText(ctx, width, eText, eOptions);
         }
       }
-
       base64 = canvas.toDataURL(type);
-      writeImg(base64); // TODO
+      // writeImg(base64); // DELETE
     };
     img.onerror = err => {
       console.error(err);
@@ -52,9 +62,9 @@ const make = (text, options, extensions) => {
 
 const fillText = (ctx, width, text, options) => {
   const {x, y, font, color, align, max, direction} = options;
-  ctx.font = font;
-  ctx.fillStyle = color;
-  ctx.textAlign = align;
+  ctx.font = font || '32px sans-serif';
+  ctx.fillStyle = color || '#000000';
+  ctx.textAlign = align || 'center';
 
   const maxWidth = max || width;
   const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
