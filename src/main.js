@@ -12,12 +12,16 @@ import {
   TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
-  FEATURE_TYPE
+  FEATURE_TYPE,
+  FEATURE_IMAGE_TYPE,
+  MATERIAL_TABLE
 } from './db/index.js';
 import { make } from './convert/make.js';
-import { formatMenu, formatNull, formatHelp } from './convert/format.js';
+import { formatMenu, formatNull, formatHelp, formatError } from './convert/format.js';
 import { send } from './service/index.js';
-import {COMMAND_LIST} from './config/constant.js';
+import { testFile } from './convert/write.js';
+import { convert } from './convert/base64.js';
+import { COMMAND_LIST } from './config/constant.js';
 
 export * from './service/router.js';
 export * from './export/backup.js';
@@ -37,8 +41,6 @@ const special = (command, toid, text) => {
 
   return specialCommand;
 };
-
-// const send
 
 const control = encryption => {
   const {fromid, toid, command, text, params} = parser(encryption);
@@ -80,13 +82,13 @@ const control = encryption => {
 
   // 周报 张飞 大家
   const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
-  // console.log('singleList: ', singleList);
+  console.log('singleList: ', singleList);
 
   if (singleList.length) { // 有内容
     // const {type, sid, sname, tid} = singleList[0];
     // const param = params.length ? params[0] : '';
-    const param = '李四';
-    const type = 'TEXT';
+    const param = 'vscode';
+    const type = 'IMAGE';
     const sid = 'meme_1638242413038';
     const sname = 'STORY';
     const tid = 'meme_1638188661236';
@@ -105,26 +107,71 @@ const control = encryption => {
       return;
     }
 
-    if (type === FEATURE_TYPE.TEXT && param) {
-      const textData = getDataByColumn(sid, 'mid', sname);
-      const options = getDataListByColumn(tid, 'mid', TEXT_TABLE);
-      if (textData.image && options.length) {
-        const base64 = make(text, textData, {
-          picture: false,
-          text: param,
-          options: options[0]
-        });
-        send(toid, base64);
-      }
+    const imageData = getDataByColumn(sid, 'mid', sname);
+    if (!imageData.image) {
+      const content = formatError();
+      send(toid, content, 'TEXT');
+
+      insertLog({
+        fromid,
+        text: `miss ${sid} in ${sname}. title is [${command}].`,
+        date: new Date()
+      });
       return;
     }
 
-    if (type === FEATURE_TYPE.IMAGE && param) {
-      const {x, y, width, height} = singleList[0];
-      // 绘图，带新增文字版本
-      // 获取对应的路径，是否为SVG / Material 等内容，然后判断是否存在
-      // 存在，绘制图形
-      // 不存在，绘制文本，
+    if (param) {
+      let options = {};
+      let imageBase64 = '';
+
+      if (type === FEATURE_TYPE.TEXT) {
+        const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE);
+        if (textStyles.length) {
+          options = textStyles[0];
+        }
+      }
+
+      if (type === FEATURE_TYPE.IMAGE) {
+        const {x, y, width, height, ipath} = singleList[0];
+
+        if (ipath === FEATURE_IMAGE_TYPE.DB) { // 数据库资源
+          const materialData = getDataListByColumn(param, 'title', MATERIAL_TABLE);
+          imageBase64 = materialData.image || '';
+        } else {
+          const filePath = testFile(ipath.toLowerCase(), param);
+          if (filePath) {
+            imageBase64 = convert(filePath);
+          }
+        }
+
+        if (imageBase64) {
+          options = {
+            image: imageBase64,
+            x,
+            y,
+            width,
+            height
+          }
+        } else {
+          const {font, color, direction} = imageData;
+          options = {
+            x,
+            y,
+            max: width,
+            font,
+            color,
+            align: 'center',
+            direction
+          }
+        }
+      }
+
+      const base64 = make(text, imageData, {
+        picture: Boolean(imageBase64),
+        text: param,
+        options
+      });
+      send(toid, base64);
       return;
     }
   }
