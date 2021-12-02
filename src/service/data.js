@@ -54,11 +54,12 @@ const _getStory = (target = []) => {
 const _getFeature = (target = []) => {
   const singleList = getSingleTable(FEATURE_TABLE);
   const children = [];
-  singleList.length && singleList.forEach(({feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
+  singleList.length && singleList.forEach(({mid, feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
     if (type === FEATURE_TYPE.COMMAND) {
       return;
     }
     let cell = {
+      mid,
       feature,
       type,
       sid,

@@ -57,8 +57,9 @@ const backup = base => {
 
 const getFeatureData = () => {
   const list = getSingleTable(FEATURE_TABLE);
-  const result = list.map(({feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
+  const result = list.map(({mid, feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
     return {
+      mid,
       feature,
       type,
       sid,

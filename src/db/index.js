@@ -258,6 +258,7 @@ const _initSeriesTable = () => {
   );`
   const feature = `CREATE TABLE ${FEATURE_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
     feature CHAR(100) COLLATE NOCASE,
     type CHAR(50) CHECK(type IN ('${FEATURE_TYPE.COMMAND}', '${FEATURE_TYPE.IMAGE}', `
       + `'${FEATURE_TYPE.TEXT}')) NOT NULL DEFAULT '${FEATURE_TYPE.COMMAND}',
@@ -284,10 +285,11 @@ const _initSeriesTable = () => {
 }
 
 const insertFeatureTable = (options, write = true) => {
-  const {feature, type = 'COMMAND', sid = '', sname = FEATURE_SOURCE_NAME.COMMON, tid = '',
+  const {mid: _mid, feature, type = 'COMMAND', sid = '', sname = FEATURE_SOURCE_NAME.COMMON, tid = '',
     x = 0, y = 0, width = 100, height = 100, ipath = FEATURE_IMAGE_TYPE.DB} = options;
-  const sql = `INSERT INTO ${FEATURE_TABLE} (feature, type, sid, sname, tid, x, y, width, height, ipath) `
-    + `VALUES ('${feature}', '${type}', '${sid}', '${sname}', '${tid}', ${x}, ${y}, ${width}, ${height}, '${ipath}');`;
+  const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
+  const sql = `INSERT INTO ${FEATURE_TABLE} (mid, feature, type, sid, sname, tid, x, y, width, height, ipath) `
+    + `VALUES ('${mid}', '${feature}', '${type}', '${sid}', '${sname}', '${tid}', ${x}, ${y}, ${width}, ${height}, '${ipath}');`;
 
   try {
     getDB().run(sql);
