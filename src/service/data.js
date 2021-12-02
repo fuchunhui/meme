@@ -5,10 +5,12 @@ import {
   updateTextTable,
   getDataByColumn,
   getDataListByColumn,
+  getSingleTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
-  FEATURE_TABLE
+  FEATURE_TABLE,
+  FEATURE_TYPE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {
@@ -21,6 +23,9 @@ const COMMON_TEXT = '常用';
 const COMMON_TYPE = 'COMMON';
 const SPECIAL_TYPE = 'SPECIAL';
 const SERIES_TYPE = 'SERIES';
+const FEATURE_ID = 'meme_feature';
+const FEATURE_TEXT = '高级';
+const CATALOG_FEATURE_TYPE = 'FEATURE';
 
 const TabMap = {
   [COMMON_TYPE]: STORY_TABLE,
@@ -28,7 +33,55 @@ const TabMap = {
   [SERIES_TABLE]: SERIES_TYPE
 };
 
-const _getFeature = (tabName = SERIES_TABLE, target = []) => {
+const _getStory = (target = []) => {
+  const list = getTable(STORY_TABLE, false);
+  if (list.length) {
+    const children = list.map(({mid, title}) => {
+      return {
+        mid,
+        title
+      };
+    });
+    target.push({
+      id: COMMON_ID,
+      text: COMMON_TEXT,
+      type: COMMON_TYPE,
+      children
+    });
+  }
+};
+
+const _getFeature = (target = []) => {
+  const singleList = getSingleTable(FEATURE_TABLE);
+  const children = [];
+  singleList.length && singleList.forEach(({feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
+    if (type === FEATURE_TYPE.COMMAND) {
+      return;
+    }
+    let cell = {
+      feature,
+      type,
+      sid,
+      sname
+    };
+    if (type === FEATURE_TYPE.TEXT) {
+      cell = Object.assign(cell, {tid});
+    }
+    if (type === FEATURE_TYPE.IMAGE) {
+      cell = Object.assign(cell, {x, y, width, height, ipath});
+    }
+    children.push(cell);
+  });
+
+  target.push({
+    id: FEATURE_ID,
+    text: FEATURE_TEXT,
+    type: CATALOG_FEATURE_TYPE,
+    children
+  });
+};
+
+const _getSeries = (tabName = SERIES_TABLE, target = []) => {
   const list = getTable(tabName, false);
   if (list.length) {
     const map = new Map();
@@ -44,42 +97,23 @@ const _getFeature = (tabName = SERIES_TABLE, target = []) => {
     });
 
     map.forEach((value, key) => {
-      let cell = {
+      target.push({
         id: key,
         text: key,
         type: TabMap[tabName],
         children: value
-      };
-      if (tabName === SERIES_TABLE) {
-        const singleList = getDataListByColumn(key, 'feature', FEATURE_TABLE);
-        const {type: seriesType, x, y, width, height} = singleList[0];
-        cell = Object.assign(cell, {seriesType, x, y, width, height});
-      }
-      target.push(cell);
+      });
     });
   }
 };
 
 const getCatalog = () => {
   const result = [];
-  const list = getTable(STORY_TABLE, false);
-  if (list.length) {
-    const children = list.map(({mid, title}) => {
-      return {
-        mid,
-        title
-      };
-    });
-    result.push({
-      id: COMMON_ID,
-      text: COMMON_TEXT,
-      type: COMMON_TYPE,
-      children
-    });
-  }
 
-  _getFeature(SERIES_TABLE, result);
-  _getFeature(SPECIAL_TABLE, result);
+  _getStory(result);
+  _getSeries(SERIES_TABLE, result);
+  _getFeature(result);
+  _getSeries(SPECIAL_TABLE, result);
 
   return result;
 };
