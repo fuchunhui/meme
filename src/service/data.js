@@ -55,23 +55,15 @@ const _getStory = (target = []) => {
 const _getFeature = (target = []) => {
   const singleList = getSingleTable(FEATURE_TABLE);
   const children = [];
-  singleList.length && singleList.forEach(({mid, feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
+  singleList.length && singleList.forEach(({mid, feature, type}) => {
     if (type === FEATURE_TYPE.COMMAND) {
       return;
     }
     let cell = {
       mid,
-      feature,
-      type,
-      sid,
-      sname
+      title: feature,
+      type
     };
-    if (type === FEATURE_TYPE.TEXT) {
-      cell = Object.assign(cell, {tid});
-    }
-    if (type === FEATURE_TYPE.IMAGE) {
-      cell = Object.assign(cell, {x, y, width, height, ipath});
-    }
     children.push(cell);
   });
 
