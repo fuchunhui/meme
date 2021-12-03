@@ -4,7 +4,6 @@ import {
   updateTable,
   updateTextTable,
   getDataByColumn,
-  getDataListByColumn,
   getSingleTable,
   STORY_TABLE,
   SPECIAL_TABLE,
@@ -18,19 +17,21 @@ import {
   CREATE_REPEAT_TITLE
 } from '../config/constant.js';
 
-const COMMON_ID = 'meme_common';
-const COMMON_TEXT = '常用';
-const COMMON_TYPE = 'COMMON';
-const SPECIAL_TYPE = 'SPECIAL';
-const SERIES_TYPE = 'SERIES';
-const FEATURE_ID = 'meme_feature';
-const FEATURE_TEXT = '高级';
-const CATALOG_FEATURE_TYPE = 'FEATURE';
+const COMMAND_ID = {
+  [STORY_TABLE]: 'meme_common',
+  [FEATURE_TABLE]: 'meme_feature'
+};
 
-const TabMap = {
-  [COMMON_TYPE]: STORY_TABLE,
-  [SPECIAL_TABLE]: SPECIAL_TYPE,
-  [SERIES_TABLE]: SERIES_TYPE
+const COMMAND_TEXT = {
+  [STORY_TABLE]: '常用',
+  [FEATURE_TABLE]: '高级'
+};
+
+const COMMAND_TYPE = {
+  [STORY_TABLE]: STORY_TABLE,
+  [SPECIAL_TABLE]: SPECIAL_TABLE,
+  [SERIES_TABLE]: SERIES_TABLE,
+  [FEATURE_TABLE]: FEATURE_TABLE
 };
 
 const _getStory = (target = []) => {
@@ -43,9 +44,9 @@ const _getStory = (target = []) => {
       };
     });
     target.push({
-      id: COMMON_ID,
-      text: COMMON_TEXT,
-      type: COMMON_TYPE,
+      id: COMMAND_ID[STORY_TABLE],
+      text: COMMAND_TEXT[STORY_TABLE],
+      type: COMMAND_TYPE[STORY_TABLE],
       children
     });
   }
@@ -75,9 +76,9 @@ const _getFeature = (target = []) => {
   });
 
   target.push({
-    id: FEATURE_ID,
-    text: FEATURE_TEXT,
-    type: CATALOG_FEATURE_TYPE,
+    id: COMMAND_ID[FEATURE_TABLE],
+    text: COMMAND_TEXT[FEATURE_TABLE],
+    type: COMMAND_TYPE[FEATURE_TABLE],
     children
   });
 };
@@ -101,7 +102,7 @@ const _getSeries = (tabName = SERIES_TABLE, target = []) => {
       target.push({
         id: key,
         text: key,
-        type: TabMap[tabName],
+        type: COMMAND_TYPE[tabName],
         children: value
       });
     });
@@ -120,7 +121,7 @@ const getCatalog = () => {
 };
 
 const open = (mid, type) => {
-  const tabName = TabMap[type];
+  const tabName = COMMAND_TYPE[type];
   const data = getDataByColumn(mid, 'mid', tabName);
   const {title, feature, image, x, y, max, font, color, align, direction} = data;
 
