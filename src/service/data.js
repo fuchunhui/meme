@@ -4,12 +4,14 @@ import {
   updateTable,
   updateTextTable,
   getDataByColumn,
+  getDataListByColumn,
   getSingleTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
-  FEATURE_TYPE
+  FEATURE_TYPE,
+  TEXT_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {
@@ -154,10 +156,32 @@ const updateText = (options) => {
   return emptySucess();
 };
 
+const openFeature = mid => {
+  const featureList = getDataListByColumn(mid, 'mid', FEATURE_TABLE);
+  const {feature, type, sid, sname, tid, x, y, width, height, ipath} = featureList[0];
+  const story = open(sid, sname);
+  let cell = {
+    mid,
+    feature,
+    type,
+    story
+  };
+
+  if (type === FEATURE_TYPE.TEXT) {
+    const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE);
+    cell.et = textStyles.length ? textStyles[0] : null;
+  } else if (type === FEATURE_TYPE.IMAGE) {
+    cell.ei = {x, y, width, height, ipath};
+  }
+
+  return sucess(cell);
+};
+
 export {
   getCatalog,
   open,
   create,
   update,
-  updateText
+  updateText,
+  openFeature
 };

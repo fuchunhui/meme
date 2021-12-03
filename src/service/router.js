@@ -2,7 +2,8 @@ import {
   getCatalog,
   open,
   create,
-  updateText
+  updateText,
+  openFeature
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -55,6 +56,17 @@ const listen = app => {
       errNo: 0,
       message: 'success'
     });
+  });
+
+  app.get('/image/feature/open', (req, res) => {
+    const {mid} = req.query;
+    const data = openFeature(mid);
+    res.send(data);
+  });
+
+  app.get('/image/feature/image', (req, res) => {
+    const {ipath, text} = req.query;
+    // TODO 返回base64 || '';
   });
 };
 
