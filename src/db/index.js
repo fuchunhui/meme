@@ -306,6 +306,29 @@ const insertFeatureTable = (options, write = true) => {
   }
 };
 
+const updateFeatureTable = (options) => {
+  const list = [];
+  Object.keys(options).forEach(key => {
+    if (key === 'mid') {
+      return;
+    }
+    const value = options[key];
+    const realValue = typeof value === 'string' ? `'${value}'` : value;
+    list.push(`${key}=${realValue}`);
+  });
+
+  const append = list.join(', ');
+  const sql = `UPDATE ${FEATURE_TABLE} SET ${append} WHERE mid = '${options.mid}';`;
+
+  try {
+    getDB().run(sql);
+
+    writeDB();
+  } catch (error) {
+    return error.toString();
+  }
+};
+
 const getSingleTable = (tableName = STORY_TABLE) => {
   const contents = [];
   const stmt = getDB().prepare(`SELECT * FROM ${tableName};`);
@@ -366,5 +389,6 @@ export {
   getSpecialDataListByColumn,
   updateTextTable,
   insertLog,
-  getSingleTable
+  getSingleTable,
+  updateFeatureTable
 };

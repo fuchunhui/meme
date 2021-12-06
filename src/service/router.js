@@ -3,7 +3,8 @@ import {
   open,
   create,
   updateText,
-  openFeature
+  openFeature,
+  updateFeature
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -61,6 +62,12 @@ const listen = app => {
   app.get('/image/feature/open', (req, res) => {
     const {mid} = req.query;
     const data = openFeature(mid);
+    res.send(data);
+  });
+
+  app.post('/image/feature/save', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = updateFeature(req.body);
     res.send(data);
   });
 

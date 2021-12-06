@@ -6,6 +6,7 @@ import {
   getDataByColumn,
   getDataListByColumn,
   getSingleTable,
+  updateFeatureTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
@@ -106,9 +107,10 @@ const _getSeries = (tabName = SERIES_TABLE, target = []) => {
 const getCatalog = () => {
   const result = [];
 
+  _getFeature(result); // TODO 测试暂时放在最上
   _getStory(result);
   _getSeries(SERIES_TABLE, result);
-  _getFeature(result);
+  // _getFeature(result);
   _getSeries(SPECIAL_TABLE, result);
 
   return result;
@@ -177,11 +179,20 @@ const openFeature = mid => {
   return sucess(cell);
 };
 
+const updateFeature = (options) => {
+  const data = updateFeatureTable(options);
+  if (data) {
+    return error(data, UPDATE_TEXT_FAIL);
+  }
+  return emptySucess();
+}
+
 export {
   getCatalog,
   open,
   create,
   update,
   updateText,
-  openFeature
+  openFeature,
+  updateFeature
 };
