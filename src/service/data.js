@@ -16,6 +16,8 @@ import {
   FEATURE_IMAGE_TYPE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
+import { testFile } from '../convert/write.js';
+import { convert } from '../convert/base64.js';
 import {
   UPDATE_TEXT_FAIL,
   CREATE_REPEAT_TITLE
@@ -192,6 +194,21 @@ const getImagePaths = () => {
   return Object.values(FEATURE_IMAGE_TYPE);
 };
 
+const getBase64 = (type, title) => {
+  let imageBase64 = '';
+  if (type === FEATURE_IMAGE_TYPE.DB) {
+    const materialData = getDataListByColumn(title, 'title', MATERIAL_TABLE);
+    imageBase64 = materialData.image || '';
+  } else {
+    const filePath = testFile(type.toLowerCase(), title);
+    if (filePath) {
+      imageBase64 = convert(filePath);
+    }
+  }
+
+  return imageBase64;
+};
+
 export {
   getCatalog,
   open,
@@ -200,5 +217,6 @@ export {
   updateText,
   openFeature,
   updateFeature,
-  getImagePaths
+  getImagePaths,
+  getBase64
 };

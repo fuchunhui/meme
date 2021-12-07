@@ -5,7 +5,8 @@ import {
   updateText,
   openFeature,
   updateFeature,
-  getImagePaths
+  getImagePaths,
+  getBase64
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -76,9 +77,14 @@ const listen = app => {
     res.send(data);
   });
 
-  app.get('/image/feature/image', (req, res) => {
-    const {ipath, text} = req.query;
-    // TODO 返回base64 || '';
+  app.get('/material/base64', (req, res) => {
+    const {ipath, value} = req.query;
+    const data = getBase64(ipath, value);
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
   });
 };
 

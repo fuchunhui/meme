@@ -57,6 +57,11 @@ const make = (text, options, extensions) => {
   return base64;
 };
 
+const getFontSize = font => {
+  const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
+  return Number(fontSize[1]);
+};
+
 const fillText = (ctx, width, text, options) => {
   const {x, y, font, color, align, max, direction} = options;
   ctx.font = font || '32px sans-serif';
@@ -64,8 +69,7 @@ const fillText = (ctx, width, text, options) => {
   ctx.textAlign = align || 'center';
 
   const maxWidth = max || width;
-  const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
-  const size = Number(fontSize[1]);
+  const size = getFontSize(font);
   const lines = _breakLines(text, maxWidth, ctx);
   lines.forEach((item, index) => {
     const dy = direction === 'down' ? index : index - (lines.length - 1);
@@ -124,5 +128,6 @@ const _breakLines = (text, width, ctx) => {
 };
 
 export {
-  make
+  make,
+  getFontSize
 };
