@@ -12,15 +12,12 @@ import {
   TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
-  FEATURE_TYPE,
-  FEATURE_IMAGE_TYPE,
-  MATERIAL_TABLE
+  FEATURE_TYPE
 } from './db/index.js';
-import { make } from './convert/make.js';
+import { make, getFontSize } from './convert/make.js';
 import { formatMenu, formatNull, formatHelp, formatError } from './convert/format.js';
 import { send } from './service/index.js';
-import { testFile } from './convert/write.js';
-import { convert } from './convert/base64.js';
+import { getBase64 } from './service/data.js';
 import { COMMAND_LIST } from './config/constant.js';
 
 export * from './service/router.js';
@@ -126,16 +123,7 @@ const control = encryption => {
 
       if (type === FEATURE_TYPE.IMAGE) {
         const {x, y, width, height, ipath} = singleList[0];
-
-        if (ipath === FEATURE_IMAGE_TYPE.DB) { // 数据库资源
-          const materialData = getDataListByColumn(param, 'title', MATERIAL_TABLE);
-          imageBase64 = materialData.image || '';
-        } else {
-          const filePath = testFile(ipath.toLowerCase(), param);
-          if (filePath) {
-            imageBase64 = convert(filePath);
-          }
-        }
+        imageBase64 = getBase64(ipath, param);
 
         if (imageBase64) {
           options = {
@@ -148,8 +136,8 @@ const control = encryption => {
         } else {
           const {font, color, direction} = imageData;
           options = {
-            x,
-            y,
+            x: x + width / 2,
+            y: y + getFontSize(font),
             max: width,
             font,
             color,

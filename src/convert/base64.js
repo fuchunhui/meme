@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import path from 'path';
 
 const appendBase64 = (buffer, ext) => {
-  return `data:image${ext.replace('.', '/')};base64,${buffer}`;
+  let template = ext;
+  if (ext === '.svg') {
+    template = '.svg+xml';
+  }
+  return `data:image${template.replace('.', '/')};base64,${buffer}`;
 };
 
 const convert = filePath => {
