@@ -110,10 +110,9 @@ const _getSeries = (tabName = SERIES_TABLE, target = []) => {
 const getCatalog = () => {
   const result = [];
 
-  _getFeature(result); // TODO 测试暂时放在最上
   _getStory(result);
   _getSeries(SERIES_TABLE, result);
-  // _getFeature(result);
+  _getFeature(result);
   _getSeries(SPECIAL_TABLE, result);
 
   return result;
