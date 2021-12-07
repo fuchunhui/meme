@@ -127,8 +127,17 @@ const open = (mid, type) => {
 };
 
 const create = (options) => {
-  const result = getDataByColumn(options.title, 'title', STORY_TABLE); // TODO 新建的去重判断，目前只处理了story表，还需要检测feature表内容
-  if (result.mid) {
+  const result = getDataByColumn(options.title, 'title', STORY_TABLE);
+
+  const singleList = getSingleTable(FEATURE_TABLE);
+  const children = singleList.map(({mid, feature}) => {
+    return {
+      mid,
+      title: feature
+    };
+  });
+
+  if (result.mid || children.some(item => item.title === options.title)) {
     return error({
       title: options.title
     }, CREATE_REPEAT_TITLE);
