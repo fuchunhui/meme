@@ -4,7 +4,8 @@ import {
   create,
   updateText,
   openFeature,
-  updateFeature
+  updateFeature,
+  getImagePaths
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -51,9 +52,13 @@ const listen = app => {
     console.log('备用接口');
   });
 
-  app.get('/image/commands', (req, res) => {
+  app.get('/image/config', (req, res) => {
+    const data = {
+      commands: COMMAND_LIST,
+      paths: getImagePaths()
+    };
     res.send({
-      data: COMMAND_LIST,
+      data,
       errNo: 0,
       message: 'success'
     });

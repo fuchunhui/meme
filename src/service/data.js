@@ -12,7 +12,8 @@ import {
   SERIES_TABLE,
   FEATURE_TABLE,
   FEATURE_TYPE,
-  TEXT_TABLE
+  TEXT_TABLE,
+  FEATURE_IMAGE_TYPE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {
@@ -187,6 +188,10 @@ const updateFeature = (options) => {
   return emptySucess();
 }
 
+const getImagePaths = () => {
+  return Object.values(FEATURE_IMAGE_TYPE);
+};
+
 export {
   getCatalog,
   open,
@@ -194,5 +199,6 @@ export {
   update,
   updateText,
   openFeature,
-  updateFeature
+  updateFeature,
+  getImagePaths
 };
