@@ -69,7 +69,6 @@ const formatAllMenu = (storyList, seniorList, seriesMap) => {
   const normal = formatMultiMenu(storyList, COMMAND_LENGTH);
   const senior = formatMultiMenu(seniorList, COMMAND_LENGTH);
 
-  const seriesMap = seriesMenu();
   const seriesList = [];
   seriesMap.forEach((value, key) => {
     seriesList.push(`${key}(${value.join('/')})`);
