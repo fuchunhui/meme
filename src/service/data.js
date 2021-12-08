@@ -40,6 +40,31 @@ const COMMAND_TYPE = {
   [FEATURE_TABLE]: FEATURE_TABLE
 };
 
+const normalMenu = () => {
+  const list = getTable(STORY_TABLE, false);
+  return list.filter(item => item.senior === 0).map(item => item.title);
+};
+
+const seniorMenu = () => {
+  const list = getSingleTable(FEATURE_TABLE);
+  return list.filter(item => item.type !== FEATURE_TYPE.COMMAND).map(item => item.feature);
+};
+
+const seriesMenu = () => {
+  const list = getTable(SERIES_TABLE, false);
+  const map = new Map();
+  if (list.length) {
+    list.forEach(({title, feature}) => {
+      let value = [title];
+      if (map.has(feature)) {
+        value = [...map.get(feature), ...value];
+      }
+      map.set(feature, value);
+    });
+  }
+  return map;
+};
+
 const _getStory = (target = []) => {
   const list = getTable(STORY_TABLE, false);
   if (list.length) {
@@ -218,6 +243,9 @@ const getBase64 = (type, title) => {
 };
 
 export {
+  normalMenu,
+  seniorMenu,
+  seriesMenu,
   getCatalog,
   open,
   create,
