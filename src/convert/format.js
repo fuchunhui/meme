@@ -1,9 +1,23 @@
+import { splitArray } from "../utils/utils.js";
+
+const COMMAND_LENGTH = 4;
+
 const formatMenu = (data, title = '常用菜单') => {
   const list = data.map(item => {
     return `- ${item}`;
   });
   const menu = `#### ${title}：\n` + list.join('\n');
   return menu;
+};
+
+const formatMultiMenu = (data, length) => {
+  const source = data.sort().map(item => `• ${item} `);
+  const list = splitArray(source, length);
+  const menu = [];
+  list.forEach(item => {
+    menu.push(item.join(''));
+  });
+  return menu.join('\n');
 };
 
 const warns = [
@@ -45,13 +59,49 @@ const formatHelp = () => {
     '- 菜单：`@imeme`，查询命令列表',
     '- 使用：`@imeme 命令`，获取原始表情',
     '- 文字：`@imeme 命令 文字`，返回拼接文字的表情',
-    '- 参数：`@imeme 命令 参数 文字`，返回符合输入参数的文字表情'
+    '- 参数：`@imeme 命令 参数 文字`，返回符合输入参数的文字表情',
+    '- 支持空格: 使用双引号包裹文字内容，`@imeme 鲁迅 “这句话 是我说的”`'
   ];
   return list.join('\n');
 };
 
+const formatAllMenu = (storyList, seniorList, seriesMap) => {
+  const normal = formatMultiMenu(storyList, COMMAND_LENGTH);
+  const senior = formatMultiMenu(seniorList, COMMAND_LENGTH);
+
+  const seriesMap = seriesMenu();
+  const seriesList = [];
+  seriesMap.forEach((value, key) => {
+    seriesList.push(`${key}(${value.join('/')})`);
+  });
+  const series = seriesList.map(item => `- ${item}`).join('\n');;
+
+  const content = [
+    '#### 常用菜单：',
+    '常规用法：`@imeme 加油 打工人`',
+    normal,
+    '高级用法：`@imeme 上号 vscode 打工人`',
+    senior,
+    '固定参数用法：`@imeme 周报 张飞 打工人`',
+    series
+  ];
+
+  return content.join('\n');
+};
+
+const formatImageMenu = data => {
+  // 筛选命令，太长的命令，放在最后显示
+  // 表格的方式展示内容
+  // 这是一张丰富的菜单，图片式的方式，就比较有意思了。
+  // 可以是一张宣传海报
+  return '' // base64
+};
+
 export {
   formatMenu,
+  formatMultiMenu,
+  formatAllMenu,
+  formatImageMenu,
   formatNull,
   formatHelp,
   formatError
