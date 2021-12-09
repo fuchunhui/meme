@@ -8,6 +8,7 @@ export default {
   color: '#FF0000',
   align: 'start',
   direction: 'down',
+  blur: 0,
   max: 100
 };
 

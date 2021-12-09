@@ -133,7 +133,7 @@ const control = encryption => {
             height
           }
         } else {
-          const {font, color, direction} = imageData;
+          const {font, color, direction, blur} = imageData;
           options = {
             x: x + width / 2,
             y: y + getFontSize(font),
@@ -141,7 +141,8 @@ const control = encryption => {
             font,
             color,
             align: 'center',
-            direction
+            direction,
+            blur
           }
         }
       }

@@ -12,7 +12,7 @@ import {
 
 const getData = (tableName) => {
   const list = getTable(tableName);
-  const result = list.map(({mid, title, feature, image, senior, x, y, font, color, align, max, direction}) => {
+  const result = list.map(({mid, title, feature, image, senior, x, y, font, color, align, max, direction, blur}) => {
     return {
       mid,
       title,
@@ -25,7 +25,8 @@ const getData = (tableName) => {
       color,
       align,
       max,
-      direction
+      direction,
+      blur
     };
   });
 

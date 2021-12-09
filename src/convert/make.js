@@ -63,9 +63,12 @@ const getFontSize = font => {
 };
 
 const fillText = (ctx, width, text, options) => {
-  const {x, y, font, color, align, max, direction} = options;
+  const {x, y, font, color, align, max, direction, blur} = options;
   ctx.font = font || '32px sans-serif';
   ctx.fillStyle = color || '#000000';
+  if (blur) {
+    ctx.filter = `blur(${blur}px)`;
+  }
   ctx.textAlign = align || 'center';
 
   const maxWidth = max || width;
