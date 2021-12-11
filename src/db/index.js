@@ -1,7 +1,3 @@
-/**
- * 数据库文件
- */
-
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
 import uuid from '../utils/uuid.js';
@@ -181,7 +177,8 @@ const updateTextTable = (options) => {
 };
 
 const deleteTable = like => {
-  const text = `DELETE FROM ${TEXT_TABLE} WHERE mid in (SELECT mid FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}');`;
+  const text = `DELETE FROM ${TEXT_TABLE} WHERE mid in `
+    + `(SELECT mid FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}');`;
   const sql = `DELETE FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}';`;
   getDB().run(text);
   getDB().run(sql);
@@ -256,7 +253,7 @@ const _initSeriesTable = () => {
     feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL,
     senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
-  );`
+  );`;
   const feature = `CREATE TABLE ${FEATURE_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     mid CHAR(50) NOT NULL,
@@ -273,7 +270,7 @@ const _initSeriesTable = () => {
     height INT DEFAULT 100,
     ipath CHAR(50) CHECK(ipath IN ('${FEATURE_IMAGE_TYPE.DB}', '${FEATURE_IMAGE_TYPE.SVG}', `
       + `'${FEATURE_IMAGE_TYPE.PNG}')) NOT NULL DEFAULT '${FEATURE_IMAGE_TYPE.DB}'
-  );`
+  );`;
   getDB().run(sql + feature);
 
   seriesData.forEach(item => {
@@ -283,14 +280,15 @@ const _initSeriesTable = () => {
   featureData.forEach(item => {
     insertFeatureTable(item, false);
   });
-}
+};
 
 const insertFeatureTable = (options, write = true) => {
   const {mid: _mid, feature, type = 'COMMAND', sid = '', sname = FEATURE_SOURCE_NAME.COMMON, tid = '',
     x = 0, y = 0, width = 100, height = 100, ipath = FEATURE_IMAGE_TYPE.DB} = options;
   const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
   const sql = `INSERT INTO ${FEATURE_TABLE} (mid, feature, type, sid, sname, tid, x, y, width, height, ipath) `
-    + `VALUES ('${mid}', '${feature}', '${type}', '${sid}', '${sname}', '${tid}', ${x}, ${y}, ${width}, ${height}, '${ipath}');`;
+    + `VALUES ('${mid}', '${feature}', '${type}', '${sid}', '${sname}', '${tid}', ${x}, ${y}, `
+    + `${width}, ${height}, '${ipath}');`;
 
   try {
     getDB().run(sql);
@@ -347,13 +345,13 @@ const _initMaterialTable = () => {
     mid CHAR(50) NOT NULL,
     title CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL
-  );`
+  );`;
   getDB().run(sql);
 
   materialData.forEach(item => {
     insertMaterialTable(item, false, MATERIAL_TABLE);
   });
-}
+};
 
 const insertMaterialTable = (options, write = true) => {
   const {mid: _mid, title, image} = options;

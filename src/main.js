@@ -130,7 +130,7 @@ const control = encryption => {
             y,
             width,
             height
-          }
+          };
         } else {
           const {font, color, direction, blur} = imageData;
           options = {
@@ -142,7 +142,7 @@ const control = encryption => {
             align: 'center',
             direction,
             blur
-          }
+          };
         }
       }
 

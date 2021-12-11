@@ -221,7 +221,7 @@ const updateFeature = (options) => {
     return error(data, UPDATE_TEXT_FAIL);
   }
   return emptySucess();
-}
+};
 
 const getImagePaths = () => {
   return Object.values(FEATURE_IMAGE_TYPE);
