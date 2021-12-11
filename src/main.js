@@ -77,7 +77,6 @@ const control = encryption => {
   }
 
   const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
-
   if (singleList.length) {
     const {type, sid, sname, tid} = singleList[0];
     const param = params.length ? params[0] : '';
