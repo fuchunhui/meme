@@ -15,8 +15,8 @@ import {
 } from './db/index.js';
 import { make, getFontSize } from './convert/make.js';
 import {
-  formatMenu,
   formatAllMenu,
+  formatSeriesMenu,
   formatNull,
   formatHelp,
   formatError
@@ -90,7 +90,7 @@ const control = encryption => {
         send(toid, base64);
         return;
       }
-      const composeContent = formatMenu(commandList, command);
+      const composeContent = formatSeriesMenu(commandList, command);
       send(toid, composeContent, 'MD');
       return;
     }

@@ -20,6 +20,12 @@ const formatMultiMenu = (data, length) => {
   return menu.join('\n');
 };
 
+const formatSeriesMenu = (data, command) => {
+  const title = `固定参数参考：\`@imeme ${command} ${data[0]} 打工人\``;
+  const menu = formatMenu(data, command);
+  return `${title}\n${menu}`;
+};
+
 const warns = [
   '%u6211%u8BF4%u5927%u54E5%u4F60%u5343%u4E07%u4E0D%u8981%u80E1%u6765%u554A',
   '%u522B%u8FD9%u6837%uFF0C%u5F88%u591A%u4EBA%u770B%u7740%u5462',
@@ -65,7 +71,7 @@ const formatHelp = () => {
     '- 使用：`@imeme 命令`，获取原始表情',
     '- 文字：`@imeme 命令 文字`，返回拼接文字的表情',
     '- 参数：`@imeme 命令 参数 文字`，返回符合输入参数的文字表情',
-    '- 支持空格: 使用双引号包裹文字内容，`@imeme 鲁迅 “这句话 是我说的”`'
+    '- 文字支持空格: 使用双引号包裹文字内容，`@imeme 鲁迅 “这句话 是我说的”`'
   ];
   return list.join('\n');
 };
@@ -104,6 +110,7 @@ const formatImageMenu = data => {
 export {
   formatMenu,
   formatMultiMenu,
+  formatSeriesMenu,
   formatAllMenu,
   formatImageMenu,
   formatNull,

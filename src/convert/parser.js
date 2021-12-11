@@ -49,22 +49,39 @@ const parser = encryption => {
 
   let command = '';
   let params = [];
+  let param = '';
   let text = '';
 
   if (message) {
-    const quotationText = matchText(message);
-    if (quotationText) {
-      message = message.replace(quotationText, '').trim();
+    let surplus = '';
+    const index = message.indexOf(' ');
+    if (index !== -1) {
+      command = message.slice(0, index);
+      surplus = message.slice(index + 1); // 除去 command 剩余的部分内容
+
+      const quotationText = matchText(surplus);
+      if (quotationText) { // 判断末尾的文字，是不是带有引号
+        text = quotationText.slice(1, quotationText.length - 1);
+        if (surplus.length >= quotationText.length) { // 检测，除去文本后，是否还有参数
+          const tIndex = surplus.lastIndexOf(quotationText);
+          param = surplus(0, tIndex).trim();
+        }
+      } else {
+        const lastIndex = surplus.lastIndexOf(' '); // 查找空格，从后面获取 text 内容
+        if (lastIndex !== -1) {
+          text = surplus.slice(lastIndex + 1);
+          param = surplus.slice(0, lastIndex);
+        } else {
+          text = surplus;
+        }
+      }
+    } else {
+      command = message;
     }
 
-    const info = message.split(' ');
-    command = info.shift();
-    if (quotationText) {
-      text = quotationText.slice(1, quotationText.length - 1);
-    } else {
-      text = info.pop() || '';
+    if (param) {
+      params = [param];
     }
-    params = info;
   }
 
   return {

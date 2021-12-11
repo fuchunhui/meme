@@ -4,7 +4,7 @@
  * @returns 匹配后的内容或者 null
  */
 const matchText = value => {
-  const pattern = /“.*\s+.*”|".*\s+.*"$/g;
+  const pattern = /“.*\s+.*”$|".*\s+.*"$/g;
   const found = value.match(pattern);
   return found ? found[0] : null;
 };
