@@ -14,8 +14,8 @@ const convert = filePath => {
   const ext = path.extname(filePath);
   const base64 = appendBase64(data, ext);
   return base64;
-}
+};
 
 export {
   convert
-}
+};
