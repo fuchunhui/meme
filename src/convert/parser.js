@@ -62,9 +62,9 @@ const parser = encryption => {
       const quotationText = matchText(surplus);
       if (quotationText) { // 判断末尾的文字，是不是带有引号
         text = quotationText.slice(1, quotationText.length - 1);
-        if (surplus.length >= quotationText.length) { // 检测，除去文本后，是否还有参数
+        if (surplus.length > quotationText.length) { // 检测，除去文本后，是否还有参数
           const tIndex = surplus.lastIndexOf(quotationText);
-          param = surplus(0, tIndex).trim();
+          param = surplus.slice(0, tIndex).trim();
         }
       } else {
         const lastIndex = surplus.lastIndexOf(' '); // 查找空格，从后面获取 text 内容

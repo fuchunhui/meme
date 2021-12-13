@@ -6,7 +6,8 @@ import {
   openFeature,
   updateFeature,
   getImagePaths,
-  getBase64
+  getBase64,
+  getMaterialCatalog
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -80,6 +81,17 @@ const listen = app => {
   app.get('/material/base64', (req, res) => {
     const {ipath, value} = req.query;
     const data = getBase64(ipath, value);
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
+  });
+
+  app.get('/material/catalog', (req, res) => {
+    const {type} = req.query;
+    const data = getMaterialCatalog(type.toUpperCase());
+
     res.send({
       data,
       errNo: 0,

@@ -339,6 +339,23 @@ const getSingleTable = (tableName = STORY_TABLE) => {
   return contents;
 };
 
+const getNamedColumnFromTable = (tableName = MATERIAL_TABLE, columns = []) => {
+  const columnSQL = columns.length ? columns.join(', ') : '*';
+  const sql = `SELECT ${columnSQL} FROM ${tableName};`
+  return _getDataFromTable(sql);
+};
+
+const _getDataFromTable = sql => {
+  const contents = [];
+  const stmt = getDB().prepare(sql);
+  while (stmt.step()) {
+    const cell = stmt.getAsObject();
+    contents.push(cell);
+  }
+  stmt.free();
+  return contents;
+};
+
 const _initMaterialTable = () => {
   const sql = `CREATE TABLE ${MATERIAL_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -389,5 +406,6 @@ export {
   updateTextTable,
   insertLog,
   getSingleTable,
-  updateFeatureTable
+  updateFeatureTable,
+  getNamedColumnFromTable
 };

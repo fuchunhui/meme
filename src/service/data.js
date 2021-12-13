@@ -7,13 +7,15 @@ import {
   getDataListByColumn,
   getSingleTable,
   updateFeatureTable,
+  getNamedColumnFromTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
   FEATURE_TYPE,
   TEXT_TABLE,
-  FEATURE_IMAGE_TYPE
+  FEATURE_IMAGE_TYPE,
+  MATERIAL_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import { testFile } from '../convert/write.js';
@@ -242,6 +244,18 @@ const getBase64 = (type, title) => {
   return imageBase64;
 };
 
+const getMaterialCatalog = type => {
+  // 根据不同的 type 查找不同的表内容
+  let result = [];
+  if (type === FEATURE_IMAGE_TYPE.DB) {
+    result = getNamedColumnFromTable(MATERIAL_TABLE, ['mid', 'title']);
+  } else {
+    // 读取不同的物理目录
+  }
+
+  return result;
+};
+
 export {
   normalMenu,
   seniorMenu,
@@ -254,5 +268,6 @@ export {
   openFeature,
   updateFeature,
   getImagePaths,
-  getBase64
+  getBase64,
+  getMaterialCatalog
 };
