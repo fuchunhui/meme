@@ -9,7 +9,7 @@ const named = () => {
 
 const writeImg = (base64Img, fileName = named(), targetDir = 'output') => {
   if (!fs.existsSync(targetDir)) {
-    fs.mkdirSync(targetDir, { recursive: true });
+    fs.mkdirSync(targetDir, {recursive: true});
   }
   const parts = base64Img.split(';base64,');
   const base64Image = parts.pop();

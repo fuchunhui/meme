@@ -10,7 +10,7 @@ import {
   MATERIAL_TABLE
 } from '../db/index.js';
 
-const getData = (tableName) => {
+const getData = tableName => {
   const list = getTable(tableName);
   const result = list.map(({mid, title, feature, image, senior, x, y, font, color, align, max, direction, blur}) => {
     return {

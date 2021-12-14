@@ -18,8 +18,8 @@ import {
   MATERIAL_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
-import { testFile } from '../convert/write.js';
-import { convert } from '../convert/base64.js';
+import {testFile} from '../convert/write.js';
+import {convert} from '../convert/base64.js';
 import {
   UPDATE_TEXT_FAIL,
   CREATE_REPEAT_TITLE
@@ -153,7 +153,7 @@ const open = (mid, type) => {
   return {mid, title, feature, image, x, y, max, font, color, align, direction, blur};
 };
 
-const create = (options) => {
+const create = options => {
   const result = getDataByColumn(options.title, 'title', STORY_TABLE);
 
   const singleList = getSingleTable(FEATURE_TABLE);
@@ -180,7 +180,7 @@ const create = (options) => {
   });
 };
 
-const update = (options) => {
+const update = options => {
   const data = updateTable(options);
   if (data) {
     return error(data, UPDATE_TEXT_FAIL);
@@ -188,7 +188,7 @@ const update = (options) => {
   return emptySucess();
 };
 
-const updateText = (options) => {
+const updateText = options => {
   const data = updateTextTable(options);
   if (data) {
     return error(data, UPDATE_TEXT_FAIL);
@@ -217,7 +217,7 @@ const openFeature = mid => {
   return sucess(cell);
 };
 
-const updateFeature = (options) => {
+const updateFeature = options => {
   const data = updateFeatureTable(options);
   if (data) {
     return error(data, UPDATE_TEXT_FAIL);

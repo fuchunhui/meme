@@ -1,4 +1,4 @@
-import { splitArray } from '../utils/utils.js';
+import {splitArray} from '../utils/utils.js';
 
 const COMMAND_LENGTH = 4;
 
@@ -104,6 +104,7 @@ const formatImageMenu = data => {
   // 表格的方式展示内容
   // 这是一张丰富的菜单，图片式的方式，就比较有意思了。
   // 可以是一张宣传海报
+  console.log(data);
   return ''; // base64
 };
 

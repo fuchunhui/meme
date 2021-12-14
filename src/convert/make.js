@@ -1,7 +1,7 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
 
-const { createCanvas, Image } = pkg;
+const {createCanvas, Image} = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
 const LINE_HEIGHT = 1.2;
 

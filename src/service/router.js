@@ -47,11 +47,11 @@ const listen = app => {
   });
 
   app.get('/image/download', (req, res) => {
-    console.log('备用接口');
+    console.log('备用接口', req, res);
   });
 
   app.get('/image/export', (req, res) => {
-    console.log('备用接口');
+    console.log('备用接口', req, res);
   });
 
   app.get('/image/config', (req, res) => {

@@ -2,7 +2,7 @@
  * @file 主控流程，负责整个消息的控制
  */
 
-import { parser } from './convert/parser.js';
+import {parser} from './convert/parser.js';
 import {
   getDataByColumn,
   getDataListByColumn,
@@ -13,7 +13,7 @@ import {
   FEATURE_TABLE,
   FEATURE_TYPE
 } from './db/index.js';
-import { make, getFontSize } from './convert/make.js';
+import {make, getFontSize} from './convert/make.js';
 import {
   formatAllMenu,
   formatSeriesMenu,
@@ -21,14 +21,14 @@ import {
   formatHelp,
   formatError
 } from './convert/format.js';
-import { send } from './service/index.js';
+import {send} from './service/index.js';
 import {
   normalMenu,
   seniorMenu,
   seriesMenu,
   getBase64
 } from './service/data.js';
-import { COMMAND_LIST } from './config/constant.js';
+import {COMMAND_LIST} from './config/constant.js';
 
 export * from './service/router.js';
 export * from './export/backup.js';

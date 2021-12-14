@@ -54,7 +54,7 @@ const _initTable = () => {
     feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL,
     senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
-  );`
+  );`;
   const text = `CREATE TABLE ${TEXT_TABLE} (
     tid INTEGER PRIMARY KEY AUTOINCREMENT,
     mid CHAR(50) NOT NULL,
@@ -66,7 +66,7 @@ const _initTable = () => {
     align CHAR(10) NOT NULL,
     direction CHAR(10) NOT NULL,
     blur REAL DEFAULT 0
-  );`
+  );`;
   const logger = `CREATE TABLE ${LOG_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fromid CHAR(100) NOT NULL,
@@ -162,7 +162,7 @@ const updateTable = (options, tableName = STORY_TABLE) => {
   }
 };
 
-const updateTextTable = (options) => {
+const updateTextTable = options => {
   const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down', blur = 0} = options;
   const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}',`
@@ -226,13 +226,13 @@ const _initSpecialTable = () => {
     feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL,
     senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
-  );`
+  );`;
   getDB().run(sql);
 
   specialData.forEach(item => {
     insertTable(item, false, SPECIAL_TABLE);
   });
-}
+};
 
 const getSpecialDataListByColumn = (value, column = 'feature') => {
   const contents = [];
@@ -305,7 +305,7 @@ const insertFeatureTable = (options, write = true) => {
   }
 };
 
-const updateFeatureTable = (options) => {
+const updateFeatureTable = options => {
   const list = [];
   Object.keys(options).forEach(key => {
     if (key === 'mid') {
@@ -341,7 +341,7 @@ const getSingleTable = (tableName = STORY_TABLE) => {
 
 const getNamedColumnFromTable = (tableName = MATERIAL_TABLE, columns = []) => {
   const columnSQL = columns.length ? columns.join(', ') : '*';
-  const sql = `SELECT ${columnSQL} FROM ${tableName};`
+  const sql = `SELECT ${columnSQL} FROM ${tableName};`;
   return _getDataFromTable(sql);
 };
 
