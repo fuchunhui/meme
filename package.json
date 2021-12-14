@@ -7,7 +7,7 @@
     "tsh": "sh .draft/test.sh",
     "tjs": "node .draft/test.js",
     "tsvg": "node .draft/test-svg.js",
-    "t64":  "node .draft/convert.js",
+    "t64": "node .draft/convert.js",
     "db": "sh .draft/db.sh",
     "test": "cross-env NODE_ENV=test node app.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "eslint": "^8.4.1",
     "md5": "^2.3.0"
   },
   "repository": {
