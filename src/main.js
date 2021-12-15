@@ -143,6 +143,12 @@ const control = encryption => {
             direction,
             blur
           };
+
+          insertLog({
+            fromid,
+            text: `[${command}], missing [${param}].`,
+            date: new Date()
+          });
         }
       }
 
