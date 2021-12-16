@@ -19,7 +19,9 @@ import {
   formatSeriesMenu,
   formatNull,
   formatHelp,
-  formatError
+  formatError,
+  formatOther,
+  formatGuide
 } from './convert/format.js';
 import {send} from './service/index.js';
 import {
@@ -171,12 +173,17 @@ const control = encryption => {
     const base64 = make(text, data);
     send(toid, base64);
   } else {
-    const content = formatNull();
+    let content = '';
+    const percent = Math.floor(Math.random() * 100);
+    if (percent < 20) {
+      content = formatOther();
+    } else if (percent > 90) {
+      content = formatGuide();
+    } else {
+      content = formatNull();
+    }
+
     send(toid, content, 'TEXT');
-    // TODO 小概率事件，20%
-    // 随机触发其他机器人对话，否认自己的能力
-    // 让其他机器人给图
-    // 增加配置内容，开启和关闭
 
     insertLog({
       fromid,
