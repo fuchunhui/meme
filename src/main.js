@@ -72,6 +72,9 @@ const control = encryption => {
       content = formatHelp();
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
+    } else if (command === '*') {
+      content = ''; // TODO 随机选择一个图，发送。随机的文字。文字内容可选。
+      return;
     }
 
     send(toid, content, 'MD');
