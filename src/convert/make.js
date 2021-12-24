@@ -62,6 +62,14 @@ const getFontSize = font => {
   return Number(fontSize[1]);
 };
 
+// 文字旋转，根据x, y, width, lines算出高，可以得出旋转后的中心点tcx, tcy，绘制后，重置中心点
+// context.save();
+// context.translate(newx, newy);
+// context.rotate(-Math.PI/2);
+// context.textAlign = "center";
+// context.fillText("Your Label Here", labelXposition, 0);
+// context.restore();
+
 const fillText = (ctx, width, text, options) => {
   const {x, y, font, color, align, max, direction, blur} = options;
   ctx.font = font || '32px sans-serif';
