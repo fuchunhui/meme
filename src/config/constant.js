@@ -13,6 +13,7 @@ export const COMMAND_LIST = [
 export const ROLER = [
   '23333',
   'RD', 'FE', 'PM', 'QA',
+  '吃瓜群众',
   '打工人', '大伙', '大家', '大佬',
   '干饭人', '瓜娃子',
   '某同学', '年轻人',

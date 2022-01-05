@@ -51,9 +51,16 @@ const special = (command, toid, text) => {
   return specialCommand;
 };
 
-const control = encryption => {
-  const {fromid, toid, command, text, params} = parser(encryption);
+const random = () => {
+  // 返回关键字
+  // command, text, params
+  // 常规命令的一种，命令 + 文字 10
+  // 高级 命令 文字 参数  10
+  // 随机一张图 lib库下 文件夹 60%
+  // 固定语句，我说点啥？我今天什么都不讲 20
+};
 
+const control = ({fromid, toid, command, text, params}) => {
   if (command === '') {
     const storyList = normalMenu();
     const seniorList = seniorMenu();
@@ -196,4 +203,9 @@ const control = encryption => {
   }
 };
 
-export default control;
+const main = encryption => {
+  const {fromid, toid, command, text, params} = parser(encryption);
+  control({fromid, toid, command, text, params});
+};
+
+export default main;
