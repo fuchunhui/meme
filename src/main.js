@@ -12,7 +12,8 @@ import {
   TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
-  FEATURE_TYPE
+  FEATURE_TYPE,
+  STORY_TABLE
 } from './db/index.js';
 import {make, getFontSize} from './convert/make.js';
 import {
@@ -31,7 +32,7 @@ import {
   seriesMenu,
   getBase64
 } from './service/data.js';
-import {COMMAND_LIST} from './config/constant.js';
+import {COMMAND_LIST, getRole} from './config/constant.js';
 
 export * from './service/router.js';
 export * from './export/backup.js';
@@ -54,12 +55,14 @@ const special = (command, toid, text) => {
 
 const random = () => {
   let command = '';
-  let text = '';
+  let text = getRole();
   let params = [];
 
   const percent = Math.floor(Math.random() * 100);
   if (percent < 20) {
     // 常规命令的一种，命令 + 文字 
+    const {title} = getRandom(STORY_TABLE, 'title', 'senior = 0');
+    console.log('normal < 20: ', title, text);
   } else if (percent < 30) {
     // 高级 命令 文字 参数  10
   } else if (percent < 50) {

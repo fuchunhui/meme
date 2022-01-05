@@ -10,7 +10,7 @@ export const COMMAND_LIST = [
 ];
 
 // 按照拼音顺序排列，避免重复添加
-export const ROLER = [
+const ROLER = [
   '23333',
   'RD', 'FE', 'PM', 'QA',
   '吃瓜群众',
@@ -20,3 +20,7 @@ export const ROLER = [
   '我滴乖乖', '小可爱', '兄弟们',
   '一起爬山？'
 ];
+
+export const getRole = () => {
+  return ROLER[Math.floor(Math.random() * ROLER.length)];
+};

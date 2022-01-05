@@ -427,8 +427,9 @@ const insertMysteryTable = (options, write = true) => {
   }
 };
 
-const getRandom = (tableName = MYSTERY_TABLE) => {
-  const sql = `SELECT * FROM ${tableName} ORDER BY RANDOM() limit 1`;
+const getRandom = (tableName = MYSTERY_TABLE, column = '*', condition = '') => {
+  const expression = condition ? `where ${condition}` : '';
+  const sql = `SELECT ${column} FROM ${tableName} ${expression} ORDER BY RANDOM() limit 1`;
   const stmt = getDB().prepare(sql);
   const result = stmt.getAsObject({});
   stmt.free();
