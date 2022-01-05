@@ -8,6 +8,7 @@ import {
   getDataListByColumn,
   getSpecialDataListByColumn,
   insertLog,
+  getRandom,
   TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
@@ -52,12 +53,28 @@ const special = (command, toid, text) => {
 };
 
 const random = () => {
-  // 返回关键字
-  // command, text, params
-  // 常规命令的一种，命令 + 文字 10
-  // 高级 命令 文字 参数  10
-  // 随机一张图 lib库下 文件夹 60%
-  // 固定语句，我说点啥？我今天什么都不讲 20
+  let command = '';
+  let text = '';
+  let params = [];
+
+  const percent = Math.floor(Math.random() * 100);
+  if (percent < 20) {
+    // 常规命令的一种，命令 + 文字 
+  } else if (percent < 30) {
+    // 高级 命令 文字 参数  10
+  } else if (percent < 50) {
+    // 固定语句，我说点啥？我今天什么都不讲 20
+    const mystery = getRandom();
+    console.log({...mystery});
+  } else {
+    // 随机一张图 lib库下 文件夹 60%
+  }
+
+  return {
+    command,
+    text,
+    params
+  };
 };
 
 const control = ({fromid, toid, command, text, params}) => {
@@ -80,7 +97,8 @@ const control = ({fromid, toid, command, text, params}) => {
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
     } else if (command === '*') {
-      content = ''; // TODO 随机选择一个图，发送。随机的文字。文字内容可选。
+      const {command, text, params} = random();
+      control({fromid, toid, command, text, params});
       return;
     }
 
@@ -204,8 +222,9 @@ const control = ({fromid, toid, command, text, params}) => {
 };
 
 const main = encryption => {
-  const {fromid, toid, command, text, params} = parser(encryption);
-  control({fromid, toid, command, text, params});
+  random();
+  // const {fromid, toid, command, text, params} = parser(encryption);
+  // control({fromid, toid, command, text, params});
 };
 
 export default main;

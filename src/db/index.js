@@ -427,6 +427,14 @@ const insertMysteryTable = (options, write = true) => {
   }
 };
 
+const getRandom = (tableName = MYSTERY_TABLE) => {
+  const sql = `SELECT * FROM ${tableName} ORDER BY RANDOM() limit 1`;
+  const stmt = getDB().prepare(sql);
+  const result = stmt.getAsObject({});
+  stmt.free();
+  return result;
+};
+
 export {
   initDB,
   writeDB,
@@ -443,5 +451,6 @@ export {
   insertLog,
   getSingleTable,
   updateFeatureTable,
-  getNamedColumnFromTable
+  getNamedColumnFromTable,
+  getRandom
 };

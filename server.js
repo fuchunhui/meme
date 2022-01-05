@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json({limit: '10mb'}));
 app.use(express.text());
 app.use(express.raw());
-app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+app.use(express.urlencoded({extended: false, limit: '10mb'}));
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));
