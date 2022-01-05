@@ -9,11 +9,11 @@ import {
   getSpecialDataListByColumn,
   insertLog,
   getRandom,
+  STORY_TABLE,
   TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
-  FEATURE_TYPE,
-  STORY_TABLE
+  FEATURE_TYPE
 } from './db/index.js';
 import {make, getFontSize} from './convert/make.js';
 import {
@@ -30,7 +30,8 @@ import {
   normalMenu,
   seniorMenu,
   seriesMenu,
-  getBase64
+  getBase64,
+  getRandomImageName
 } from './service/data.js';
 import {COMMAND_LIST, getRole} from './config/constant.js';
 
@@ -59,20 +60,32 @@ const random = () => {
   let params = [];
 
   const percent = Math.floor(Math.random() * 100);
-  if (percent < 20) {
-    // 常规命令的一种，命令 + 文字 
+  if (percent < 2) { // 20
     const {title} = getRandom(STORY_TABLE, 'title', 'senior = 0');
-    console.log('normal < 20: ', title, text);
-  } else if (percent < 30) {
-    // 高级 命令 文字 参数  10
-  } else if (percent < 50) {
+    command = title;
+  } else if (percent < 3) { // 30
+    const {feature, type, ipath} = getRandom(FEATURE_TABLE, ['feature', 'type', 'ipath']);
+    console.log('senior < 30', feature, type);
+
+    let content = '';
+    if (type === FEATURE_TYPE.COMMAND) {
+      const {title} = getRandom(SERIES_TABLE, 'title', `feature = '${feature}'`);
+      content = title;
+    } else if (type === FEATURE_TYPE.IMAGE) {
+      content = getRandomImageName(ipath);
+    } else {
+      content = getRole();
+    }
+    params = [content];
+  } else if (percent < 99) { // 50
     // 固定语句，我说点啥？我今天什么都不讲 20
     const mystery = getRandom();
     console.log({...mystery});
   } else {
-    // 随机一张图 lib库下 文件夹 60%
+    // 随机一张图 lib库下 文件夹 50%
   }
 
+  console.log('percent: ', percent, command, text, params);
   return {
     command,
     text,
