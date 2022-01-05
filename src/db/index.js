@@ -6,6 +6,7 @@ import specialData from '../config/special/index.js';
 import seriesData from '../config/series.js';
 import featureData from '../config/feature.js';
 import materialData from '../config/material.js';
+import mysteryData from '../config/mystery.js';
 
 export const STORY_TABLE = 'STORY';
 export const TEXT_TABLE = 'TEXT';
@@ -14,6 +15,7 @@ export const SPECIAL_TABLE = 'SPECIAL';
 export const SERIES_TABLE = 'SERIES';
 export const FEATURE_TABLE = 'FEATURE';
 export const MATERIAL_TABLE = 'MATERIAL';
+export const MYSTERY_TABLE = 'MYSTERY';
 export const FEATURE_TYPE = {
   'COMMAND': 'COMMAND',
   'TEXT': 'TEXT',
@@ -86,6 +88,7 @@ const initDB = () => {
   _initSeriesTable();
   _initSpecialTable();
   _initMaterialTable();
+  _initMysteryTable();
   writeDB();
 };
 
@@ -382,6 +385,39 @@ const insertMaterialTable = (options, write = true) => {
     return {
       error: false,
       data: `Material: ${title}`
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error.toString()
+    };
+  }
+};
+
+const _initMysteryTable = () => {
+  const sql = `CREATE TABLE ${MYSTERY_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title CHAR(100) COLLATE NOCASE,
+    text CHAR(200) NOT NULL,
+    param CHAR(200) NOT NULL
+  );`;
+  getDB().run(sql);
+
+  mysteryData.forEach(item => {
+    insertMysteryTable(item, false, MYSTERY_TABLE);
+  });
+};
+
+const insertMysteryTable = (options, write = true) => {
+  const {title, text, param} = options;
+  const sql = `INSERT INTO ${MYSTERY_TABLE} (title, text, param) VALUES ('${title}', '${text}', '${param}');`;
+
+  try {
+    getDB().run(sql);
+    write && writeDB();
+    return {
+      error: false,
+      data: `Mystery: ${title}`
     };
   } catch (error) {
     return {

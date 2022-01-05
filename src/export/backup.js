@@ -7,7 +7,8 @@ import {
   SPECIAL_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
-  MATERIAL_TABLE
+  MATERIAL_TABLE,
+  MYSTERY_TABLE
 } from '../db/index.js';
 
 const getData = tableName => {
@@ -54,6 +55,7 @@ const backup = base => {
   save(base, 'series', SERIES_TABLE);
   saveSingle(base, 'feature', getFeatureData);
   saveSingle(base, 'material', getMaterialData);
+  saveSingle(base, 'mystery', getMysteryData);
 };
 
 const getFeatureData = () => {
@@ -85,6 +87,19 @@ const getMaterialData = () => {
       feature,
       title,
       image
+    };
+  });
+
+  return result;
+};
+
+const getMysteryData = () => {
+  const list = getSingleTable(MYSTERY_TABLE);
+  const result = list.map(({title, text, param}) => {
+    return {
+      title,
+      text,
+      param
     };
   });
 
