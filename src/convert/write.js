@@ -26,9 +26,19 @@ const testFile = (ipath = 'svg', name = '', targetDir = 'lib') => {
   return fs.existsSync(filePath) ? filePath : false;
 };
 
+const getFileName = (ipath = 'svg', targetDir = 'lib') => {
+  const tardir = path.resolve(__dirname, targetDir, ipath);
+  const files = fs.readdirSync(tardir);
+  const index = Math.floor(Math.random() * files.length);
+  const file = files[index];
+  const ext = path.extname(file);
+  return file.slice(0, file.length - ext.length);
+};
+
 export {
   named,
   writeImg,
   removeImg,
-  testFile
+  testFile,
+  getFileName
 };

@@ -8,6 +8,7 @@ import {
   getSingleTable,
   updateFeatureTable,
   getNamedColumnFromTable,
+  getRandom,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
@@ -18,7 +19,7 @@ import {
   MATERIAL_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
-import {testFile} from '../convert/write.js';
+import {testFile, getFileName} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {
   UPDATE_TEXT_FAIL,
@@ -256,6 +257,18 @@ const getMaterialCatalog = type => {
   return result;
 };
 
+const getRandomImageName = (type, ipath) => {
+  let content = '';
+  if (type === FEATURE_IMAGE_TYPE.DB) {
+    const {title} = getRandom(MATERIAL_TABLE, 'title');
+    content = title;
+  } else {
+    content = getFileName(ipath);
+  }
+
+  return content;
+};
+
 export {
   normalMenu,
   seniorMenu,
@@ -269,5 +282,6 @@ export {
   updateFeature,
   getImagePaths,
   getBase64,
-  getMaterialCatalog
+  getMaterialCatalog,
+  getRandomImageName
 };
