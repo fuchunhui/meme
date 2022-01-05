@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import template from './template.js';
-import { getSize } from '../src/convert/size.js';
+import {getSize} from '../src/convert/size.js';
 
 const fileName = process.argv.splice(2)[0];
 if (!fileName) {
@@ -54,7 +54,7 @@ fs.readdir(tardir, (err, files) => {
       ...template,
       ...item,
       feature: fileName
-    }
+    };
   });
 
   const saveData = 'export default ' + JSON.stringify(fileList) + ';\n';
