@@ -106,7 +106,8 @@ const _resetDB = () => {
     SPECIAL_TABLE,
     SERIES_TABLE,
     FEATURE_TABLE,
-    MATERIAL_TABLE
+    MATERIAL_TABLE,
+    MYSTERY_TABLE
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getDB().run(sql);
