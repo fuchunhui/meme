@@ -77,12 +77,16 @@ const random = () => {
       content = getRole();
     }
     params = [content];
-  } else if (percent < 99) { // 50
-    // 固定语句，我说点啥？我今天什么都不讲 20
-    const mystery = getRandom();
-    console.log({...mystery});
+  } else if (percent < 4) { // 50
+    const {title, text: _randomText, param} = getRandom();
+    command = title;
+    text = _randomText;
+    if (param) {
+      params.push(param);
+    }
   } else {
     // 随机一张图 lib库下 文件夹 50%
+    // TODO 新建lib库，随机返回路径和名字。？？好像还缺少这样的请求。
   }
 
   console.log('percent: ', percent, command, text, params);
