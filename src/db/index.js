@@ -29,7 +29,8 @@ const FEATURE_SOURCE_NAME = {
 export const FEATURE_IMAGE_TYPE = {
   'SVG': 'SVG',
   'PNG': 'PNG',
-  'DB': 'DB'
+  'DB': 'DB',
+  'RANDOM': 'RANDOM'
 };
 
 const DB_PATH = './public/db/meme.db';

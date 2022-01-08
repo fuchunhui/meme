@@ -35,10 +35,19 @@ const getFileName = (ipath = 'svg', targetDir = 'lib') => {
   return file.slice(0, file.length - ext.length);
 };
 
+const getRandomPath = (ipath = 'random', targetDir = 'lib') => {
+  const tardir = path.resolve(__dirname, targetDir, ipath);
+  const files = fs.readdirSync(tardir);
+  const index = Math.floor(Math.random() * files.length);
+  const file = files[index];
+  return path.resolve(tardir, file);
+};
+
 export {
   named,
   writeImg,
   removeImg,
   testFile,
-  getFileName
+  getFileName,
+  getRandomPath
 };

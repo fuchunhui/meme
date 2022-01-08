@@ -19,7 +19,7 @@ import {
   MATERIAL_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
-import {testFile, getFileName} from '../convert/write.js';
+import {testFile, getFileName, getRandomPath} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {
   UPDATE_TEXT_FAIL,
@@ -235,6 +235,9 @@ const getBase64 = (type, title) => {
   if (type === FEATURE_IMAGE_TYPE.DB) {
     const materialData = getDataListByColumn(title, 'title', MATERIAL_TABLE);
     imageBase64 = materialData.image || '';
+  } else if (type === FEATURE_IMAGE_TYPE.RANDOM) {
+    const filePath = getRandomPath();
+    imageBase64 = convert(filePath);
   } else {
     const filePath = testFile(type.toLowerCase(), title);
     if (filePath) {
