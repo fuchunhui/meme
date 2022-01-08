@@ -60,12 +60,11 @@ const random = () => {
   let params = [];
 
   const percent = Math.floor(Math.random() * 100);
-  if (percent < 2) { // 20
+  if (percent < 20) {
     const {title} = getRandom(STORY_TABLE, 'title', 'senior = 0');
     command = title;
-  } else if (percent < 3) { // 30
+  } else if (percent < 30) {
     const {feature, type, ipath} = getRandom(FEATURE_TABLE, ['feature', 'type', 'ipath']);
-    console.log('senior < 30', feature, type);
 
     let content = '';
     if (type === FEATURE_TYPE.COMMAND) {
@@ -77,7 +76,7 @@ const random = () => {
       content = getRole();
     }
     params = [content];
-  } else if (percent < 4) { // 50
+  } else if (percent < 50) {
     const {title, text: _randomText, param} = getRandom();
     command = title;
     text = _randomText;
@@ -85,11 +84,9 @@ const random = () => {
       params.push(param);
     }
   } else {
-    // 随机一张图 lib库下 文件夹 50%
-    // TODO 新建lib库，随机返回路径和名字。？？好像还缺少这样的请求。
+    return {mystery: true};
   }
 
-  console.log('percent: ', percent, command, text, params);
   return {
     command,
     text,
@@ -117,8 +114,13 @@ const control = ({fromid, toid, command, text, params}) => {
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
     } else if (command === '*') {
-      const {command, text, params} = random();
-      control({fromid, toid, command, text, params});
+      const {command, text, params, mystery} = random();
+      if (mystery) {
+        const base64 = getBase64('RANDOM');
+        send(toid, base64);
+      } else {
+        control({fromid, toid, command, text, params});
+      }
       return;
     }
 
@@ -242,9 +244,8 @@ const control = ({fromid, toid, command, text, params}) => {
 };
 
 const main = encryption => {
-  random();
-  // const {fromid, toid, command, text, params} = parser(encryption);
-  // control({fromid, toid, command, text, params});
+  const {fromid, toid, command, text, params} = parser(encryption);
+  control({fromid, toid, command, text, params});
 };
 
 export default main;
