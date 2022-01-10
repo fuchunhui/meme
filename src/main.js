@@ -227,7 +227,7 @@ const control = ({fromid, toid, command, text, params}) => {
     const percent = Math.floor(Math.random() * 100);
     if (percent < 20) {
       content = formatOther();
-    } else if (percent > 90) {
+    } else if (percent < 40) {
       content = formatGuide();
     } else {
       content = formatNull();
