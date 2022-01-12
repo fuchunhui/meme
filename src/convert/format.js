@@ -134,8 +134,8 @@ const guides = [
   '%E4%BD%A0%E5%A5%BD%E5%83%8F%E8%BF%B7%E8%B7%AF%E4%BA%86%EF%BC%8C%E8%AF%95%E8%AF%95%60%40imeme%20help%60',
   '%E5%83%8F%E8%BF%99%E6%A0%B7%60%40imeme%60%E5%8F%AF%E4%BB%A5%E7%9C%8B%E7%9C%8B%E6%88%91%E4%BC%9A%E4%BB%80%E4%B9'
     + '%88%E6%9C%AC%E9%A2%86',
-  '%E4%BD%A0%E5%96%9C%E6%AC%A2%E5%BC%80%E5%BF%99%E7%9B%92%E5%90%97%EF%BC%8C%E6%88%91%E4%B9%9F%E4%BC%9A%60%40'
-    + 'imeme%20*%60'
+  '%E4%BD%A0%E5%96%9C%E6%AC%A2%E5%BC%80%E7%9B%B2%E7%9B%92%E5%90%97%EF%BC%8C%E6%88%91%E4%B9%9F%E4%BC%9A%60'
+    + '%40imeme%20*%60'
 ];
 const formatGuide = () => {
   return formatNull(guides);
