@@ -224,16 +224,18 @@ const control = ({fromid, toid, command, text, params}) => {
     send(toid, base64);
   } else {
     let content = '';
+    let messagesType = 'TEXT';
     const percent = Math.floor(Math.random() * 100);
     if (percent < 20) {
       content = formatOther();
     } else if (percent < 40) {
       content = formatGuide();
+      messagesType = 'MD';
     } else {
       content = formatNull();
     }
 
-    send(toid, content, 'TEXT');
+    send(toid, content, messagesType);
 
     insertLog({
       fromid,
