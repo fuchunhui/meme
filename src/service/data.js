@@ -149,9 +149,9 @@ const getCatalog = () => {
 const open = (mid, type) => {
   const tabName = COMMAND_TYPE[type];
   const data = getDataByColumn(mid, 'mid', tabName);
-  const {title, feature, image, x, y, max, font, color, align, direction, blur} = data;
+  const {title, feature, image, x, y, max, font, color, align, direction, blur, degree} = data;
 
-  return {mid, title, feature, image, x, y, max, font, color, align, direction, blur};
+  return {mid, title, feature, image, x, y, max, font, color, align, direction, blur, degree};
 };
 
 const create = options => {

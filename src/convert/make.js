@@ -62,16 +62,8 @@ const getFontSize = font => {
   return Number(fontSize[1]);
 };
 
-// 文字旋转，根据x, y, width, lines算出高，可以得出旋转后的中心点tcx, tcy，绘制后，重置中心点
-// context.save();
-// context.translate(newx, newy);
-// context.rotate(-Math.PI/2);
-// context.textAlign = "center";
-// context.fillText("Your Label Here", labelXposition, 0);
-// context.restore();
-
 const fillText = (ctx, width, text, options) => {
-  const {x, y, font, color, align, max, direction, blur} = options;
+  const {x, y, font, color, align, max, direction, blur, degree} = options;
   ctx.font = font || '32px sans-serif';
   ctx.fillStyle = color || '#000000';
   if (blur) {
@@ -84,11 +76,19 @@ const fillText = (ctx, width, text, options) => {
   const lines = _breakLines(text, maxWidth, ctx);
   lines.forEach((item, index) => {
     const dy = direction === 'down' ? index : index - (lines.length - 1);
-    ctx.fillText(item, x, y + dy * size * LINE_HEIGHT, maxWidth);
+    ctx.save();
+    if (degree) {
+      ctx.translate(x, y + dy * size * LINE_HEIGHT);
+      ctx.rotate(degree * Math.PI / 180);
+      ctx.fillText(item, 0, 0, maxWidth);
+    } else {
+      ctx.fillText(item, x, y + dy * size * LINE_HEIGHT, maxWidth);
+    }
+    ctx.restore();
   });
 };
 
-const cook = () => {
+const cook = () => { // eslint-disable-line
   // 用于制作图片，修剪操作。
   // 图片的剪切，打补丁等操作。
 };

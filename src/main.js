@@ -184,7 +184,7 @@ const control = ({fromid, toid, command, text, params}) => {
             height
           };
         } else {
-          const {font, color, direction, blur} = imageData;
+          const {font, color, direction, blur, degree} = imageData;
           options = {
             x: x + width / 2,
             y: y + getFontSize(font),
@@ -193,7 +193,8 @@ const control = ({fromid, toid, command, text, params}) => {
             color,
             align: 'center',
             direction,
-            blur
+            blur,
+            degree
           };
 
           insertLog({

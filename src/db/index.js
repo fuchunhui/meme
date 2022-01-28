@@ -68,7 +68,8 @@ const _initTable = () => {
     color CHAR(20) NOT NULL,
     align CHAR(10) NOT NULL,
     direction CHAR(10) NOT NULL,
-    blur REAL DEFAULT 0
+    blur REAL DEFAULT 0,
+    degree REAL DEFAULT 0
   );`;
   const logger = `CREATE TABLE ${LOG_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,13 +133,13 @@ const getTable = (tableName = STORY_TABLE, join = true) => {
 
 const insertTable = (options, write = true, tableName = STORY_TABLE) => {
   const {mid: _mid, title, feature, image, senior = 0, x = 0, y = 0, max = 100, font = '32px sans-serif',
-    color = 'black', align = 'start', direction = 'down', blur = 0} = options;
+    color = 'black', align = 'start', direction = 'down', blur = 0, degree = 0} = options;
   const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
 
   const sql = `INSERT INTO ${tableName} (mid, title, feature, image, senior) `
     + `VALUES ('${mid}', '${title}', '${feature}', '${image}', '${senior}');`;
-  const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction, blur) `
-    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}', ${blur});`;
+  const text = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction, blur, degree) `
+    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}', ${blur}, ${degree});`;
 
   try {
     getDB().run(sql + text);
@@ -169,9 +170,10 @@ const updateTable = (options, tableName = STORY_TABLE) => {
 
 const updateTextTable = options => {
   const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif',
-    color = 'black', align = 'start', direction = 'down', blur = 0} = options;
+    color = 'black', align = 'start', direction = 'down', blur = 0, degree = 0} = options;
   const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}',`
-    + ` color = '${color}', align = '${align}', direction = '${direction}', blur = ${blur} WHERE mid = '${mid}';`;
+    + ` color = '${color}', align = '${align}', direction = '${direction}', blur = ${blur},`
+    + ` degree = ${degree} WHERE mid = '${mid}';`;
   try {
     getDB().run(text);
 

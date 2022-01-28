@@ -9,6 +9,7 @@ export default {
   align: 'start',
   direction: 'down',
   blur: 0,
+  degree: 0,
   max: 100
 };
 
