@@ -18,15 +18,15 @@
   },
   "type": "module",
   "dependencies": {
-    "axios": "^0.22.0",
+    "axios": "^0.25.0",
     "canvas": "^2.8.0",
     "crypto-js": "^4.1.1",
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "sql.js": "^1.6.2"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "eslint": "^8.4.1",
+    "eslint": "^8.7.0",
     "md5": "^2.3.0"
   },
   "repository": {
