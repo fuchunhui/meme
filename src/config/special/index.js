@@ -1,4 +1,4 @@
-import mid from './mid-autumn.js';
+import mid from './special.js'; // mid-autumn
 
 const special = [].concat(mid);
 
