@@ -1,4 +1,4 @@
-import {initDB} from './src/db/index.js';
+import {initDB} from './src/db/index.js'; // eslint-disable-line
 import main, {listen, backup} from './src/main.js';
 
 // initDB();

@@ -229,7 +229,7 @@ const control = ({fromid, toid, command, text, params}) => {
     const percent = Math.floor(Math.random() * 100);
     if (percent < 20) {
       content = formatOther();
-    } else if (percent < 40) {
+    } else if (percent < 60) {
       content = formatGuide();
       messagesType = 'MD';
     } else {
