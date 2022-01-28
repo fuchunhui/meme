@@ -2,8 +2,15 @@ import {
   getCatalog,
   open,
   create,
-  updateText
+  updateText,
+  openFeature,
+  updateFeature,
+  getImagePaths,
+  getBase64,
+  getMaterialCatalog
 } from './data.js';
+
+import {COMMAND_LIST} from '../config/constant.js';
 
 const listen = app => {
   app.get('/image/catalog', (req, res) => {
@@ -40,11 +47,56 @@ const listen = app => {
   });
 
   app.get('/image/download', (req, res) => {
-    console.log('备用接口');
+    console.log('备用接口', req, res);
   });
 
   app.get('/image/export', (req, res) => {
-    console.log('备用接口');
+    console.log('备用接口', req, res);
+  });
+
+  app.get('/image/config', (req, res) => {
+    const data = {
+      commands: COMMAND_LIST,
+      paths: getImagePaths()
+    };
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
+  });
+
+  app.get('/image/feature/open', (req, res) => {
+    const {mid} = req.query;
+    const data = openFeature(mid);
+    res.send(data);
+  });
+
+  app.post('/image/feature/save', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = updateFeature(req.body);
+    res.send(data);
+  });
+
+  app.get('/material/base64', (req, res) => {
+    const {ipath, value} = req.query;
+    const data = getBase64(ipath, value);
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
+  });
+
+  app.get('/material/catalog', (req, res) => {
+    const {type} = req.query;
+    const data = getMaterialCatalog(type.toUpperCase());
+
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
   });
 };
 

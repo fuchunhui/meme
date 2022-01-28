@@ -27,8 +27,6 @@ const send = (toid, content, type = 'IMAGE') => {
     method: 'post',
     headers,
     data
-  }).then(res => {
-    // console.log(res.data);
   }).catch(error => {
     console.error(error);
   });

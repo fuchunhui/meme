@@ -11,5 +11,6 @@ const {server, traget, key} = config;
 export default {
   server,
   traget,
-  key
+  key,
+  extension: {}
 };
