@@ -131,7 +131,7 @@ const control = ({fromid, toid, command, text, params}) => {
   const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
   if (singleList.length) {
     const {type, sid, sname, tid} = singleList[0];
-    const param = params.length ? params[0] : '';
+    let param = params.length ? params[0] : '';
 
     if (type === FEATURE_TYPE.COMMAND) {
       const commands = getDataListByColumn(command, 'feature', SERIES_TABLE);
@@ -160,11 +160,15 @@ const control = ({fromid, toid, command, text, params}) => {
       return;
     }
 
+    if (type === FEATURE_TYPE.REPEAT && !param) {
+      param = text;
+    }
+
     if (param) {
       let options = {};
       let imageBase64 = '';
 
-      if (type === FEATURE_TYPE.TEXT) {
+      if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
         const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE);
         if (textStyles.length) {
           options = textStyles[0];

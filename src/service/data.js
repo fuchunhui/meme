@@ -208,7 +208,7 @@ const openFeature = mid => {
     story
   };
 
-  if (type === FEATURE_TYPE.TEXT) {
+  if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
     const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE);
     cell.et = textStyles.length ? textStyles[0] : null;
   } else if (type === FEATURE_TYPE.IMAGE) {
