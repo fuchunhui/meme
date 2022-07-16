@@ -76,6 +76,7 @@ const formatHelp = () => {
   const list = [
     '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
     '- 菜单：`@imeme`，查询命令列表',
+    '- 图片：`@imeme image`，查询图片列表',
     '- 使用：`@imeme 命令`，获取原始表情',
     '- 文字：`@imeme 命令 文字`，返回拼接文字的表情',
     '- 参数：`@imeme 命令 参数 文字`，返回符合输入参数的文字表情',
@@ -107,13 +108,13 @@ const formatAllMenu = (storyList, seniorList, seriesMap) => {
   return content.join('\n');
 };
 
-const formatImageMenu = data => {
-  // 筛选命令，太长的命令，放在最后显示
-  // 表格的方式展示内容
-  // 这是一张丰富的菜单，图片式的方式，就比较有意思了。
-  // 可以是一张宣传海报
-  console.log(data);
-  return ''; // base64
+const formatImageMenu = () => {
+  return {
+    title: '', // 为空，则不绘制标题
+    normal: '常规用法举例：@imeme 加油 打工人',
+    senior: '高级用法举例：@imeme 上号 vscode 打工人',
+    series: '参数用法举例：@imeme 周报 张飞 打工人'
+  };
 };
 
 const others = [

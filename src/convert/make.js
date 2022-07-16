@@ -138,7 +138,86 @@ const _breakLines = (text, width, ctx) => {
   return lines;
 };
 
+const makeMenu = (images, options) => {
+  const {normal: inor, senior: isen, series: iser} = images;
+  const {normal, senior, series, title} = options;
+  const data = [
+    {
+      title: normal,
+      children: inor
+    },
+    {
+      title: senior,
+      children: isen
+    },
+    {
+      title: series,
+      children: iser
+    }
+  ];
+
+  const gap = 10;
+  const secondHeight = 30;
+  const headHeight = title ? gap * 3 : 0;
+  const dimension = 120;
+  const times = 8;
+  const padding = 5;
+
+  const width = dimension * times + gap * (times + 1);
+  const height = headHeight
+    + data.length * secondHeight
+    + (dimension + gap) * data.reduce((pre, current) => pre + Math.ceil(current.children.length / times), 0)
+    + gap * 3;
+
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  let x = gap;
+  let y = 0;
+
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#333333';
+  if (title) {
+    ctx.font = '30px sans-serif';
+    ctx.fillText(title, x, y);
+    y += headHeight;
+  }
+
+  data.forEach(({title, children}) => {
+    ctx.font = '24px sans-serif';
+    ctx.fillText(title, x, y);
+
+    y += secondHeight + gap;
+
+    children.forEach(({title: ctitle, image}, cidx) => {
+      const img = new Image();
+
+      const cx = x + (cidx % times) * (dimension + gap);
+      const cy = y + Math.floor(cidx / times) * (dimension + gap);
+
+      img.onload = () => {
+        ctx.drawImage(img, cx, cy, dimension, dimension);
+
+        ctx.save();
+        ctx.font = '16px sans-serif';
+        ctx.fillStyle = '#FF0000';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(ctitle, cx + padding, cy + dimension);
+
+        ctx.restore();
+      };
+      img.src = image;
+    });
+
+    y += Math.ceil(children.length / times) * (dimension + gap);
+  });
+
+  const base64 = canvas.toDataURL();
+  return base64;
+};
+
 export {
   make,
-  getFontSize
+  getFontSize,
+  makeMenu
 };

@@ -15,7 +15,7 @@ import {
   FEATURE_TABLE,
   FEATURE_TYPE
 } from './db/index.js';
-import {make, getFontSize} from './convert/make.js';
+import {make, getFontSize, makeMenu} from './convert/make.js';
 import {
   formatAllMenu,
   formatSeriesMenu,
@@ -23,13 +23,15 @@ import {
   formatHelp,
   formatError,
   formatOther,
-  formatGuide
+  formatGuide,
+  formatImageMenu
 } from './convert/format.js';
 import {send} from './service/index.js';
 import {
   normalMenu,
   seniorMenu,
   seriesMenu,
+  imageMenu,
   getBase64,
   getRandomImageName
 } from './service/data.js';
@@ -100,7 +102,6 @@ const control = ({fromid, toid, command, text, params}) => {
     const seniorList = seniorMenu();
     const seriesMap = seriesMenu();
 
-    // TODO 随机返回 Image 的菜单示意图
     const content = formatAllMenu(storyList, seniorList, seriesMap);
     send(toid, content, 'MD');
 
@@ -111,6 +112,14 @@ const control = ({fromid, toid, command, text, params}) => {
     let content = '';
     if (command === 'help') {
       content = formatHelp();
+    } else if (command === 'image') {
+      // 当前每次600ms 左右，根据实际情况，考虑是否优化为每天生成一次固定菜单。
+      const imageList = imageMenu();
+      const options = formatImageMenu();
+
+      const base64 = makeMenu(imageList, options);
+      send(toid, base64);
+      return;
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
     } else if (command === '*') {

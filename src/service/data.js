@@ -21,6 +21,7 @@ import {
 import {emptySucess, sucess, error} from './ajax.js';
 import {testFile, getFileName, getRandomPath} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
+import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
   UPDATE_TEXT_FAIL,
   CREATE_REPEAT_TITLE
@@ -66,6 +67,21 @@ const seriesMenu = () => {
     });
   }
   return map;
+};
+
+const imageMenu = () => {
+  const list = getTable(STORY_TABLE, false);
+  const [normal, senior] = group(list, story => story.senior === 0);
+
+  const series = getTable(SERIES_TABLE, false);
+  series.forEach(item => item.title = `${item.feature} ${item.title}`);
+  sortBykey(series, 'title');
+
+  return {
+    normal: filterKeys(normal),
+    senior: filterKeys(senior),
+    series: filterKeys(series)
+  };
 };
 
 const _getStory = (target = []) => {
@@ -276,6 +292,7 @@ export {
   normalMenu,
   seniorMenu,
   seriesMenu,
+  imageMenu,
   getCatalog,
   open,
   create,
