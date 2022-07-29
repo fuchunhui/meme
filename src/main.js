@@ -40,7 +40,7 @@ import {COMMAND_LIST, getRole} from './config/constant.js';
 export * from './service/router.js';
 export * from './export/backup.js';
 
-const special = (command, toid, text) => {
+const special = (command, key, toid, text) => {
   const commands = getSpecialDataListByColumn(command);
   const specialCommand = commands.length > 0;
 
@@ -49,7 +49,7 @@ const special = (command, toid, text) => {
     const data = commands[index];
     if (data.image) {
       const base64 = make(text, data);
-      send(toid, base64);
+      send(key, toid, base64);
     }
   }
 
@@ -96,14 +96,14 @@ const random = () => {
   };
 };
 
-const control = ({fromid, toid, command, text, params}) => {
+const control = ({fromid, toid, command, text, params, key}) => {
   if (command === '') {
     const storyList = normalMenu();
     const seniorList = seniorMenu();
     const seriesMap = seriesMenu();
 
     const content = formatAllMenu(storyList, seniorList, seriesMap);
-    send(toid, content, 'MD');
+    send(key, toid, content, 'MD');
 
     return;
   }
@@ -118,7 +118,7 @@ const control = ({fromid, toid, command, text, params}) => {
       const options = formatImageMenu();
 
       const base64 = makeMenu(imageList, options);
-      send(toid, base64);
+      send(key, toid, base64);
       return;
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
@@ -126,14 +126,14 @@ const control = ({fromid, toid, command, text, params}) => {
       const {command, text, params, mystery} = random();
       if (mystery) {
         const base64 = getBase64('RANDOM');
-        send(toid, base64);
+        send(key, toid, base64);
       } else {
         control({fromid, toid, command, text, params});
       }
       return;
     }
 
-    send(toid, content, 'MD');
+    send(key, toid, content, 'MD');
     return;
   }
 
@@ -148,18 +148,18 @@ const control = ({fromid, toid, command, text, params}) => {
       if (param && commandList.includes(param)) {
         const commandData = getDataByColumn(param, 'title', SERIES_TABLE);
         const base64 = make(text, commandData);
-        send(toid, base64);
+        send(key, toid, base64);
         return;
       }
       const composeContent = formatSeriesMenu(commandList, command);
-      send(toid, composeContent, 'MD');
+      send(key, toid, composeContent, 'MD');
       return;
     }
 
     const imageData = getDataByColumn(sid, 'mid', sname);
     if (!imageData.image) {
       const content = formatError();
-      send(toid, content, 'TEXT');
+      send(key, toid, content, 'TEXT');
 
       insertLog({
         fromid,
@@ -223,19 +223,19 @@ const control = ({fromid, toid, command, text, params}) => {
         text: param,
         options
       });
-      send(toid, base64);
+      send(key, toid, base64);
       return;
     }
   }
 
-  if (special(command, toid, text)) {
+  if (special(command, key, toid, text)) {
     return;
   }
 
   const data = getDataByColumn(command);
   if (data.image) {
     const base64 = make(text, data);
-    send(toid, base64);
+    send(key, toid, base64);
   } else {
     let content = '';
     let messagesType = 'TEXT';
@@ -249,7 +249,7 @@ const control = ({fromid, toid, command, text, params}) => {
       content = formatNull();
     }
 
-    send(toid, content, messagesType);
+    send(key, toid, content, messagesType);
 
     insertLog({
       fromid,
@@ -260,8 +260,8 @@ const control = ({fromid, toid, command, text, params}) => {
 };
 
 const main = encryption => {
-  const {fromid, toid, command, text, params} = parser(encryption);
-  control({fromid, toid, command, text, params});
+  const {fromid, toid, command, text, params, key} = parser(encryption);
+  control({fromid, toid, command, text, params, key});
 };
 
 export default main;

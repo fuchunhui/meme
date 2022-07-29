@@ -1,9 +1,8 @@
 import crypto from 'crypto-js';
-import config from '../config/index.js';
+import {config} from '../config/index.js';
 import {matchText} from '../utils/regex.js';
 
 const {enc, mode, pad, AES} = crypto;
-const {key} = config;
 
 class AESCipher {
   constructor(key) {
@@ -40,9 +39,33 @@ const _decode = encryption => {
   return JSON.parse(data);
 };
 
+const _decodes = encryption => {
+  let info = null;
+
+  for (const {key} of config) {
+    const cipher = new AESCipher(key);
+    let data = null;
+
+    try {
+      data = cipher.decrypt(encryption);
+    } catch (error) {
+      console.error(error);
+    }
+
+    if (data) {
+      info = {
+        ...JSON.parse(data),
+        key
+      };
+      break;
+    }
+  }
+  
+  return info;
+};
+
 const parser = encryption => {
-  const content = _decode(encryption);
-  const {header, body} = content.message;
+  const {message: {header, body}, key} = _decodes(encryption);
   const {fromuserid: fromid, toid} = header;
   const cell = body.find(({type, content}) => type === 'TEXT' && content.trim());
   let message = cell ? cell.content.trim() : '';
@@ -89,7 +112,8 @@ const parser = encryption => {
     toid,
     command,
     text,
-    params
+    params,
+    key
   };
 };
 

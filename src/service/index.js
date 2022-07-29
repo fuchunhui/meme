@@ -1,13 +1,11 @@
 import axios from 'axios';
-import config from '../config/index.js';
-
-const {server} = config;
+import {getConfig} from '../config/index.js';
 
 const headers = {
   'content-type': 'application/json'
 };
 
-const send = (toid, content, type = 'IMAGE') => {
+const send = (key, toid, content, type = 'IMAGE') => {
   const data = {
     message: {
       header: {
@@ -22,8 +20,9 @@ const send = (toid, content, type = 'IMAGE') => {
     }
   };
 
+  const url = getConfig(key).server;
   axios({
-    url: server,
+    url,
     method: 'post',
     headers,
     data

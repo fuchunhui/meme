@@ -6,11 +6,12 @@ if (env === 'test') {
   process.env.MEME_BASE_URL = 'http://localhost:8080';
 }
 
-const {server, token, key} = config;
 
-export default {
-  server,
-  token,
-  key,
-  extension: {}
+const getConfig = key => {
+  return config.find(item => item.key === key);
+};
+
+export {
+  config,
+  getConfig
 };
