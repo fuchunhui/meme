@@ -2,7 +2,7 @@ import express from 'express';
 import md5 from 'md5';
 import path from 'path';
 import {come, listen} from './app.js';
-import config from './src/config/index.js';
+import {token} from './src/config/index.js';
 
 const app = express();
 
@@ -39,7 +39,7 @@ app.post('*', (req, res) => {
 
   if (req.body.echostr) {
     const {signature, rn, timestamp, echostr} = req.body;
-    const str = md5(`${rn}${timestamp}${config.token}`);
+    const str = md5(`${rn}${timestamp}${token}`);
     if (signature === str) {
       res.send(echostr);
     } else {

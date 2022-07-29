@@ -6,11 +6,11 @@ if (env === 'test') {
   process.env.MEME_BASE_URL = 'http://localhost:8080';
 }
 
-const {server, traget, key} = config;
+const {server, token, key} = config;
 
 export default {
   server,
-  traget,
+  token,
   key,
   extension: {}
 };
