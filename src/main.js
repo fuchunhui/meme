@@ -245,7 +245,7 @@ const control = ({fromid, toid, command, text, params, key}) => {
     if (percent < 20) {
       content = formatOther();
     } else if (percent < 60) {
-      content = formatGuide();
+      content = formatGuide(name);
       messagesType = 'MD';
     } else {
       content = formatNull();

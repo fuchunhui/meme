@@ -74,7 +74,7 @@ const formatError = () => {
 
 const formatHelp = name => {
   const list = [
-    `#### 我是一个<font color="red"> 斗图 </font>智障机器人`,
+    '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
     `- 菜单：\`@${name}\`，查询命令列表`,
     `- 图片：\`@${name} image\`，查询图片列表`,
     `- 使用：\`@${name} 命令\`，获取原始表情`,
@@ -136,8 +136,9 @@ const guides = [
   '%E4%BD%A0%E5%96%9C%E6%AC%A2%E5%BC%80%E7%9B%B2%E7%9B%92%E5%90%97%EF%BC%8C%E6%88%91%E4%B9%9F%E4%BC%9A%60'
     + '%40imeme%20*%60'
 ];
-const formatGuide = () => {
-  return formatNull(guides);
+const formatGuide = name => {
+  const list = guides.map(item => item.replace(/imeme/g, name));
+  return formatNull(list);
 };
 
 export {
