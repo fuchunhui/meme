@@ -39,7 +39,7 @@ app.post('*', (req, res) => {
 
   if (req.body.echostr) {
     const {signature, rn, timestamp, echostr} = req.body;
-    let auth = false; 
+    let auth = false;
     for (const {token} of config) {
       const str = md5(`${rn}${timestamp}${token}`);
       if (signature === str) {

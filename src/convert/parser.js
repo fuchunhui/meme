@@ -33,11 +33,11 @@ class AESCipher {
   }
 }
 
-const _decode = encryption => {
-  const cipher = new AESCipher(key);
-  const data = cipher.decrypt(encryption);
-  return JSON.parse(data);
-};
+// const _decode = encryption => {
+//   const cipher = new AESCipher(key);
+//   const data = cipher.decrypt(encryption);
+//   return JSON.parse(data);
+// };
 
 const _decodes = encryption => {
   let info = null;
