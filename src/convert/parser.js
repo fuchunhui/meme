@@ -49,7 +49,7 @@ const _decodes = encryption => {
     try {
       data = cipher.decrypt(encryption);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
 
     if (data) {

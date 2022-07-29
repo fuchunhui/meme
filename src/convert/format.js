@@ -20,8 +20,8 @@ const formatMultiMenu = (data, length) => {
   return menu.join('\n');
 };
 
-const formatSeriesMenu = (data, command) => {
-  const title = `固定参数参考：\`@imeme ${command} ${data[0]} 打工人\``;
+const formatSeriesMenu = (name, data, command) => {
+  const title = `固定参数参考：\`@${name} ${command} ${data[0]} 打工人\``;
   const menu = formatMenu(data, command);
   return `${title}\n${menu}`;
 };
@@ -72,20 +72,20 @@ const formatError = () => {
   return formatNull(errors);
 };
 
-const formatHelp = () => {
+const formatHelp = name => {
   const list = [
-    '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
-    '- 菜单：`@imeme`，查询命令列表',
-    '- 图片：`@imeme image`，查询图片列表',
-    '- 使用：`@imeme 命令`，获取原始表情',
-    '- 文字：`@imeme 命令 文字`，返回拼接文字的表情',
-    '- 参数：`@imeme 命令 参数 文字`，返回符合输入参数的文字表情',
-    '- 文字支持空格: 使用双引号包裹文字内容，`@imeme 鲁迅 “这句话 是我说的”`'
+    `#### 我是一个<font color="red"> 斗图 </font>智障机器人`,
+    `- 菜单：\`@${name}\`，查询命令列表`,
+    `- 图片：\`@${name} image\`，查询图片列表`,
+    `- 使用：\`@${name} 命令\`，获取原始表情`,
+    `- 文字：\`@${name} 命令 文字\`，返回拼接文字的表情`,
+    `- 参数：\`@${name} 命令 参数 文字\`，返回符合输入参数的文字表情`,
+    `- 文字支持空格: 使用双引号包裹文字内容，\`@${name} 鲁迅 “这句话 是我说的”\``
   ];
   return list.join('\n');
 };
 
-const formatAllMenu = (storyList, seniorList, seriesMap) => {
+const formatAllMenu = (name, storyList, seniorList, seriesMap) => {
   const normal = formatMultiMenu(storyList, COMMAND_LENGTH);
   const senior = formatMultiMenu(seniorList, COMMAND_LENGTH);
 
@@ -97,23 +97,23 @@ const formatAllMenu = (storyList, seniorList, seriesMap) => {
 
   const content = [
     '#### 常用菜单：',
-    '常规用法：`@imeme 加油 打工人`',
+    `常规用法：\`@${name} 加油 打工人\``,
     normal,
-    '高级用法：`@imeme 上号 vscode 打工人`',
+    `高级用法：\`@${name} 上号 vscode 打工人\``,
     senior,
-    '固定参数用法：`@imeme 周报 张飞 打工人`',
+    `固定参数用法：\`@${name} 周报 张飞 打工人\``,
     series
   ];
 
   return content.join('\n');
 };
 
-const formatImageMenu = () => {
+const formatImageMenu = name => {
   return {
     title: '', // 为空，则不绘制标题
-    normal: '常规用法举例：@imeme 加油 打工人',
-    senior: '高级用法举例：@imeme 上号 vscode 打工人',
-    series: '参数用法举例：@imeme 周报 张飞 打工人'
+    normal: `常规用法举例：@${name} 加油 打工人`,
+    senior: `高级用法举例：@${name} 上号 vscode 打工人`,
+    series: `参数用法举例：@${name} 周报 张飞 打工人`
   };
 };
 

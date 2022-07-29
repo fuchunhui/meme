@@ -36,6 +36,7 @@ import {
   getRandomImageName
 } from './service/data.js';
 import {COMMAND_LIST, getRole} from './config/constant.js';
+import {getConfig} from './config/index.js';
 
 export * from './service/router.js';
 export * from './export/backup.js';
@@ -97,12 +98,13 @@ const random = () => {
 };
 
 const control = ({fromid, toid, command, text, params, key}) => {
+  const name = getConfig(key).name;
   if (command === '') {
     const storyList = normalMenu();
     const seniorList = seniorMenu();
     const seriesMap = seriesMenu();
 
-    const content = formatAllMenu(storyList, seniorList, seriesMap);
+    const content = formatAllMenu(name, storyList, seniorList, seriesMap);
     send(key, toid, content, 'MD');
 
     return;
@@ -111,11 +113,11 @@ const control = ({fromid, toid, command, text, params, key}) => {
   if (COMMAND_LIST.includes(command)) {
     let content = '';
     if (command === 'help') {
-      content = formatHelp();
+      content = formatHelp(name);
     } else if (command === 'image') {
       // 当前每次600ms 左右，根据实际情况，考虑是否优化为每天生成一次固定菜单。
       const imageList = imageMenu();
-      const options = formatImageMenu();
+      const options = formatImageMenu(name);
 
       const base64 = makeMenu(imageList, options);
       send(key, toid, base64);
@@ -128,7 +130,7 @@ const control = ({fromid, toid, command, text, params, key}) => {
         const base64 = getBase64('RANDOM');
         send(key, toid, base64);
       } else {
-        control({fromid, toid, command, text, params});
+        control({fromid, toid, command, text, params, key});
       }
       return;
     }
@@ -151,7 +153,7 @@ const control = ({fromid, toid, command, text, params, key}) => {
         send(key, toid, base64);
         return;
       }
-      const composeContent = formatSeriesMenu(commandList, command);
+      const composeContent = formatSeriesMenu(name, commandList, command);
       send(key, toid, composeContent, 'MD');
       return;
     }
