@@ -159,8 +159,8 @@ const makeMenu = (images, options) => {
   const gap = 10;
   const secondHeight = 30;
   const headHeight = title ? gap * 3 : 0;
-  const dimension = 120;
-  const times = 8;
+  const dimension = 100;
+  const times = 9;
   const padding = 5;
 
   const width = dimension * times + gap * (times + 1);
