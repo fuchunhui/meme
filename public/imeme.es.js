@@ -9108,7 +9108,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       return ["STORY", "SERIES", "SPECIAL"].includes(curType.value);
     });
     const featureChange = ({ mid, type, options }) => {
-      if (type === "TEXT") {
+      if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
         Api.saveImage(options);
       } else {
         Api.saveFeatureImage({
