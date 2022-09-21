@@ -6737,16 +6737,23 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
           onToggle: _cache[6] || (_cache[6] = ($event) => changeValue($event, "direction"))
         }, null, 8, ["checked"]),
         createVNode(unref(_sfc_main$a), {
+          label: "center",
+          name: "direction",
+          value: "center",
+          checked: unref(direction) === "center",
+          onToggle: _cache[7] || (_cache[7] = ($event) => changeValue($event, "direction"))
+        }, null, 8, ["checked"]),
+        createVNode(unref(_sfc_main$a), {
           label: "down",
           name: "direction",
           value: "down",
           checked: unref(direction) === "down",
-          onToggle: _cache[7] || (_cache[7] = ($event) => changeValue($event, "direction"))
+          onToggle: _cache[8] || (_cache[8] = ($event) => changeValue($event, "direction"))
         }, null, 8, ["checked"]),
         createVNode(unref(MemeInput), {
           class: "property-degree",
           value: unref(degree),
-          "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => changeValue($event, "degree"))
+          "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => changeValue($event, "degree"))
         }, null, 8, ["value"])
       ]);
     };
@@ -6809,14 +6816,21 @@ const fillText = (ctx, width, text, options) => {
   const size2 = getFontSize(font);
   const lines = breakLines(text, maxWidth, ctx);
   lines.forEach((item, index2) => {
-    const dy = direction === "down" ? index2 : index2 - (lines.length - 1);
+    let offset = 0;
+    if (direction === "down") {
+      offset = index2;
+    } else if (direction === "center") {
+      offset = index2 - (lines.length - 1) / 2;
+    } else {
+      offset = index2 - (lines.length - 1);
+    }
     ctx.save();
     if (degree) {
-      ctx.translate(x, y + dy * size2 * LINE_HEIGHT);
+      ctx.translate(x, y + offset * size2 * LINE_HEIGHT);
       ctx.rotate(degree * Math.PI / 180);
       ctx.fillText(item, 0, 0, maxWidth);
     } else {
-      ctx.fillText(item, x, y + dy * size2 * LINE_HEIGHT, maxWidth);
+      ctx.fillText(item, x, y + offset * size2 * LINE_HEIGHT, maxWidth);
     }
     ctx.restore();
   });
