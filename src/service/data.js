@@ -24,6 +24,7 @@ import {convert} from '../convert/base64.js';
 import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
   UPDATE_TEXT_FAIL,
+  UPDATE_STORY_FAIL,
   CREATE_REPEAT_TITLE
 } from '../config/constant.js';
 
@@ -200,7 +201,7 @@ const create = options => {
 const update = options => {
   const data = updateTable(options);
   if (data) {
-    return error(data, UPDATE_TEXT_FAIL);
+    return error(data, UPDATE_STORY_FAIL);
   }
   return emptySucess();
 };

@@ -2,6 +2,7 @@ import {
   getCatalog,
   open,
   create,
+  update,
   updateText,
   openFeature,
   updateFeature,
@@ -43,6 +44,12 @@ const listen = app => {
   app.post('/image/create', (req, res) => {
     console.log('request: ', JSON.stringify(req.body));
     const data = create(req.body);
+    res.send(data);
+  });
+
+  app.post('/image/update', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = update(req.body);
     res.send(data);
   });
 
