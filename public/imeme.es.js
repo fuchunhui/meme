@@ -6183,6 +6183,9 @@ function extractChangingRecords(to, from) {
   }
   return [leavingRecords, updatingRecords, enteringRecords];
 }
+function useRoute() {
+  return inject(routeLocationKey);
+}
 var Side_vue_vue_type_style_index_0_lang = "";
 const _hoisted_1$c = { class: "side" };
 const _hoisted_2$6 = { class: "side-content-title" };
@@ -6901,7 +6904,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
   props: {
     story: null
   },
-  emits: ["change", "create", "replace"],
+  emits: ["change", "create", "replace", "update"],
   setup(__props, { emit }) {
     const props = __props;
     const localStory = toRefs(props).story;
@@ -7161,13 +7164,30 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
       showLayer.value = false;
       pickStatus.value = false;
     };
+    const route = useRoute();
+    const canEdit = computed(() => {
+      return route.path === "/edit";
+    });
+    const changeTitle = (value) => {
+      localStory.value.title = value;
+      emit("update", localStory.value);
+    };
     onMounted(() => {
       makeCanvas();
     });
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1$4, [
         createBaseVNode("div", _hoisted_2$1, [
-          createBaseVNode("div", _hoisted_3$1, toDisplayString(unref(localTitle)), 1),
+          createBaseVNode("div", _hoisted_3$1, [
+            unref(canEdit) ? (openBlock(), createBlock(unref(MemeInput), {
+              key: 0,
+              class: "container-title-label",
+              value: unref(localStory).title,
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => changeTitle($event))
+            }, null, 8, ["value"])) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
+              createTextVNode(toDisplayString(unref(localTitle)), 1)
+            ], 64))
+          ]),
           createVNode(unref(_sfc_main$c), {
             label: updateStatus.value ? "\u6DFB\u52A0" : "\u53D6\u6D88\u6DFB\u52A0",
             u: "primary",
@@ -7313,6 +7333,10 @@ const urlMap = {
   },
   createImage: {
     url: "/image/create",
+    method: "post"
+  },
+  updateImage: {
+    url: "/image/update",
     method: "post"
   },
   getConfig: {
@@ -9132,6 +9156,9 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
         });
       }
     };
+    const updateImage = (value) => {
+      Api.updateImage(value);
+    };
     onMounted(() => {
       getCatalog();
       getConfig();
@@ -9148,7 +9175,8 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
           story: unref(story),
           onChange: storyChange,
           onReplace: replace,
-          onCreate: createImage
+          onCreate: createImage,
+          onUpdate: updateImage
         }, null, 8, ["story"])) : createCommentVNode("", true),
         curType.value === "FEATURE" && unref(feature).mid ? (openBlock(), createBlock(_sfc_main$2, {
           key: 1,
@@ -9187,6 +9215,10 @@ const routes = [
   {
     path: "/center",
     component: _sfc_main
+  },
+  {
+    path: "/edit",
+    component: _sfc_main$1
   }
 ];
 const router = createRouter({
