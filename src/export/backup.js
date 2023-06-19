@@ -1,26 +1,60 @@
 import path from 'path';
 import fs from 'fs';
 import {
-  getTable,
-  getSingleTable,
   STORY_TABLE,
-  SPECIAL_TABLE,
+  TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
+  MYSTERY_TABLE,
   MATERIAL_TABLE,
-  MYSTERY_TABLE
+  SPECIAL_TABLE,
+  getSingleTable
 } from '../db/index.js';
 
-const getData = tableName => {
-  const list = getTable(tableName);
-  const result = list.map(({mid, title, feature, image, senior,
-    x, y, font, color, align, max, direction, blur, degree}) => {
+const saveData = (targetFile, fileList) => {
+  const data = 'export default ' + JSON.stringify(fileList) + ';\n';
+  fs.writeFile(targetFile, data, 'utf8', err => {
+    if (err) {
+      console.error(err);
+    }
+  });
+};
+
+const saveSingle = (base, fileName, list) => {
+  const targetFile = path.resolve(base, `${fileName}.js`);
+  saveData(targetFile, list);
+};
+
+const backup = base => {
+  saveSingle(base, 'story', getStoryData(STORY_TABLE));
+  saveSingle(base, 'text', getTextData());
+  saveSingle(base, 'series', getStoryData(SERIES_TABLE));
+  saveSingle(base, 'feature', getFeatureData());
+  saveSingle(base, 'mystery', getMysteryData());
+  saveSingle(base, 'material', getMaterialData());
+  saveSingle(base, 'special', getStoryData(SPECIAL_TABLE));
+};
+
+const getStoryData = (tableName = STORY_TABLE) => {
+  const list = getSingleTable(tableName);
+  const result = list.map(({mid, title, feature, image, senior}) => {
     return {
       mid,
       title,
       feature,
       image,
-      senior,
+      senior
+    };
+  });
+
+  return result;
+};
+
+const getTextData = () => {
+  const list = getSingleTable(TEXT_TABLE);
+  const result = list.map(({mid, x, y, font, color, align, max, direction, blur, degree}) => {
+    return {
+      mid,
       x,
       y,
       font,
@@ -34,30 +68,6 @@ const getData = tableName => {
   });
 
   return result;
-};
-
-const saveData = (targetFile, fileList) => {
-  const data = 'export default ' + JSON.stringify(fileList) + ';\n';
-  fs.writeFile(targetFile, data, 'utf8', err => {
-    if (err) {
-      console.error(err);
-    }
-  });
-};
-
-const save = (base, fileName, tableName) => {
-  const list = getData(tableName);
-  const targetFile = path.resolve(base, `${fileName}.js`);
-  saveData(targetFile, list);
-};
-
-const backup = base => {
-  save(base, 'common', STORY_TABLE);
-  save(base, 'special', SPECIAL_TABLE);
-  save(base, 'series', SERIES_TABLE);
-  saveSingle(base, 'feature', getFeatureData);
-  saveSingle(base, 'material', getMaterialData);
-  saveSingle(base, 'mystery', getMysteryData);
 };
 
 const getFeatureData = () => {
@@ -106,12 +116,6 @@ const getMysteryData = () => {
   });
 
   return result;
-};
-
-const saveSingle = (base, fileName, funcName) => {
-  const list = funcName();
-  const targetFile = path.resolve(base, `${fileName}.js`);
-  saveData(targetFile, list);
 };
 
 export {
