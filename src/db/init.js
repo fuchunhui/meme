@@ -1,7 +1,7 @@
 import uuid from '../utils/uuid.js';
 
-import storyData from '../config/common.js'; // 更改文件名为 story.js
-import textData from '../config/common.js'; // 更改文件名为 text.js
+import storyData from '../config/story.js';
+import textData from '../config/text.js';
 import seriesData from '../config/series.js';
 import featureData from '../config/feature.js';
 import mysteryData from '../config/mystery.js';
