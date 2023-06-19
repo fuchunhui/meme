@@ -10,6 +10,7 @@ export const MYSTERY_TABLE = 'MYSTERY';
 export const MATERIAL_TABLE = 'MATERIAL';
 export const SPECIAL_TABLE = 'SPECIAL';
 export const LOG_TABLE = 'LOGGER';
+export const ADDITIONAL_TABLE = 'ADDITIONAL';
 
 export const FEATURE_TYPE = {
   'COMMAND': 'COMMAND',

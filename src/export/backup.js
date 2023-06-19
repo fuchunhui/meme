@@ -8,6 +8,7 @@ import {
   MYSTERY_TABLE,
   MATERIAL_TABLE,
   SPECIAL_TABLE,
+  ADDITIONAL_TABLE,
   getSingleTable
 } from '../db/index.js';
 
@@ -33,6 +34,7 @@ const backup = base => {
   saveSingle(base, 'mystery', getMysteryData());
   saveSingle(base, 'material', getMaterialData());
   saveSingle(base, 'special', getStoryData(SPECIAL_TABLE));
+  saveSingle(base, 'additional', getAdditionalData());
 };
 
 const getStoryData = (tableName = STORY_TABLE) => {
@@ -112,6 +114,18 @@ const getMysteryData = () => {
       title,
       text,
       param
+    };
+  });
+
+  return result;
+};
+
+const getAdditionalData = () => {
+  const list = getSingleTable(ADDITIONAL_TABLE);
+  const result = list.map(({mid, text}) => {
+    return {
+      mid,
+      text
     };
   });
 

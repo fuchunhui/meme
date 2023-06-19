@@ -7,6 +7,7 @@ import featureData from '../config/feature.js';
 import mysteryData from '../config/mystery.js';
 import specialData from '../config/special/index.js';
 import materialData from '../config/material.js';
+import additionalData from '../config/additional.js';
 
 import {
   STORY_TABLE,
@@ -17,6 +18,7 @@ import {
   MATERIAL_TABLE,
   SPECIAL_TABLE,
   LOG_TABLE,
+  ADDITIONAL_TABLE,
   FEATURE_TYPE,
   FEATURE_SOURCE_NAME,
   FEATURE_IMAGE_TYPE,
@@ -33,7 +35,8 @@ const _resetDB = () => {
     MYSTERY_TABLE,
     MATERIAL_TABLE,
     SPECIAL_TABLE,
-    LOG_TABLE
+    LOG_TABLE,
+    ADDITIONAL_TABLE
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getDB().run(sql);
@@ -53,6 +56,7 @@ const initDB = () => {
   _initSpecial();
   _initMaterial();
   _initLog();
+  _initAdditional();
 
   writeDB();
 };
@@ -239,6 +243,22 @@ const _initLog = () => {
     date Date
   );`;
   getDB().run(sql);
+};
+
+const _initAdditional = () => {
+  const sql = `CREATE TABLE ${ADDITIONAL_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
+    text CHAR(100) COLLATE NOCASE
+  );`;
+  getDB().run(sql);
+
+  additionalData.forEach(({mid: _mid, text}) => {
+    const mid = _getMid(_mid);
+    const statement = `INSERT INTO ${ADDITIONAL_TABLE} (mid, text) VALUES ('${mid}', '${text}');`;
+
+    return _run(statement, mid);
+  });
 };
 
 export {
