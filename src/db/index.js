@@ -49,6 +49,12 @@ const getDB = () => {
 
 /**
  * 保留建表语句
+ * 
+ * senior含义说明
+ *  0：常规 story 文本类型
+ *  1：高级类型，包含 COMMAND、REPEAT、TEXT、IMAGE
+ *  2：附加文本类型，APPEND
+ *  3：动图类型，gif
  */
 const _initTable = () => {
   const sql = `CREATE TABLE ${STORY_TABLE} (
@@ -57,7 +63,7 @@ const _initTable = () => {
     title CHAR(100) COLLATE NOCASE,
     feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL,
-    senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
+    senior INTEGER CHECK(senior IN (0, 1, 2, 3)) NOT NULL DEFAULT 0
   );`;
   const text = `CREATE TABLE ${TEXT_TABLE} (
     tid INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -233,7 +239,7 @@ const _initSpecialTable = () => {
     title CHAR(100) COLLATE NOCASE,
     feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL,
-    senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
+    senior INTEGER CHECK(senior IN (0, 1, 2, 3)) NOT NULL DEFAULT 0
   );`;
   getDB().run(sql);
 
@@ -260,7 +266,7 @@ const _initSeriesTable = () => {
     title CHAR(100) COLLATE NOCASE,
     feature CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL,
-    senior INTEGER CHECK(senior IN (0, 1)) NOT NULL DEFAULT 0
+    senior INTEGER CHECK(senior IN (0, 1, 2, 3)) NOT NULL DEFAULT 0
   );`;
   const feature = `CREATE TABLE ${FEATURE_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
