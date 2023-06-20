@@ -16,7 +16,8 @@ import {
   FEATURE_TYPE,
   TEXT_TABLE,
   FEATURE_IMAGE_TYPE,
-  MATERIAL_TABLE
+  MATERIAL_TABLE,
+  ADDITIONAL_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {testFile, getFileName, getRandomPath} from '../convert/write.js';
@@ -289,6 +290,17 @@ const getRandomImageName = (type, ipath) => {
   return content;
 };
 
+const openAdditional = mid => {
+  const additionalList = getDataListByColumn(mid, 'mid', ADDITIONAL_TABLE);
+  const {text} = additionalList[0];
+  let cell = {
+    mid,
+    text
+  };
+
+  return sucess(cell);
+};
+
 export {
   normalMenu,
   seniorMenu,
@@ -304,5 +316,6 @@ export {
   getImagePaths,
   getBase64,
   getMaterialCatalog,
-  getRandomImageName
+  getRandomImageName,
+  openAdditional
 };

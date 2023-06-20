@@ -8,7 +8,8 @@ import {
   updateFeature,
   getImagePaths,
   getBase64,
-  getMaterialCatalog
+  getMaterialCatalog,
+  openAdditional
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -104,6 +105,12 @@ const listen = app => {
       errNo: 0,
       message: 'success'
     });
+  });
+
+  app.get('/image/additional', (req, res) => {
+    const {mid} = req.query;
+    const data = openAdditional(mid);
+    res.send(data);
   });
 };
 
