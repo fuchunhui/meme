@@ -47,7 +47,7 @@ const COMMAND_TYPE = {
 
 const normalMenu = () => {
   const list = getTable(STORY_TABLE, false);
-  return list.filter(item => item.senior === 0).map(item => item.title);
+  return list.filter(item => item.senior === 0 || item.senior === 2).map(item => item.title);
 };
 
 const seniorMenu = () => {
@@ -72,7 +72,7 @@ const seriesMenu = () => {
 
 const imageMenu = () => {
   const list = getTable(STORY_TABLE, false);
-  const [normal, senior] = group(list, story => story.senior === 0);
+  const [normal, senior] = group(list, story => story.senior === 0 || story.senior === 2);
 
   const series = getTable(SERIES_TABLE, false);
   series.forEach(item => item.title = `${item.feature} ${item.title}`);
@@ -166,9 +166,9 @@ const getCatalog = () => {
 const open = (mid, type) => {
   const tabName = COMMAND_TYPE[type];
   const data = getDataByColumn(mid, 'mid', tabName);
-  const {title, feature, image, x, y, max, font, color, align, direction, blur, degree} = data;
+  const {title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree} = data;
 
-  return {mid, title, feature, image, x, y, max, font, color, align, direction, blur, degree};
+  return {mid, title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree};
 };
 
 const create = options => {
