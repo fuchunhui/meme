@@ -9,6 +9,7 @@ import {
   updateFeatureTable,
   getNamedColumnFromTable,
   getRandom,
+  updateAdditionalTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
@@ -26,7 +27,8 @@ import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
   UPDATE_TEXT_FAIL,
   UPDATE_STORY_FAIL,
-  CREATE_REPEAT_TITLE
+  CREATE_REPEAT_TITLE,
+  UPDATE_ADDITIONAL_FAIL
 } from '../config/constant.js';
 
 const COMMAND_ID = {
@@ -301,6 +303,14 @@ const openAdditional = mid => {
   return sucess(cell);
 };
 
+const updateAdditional = options => {
+  const data = updateAdditionalTable(options);
+  if (data) {
+    return error(data, UPDATE_ADDITIONAL_FAIL);
+  }
+  return emptySucess();
+};
+
 export {
   normalMenu,
   seniorMenu,
@@ -317,5 +327,6 @@ export {
   getBase64,
   getMaterialCatalog,
   getRandomImageName,
-  openAdditional
+  openAdditional,
+  updateAdditional
 };

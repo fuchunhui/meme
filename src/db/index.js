@@ -237,6 +237,18 @@ const getRandom = (tableName = MYSTERY_TABLE, columns = [], condition = '') => {
   return result;
 };
 
+const updateAdditionalTable = options => {
+  const {mid, text} = options;
+  const sql = `UPDATE ${ADDITIONAL_TABLE} SET text = '${text}' WHERE mid = '${mid}';`;
+
+  try {
+    getDB().run(sql);
+    writeDB();
+  } catch (error) {
+    return error.toString();
+  }
+};
+
 export {
   writeDB,
   getDB,
@@ -254,5 +266,6 @@ export {
   getSingleTable,
   updateFeatureTable,
   getNamedColumnFromTable,
-  getRandom
+  getRandom,
+  updateAdditionalTable
 };

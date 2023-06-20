@@ -1,6 +1,7 @@
 export const UPDATE_STORY_FAIL = '更新故事内容失败';
 export const UPDATE_TEXT_FAIL = '更新文本内容失败';
 export const CREATE_REPEAT_TITLE = '已经存在相同命令的表情，你需要换个标题';
+export const UPDATE_ADDITIONAL_FAIL = '更新故事附加文本失败';
 
 export const COMMAND_LIST = [
   'special', // 彩蛋菜单

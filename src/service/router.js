@@ -9,7 +9,8 @@ import {
   getImagePaths,
   getBase64,
   getMaterialCatalog,
-  openAdditional
+  openAdditional,
+  updateAdditional
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -110,6 +111,12 @@ const listen = app => {
   app.get('/image/additional', (req, res) => {
     const {mid} = req.query;
     const data = openAdditional(mid);
+    res.send(data);
+  });
+
+  app.post('/image/additional/update', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = updateAdditional(req.body);
     res.send(data);
   });
 };
