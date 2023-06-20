@@ -7,12 +7,14 @@ import {
   getDataByColumn,
   getDataListByColumn,
   getSpecialDataListByColumn,
+  getColumnByTable,
   insertLog,
   getRandom,
   STORY_TABLE,
   TEXT_TABLE,
   SERIES_TABLE,
   FEATURE_TABLE,
+  ADDITIONAL_TABLE,
   FEATURE_TYPE
 } from './db/index.js';
 import {make, getFontSize, makeMenu} from './convert/make.js';
@@ -236,7 +238,13 @@ const control = ({fromid, toid, command, text, params, key}) => {
 
   const data = getDataByColumn(command);
   if (data.image) {
-    const base64 = make(text, data);
+    let content = text;
+    if (data.senior === 2) {
+      const additional = getColumnByTable(data.mid, 'mid', ADDITIONAL_TABLE);
+      content += additional.text; // 补充的文本，后置处理
+    }
+
+    const base64 = make(content, data);
     send(key, toid, base64);
   } else {
     let content = '';
