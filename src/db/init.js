@@ -1,4 +1,4 @@
-import uuid from '../utils/uuid.js';
+import {getMid} from '../utils/keys.js';
 
 import storyData from '../config/story.js';
 import textData from '../config/text.js';
@@ -65,10 +65,6 @@ const initDB = () => {
   writeDB();
 };
 
-const _getMid = mid => {
-  return mid && /^meme_/g.test(mid) ? mid : uuid();
-};
-
 const _run = (sql, data) => {
   try {
     getDB().run(sql);
@@ -111,7 +107,7 @@ const _initStory = () => {
 
 const _insertStory = (options, tableName = STORY_TABLE) => {
   const {mid: _mid, title, feature, image, senior = 0} = options;
-  const mid = _getMid(_mid);
+  const mid = getMid(_mid);
   const statement = `INSERT INTO ${tableName} (mid, title, feature, image, senior) `
     + `VALUES ('${mid}', '${title}', '${feature}', '${image}', '${senior}');`;
 
@@ -136,7 +132,7 @@ const _initText = () => {
 
   textData.forEach(({mid: _mid, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down', blur = 0, degree = 0}) => {
-    const mid = _getMid(_mid);
+    const mid = getMid(_mid);
     const statement = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction, blur, degree) `
       + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', `
       + `'${direction}', ${blur}, ${degree});`;
@@ -184,7 +180,7 @@ const _initFeature = () => {
 
   featureData.forEach(({mid: _mid, feature, type = 'COMMAND', sid = '', sname = FEATURE_SOURCE_NAME.COMMON,
     tid = '', x = 0, y = 0, width = 100, height = 100, ipath = FEATURE_IMAGE_TYPE.DB}) => {
-    const mid = _getMid(_mid);
+    const mid = getMid(_mid);
     const statement = `INSERT INTO ${FEATURE_TABLE} (mid, feature, type, sid, sname, tid, x, y, width, height, ipath) `
       + `VALUES ('${mid}', '${feature}', '${type}', '${sid}', '${sname}', '${tid}', ${x}, ${y}, `
       + `${width}, ${height}, '${ipath}');`;
@@ -233,7 +229,7 @@ const _initMaterial = () => {
   getDB().run(sql);
 
   materialData.forEach(({mid: _mid, title, image}) => {
-    const mid = _getMid(_mid);
+    const mid = getMid(_mid);
     const statement = `INSERT INTO ${MATERIAL_TABLE} (mid, title, image) VALUES ('${mid}', '${title}', '${image}');`;
     return _run(statement, `Material: ${title}`);
   });
@@ -258,7 +254,7 @@ const _initAdditional = () => {
   getDB().run(sql);
 
   additionalData.forEach(({mid: _mid, text}) => {
-    const mid = _getMid(_mid);
+    const mid = getMid(_mid);
     const statement = `INSERT INTO ${ADDITIONAL_TABLE} (mid, text) VALUES ('${mid}', '${text}');`;
 
     return _run(statement, mid);
@@ -277,7 +273,7 @@ const _initGif = () => {
     font CHAR(50) NOT NULL,
     color CHAR(20) NOT NULL DEFAULT white,
     stroke CHAR(20) NOT NULL DEFAULT transparent,
-    swidth CHAR(20) NOT NULL DEFAULT 1,
+    swidth INT DEFAULT 1,
     align CHAR(10) NOT NULL,
     direction CHAR(10) NOT NULL,
     frame CHAR(100) NOT NULL DEFAULT NORMAL
@@ -286,7 +282,7 @@ const _initGif = () => {
 
   gifData.forEach(({mid: _mid, title, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', stroke = 'white', swidth = 1, align = 'start', direction = 'down', frame = 'NORMAL'}) => {
-    const mid = _getMid(_mid);
+    const mid = getMid(_mid);
     const statement = `INSERT INTO ${GIF_TABLE} `
       + `(mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame) `
       + `VALUES ('${mid}', '${title}', '${image}', ${x}, ${y}, ${max}, '${font}', '${color}', '${stroke}', `

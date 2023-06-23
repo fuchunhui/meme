@@ -5,11 +5,15 @@ import {
   updateTextTable,
   getDataByColumn,
   getDataListByColumn,
+  getColumnByTable,
   getSingleTable,
   updateFeatureTable,
   getNamedColumnFromTable,
   getRandom,
   updateAdditionalTable,
+  updateGifTable,
+  insertGifTable,
+  updateGifBaseTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
@@ -18,7 +22,8 @@ import {
   TEXT_TABLE,
   FEATURE_IMAGE_TYPE,
   MATERIAL_TABLE,
-  ADDITIONAL_TABLE
+  ADDITIONAL_TABLE,
+  GIF_TABLE
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {testFile, getFileName, getRandomPath} from '../convert/write.js';
@@ -28,24 +33,28 @@ import {
   UPDATE_TEXT_FAIL,
   UPDATE_STORY_FAIL,
   CREATE_REPEAT_TITLE,
-  UPDATE_ADDITIONAL_FAIL
+  UPDATE_ADDITIONAL_FAIL,
+  UPDATE_GIF_FAIL
 } from '../config/constant.js';
 
 const COMMAND_ID = {
   [STORY_TABLE]: 'meme_common',
-  [FEATURE_TABLE]: 'meme_feature'
+  [FEATURE_TABLE]: 'meme_feature',
+  [GIF_TABLE]: 'meme_gif'
 };
 
 const COMMAND_TEXT = {
   [STORY_TABLE]: '常用',
-  [FEATURE_TABLE]: '高级'
+  [FEATURE_TABLE]: '高级',
+  [GIF_TABLE]: '动图'
 };
 
 const COMMAND_TYPE = {
   [STORY_TABLE]: STORY_TABLE,
   [SPECIAL_TABLE]: SPECIAL_TABLE,
   [SERIES_TABLE]: SERIES_TABLE,
-  [FEATURE_TABLE]: FEATURE_TABLE
+  [FEATURE_TABLE]: FEATURE_TABLE,
+  [GIF_TABLE]: GIF_TABLE
 };
 
 const normalMenu = () => {
@@ -106,6 +115,24 @@ const _getStory = (target = []) => {
   }
 };
 
+const _getGif = (target = []) => {
+  const list = getSingleTable(GIF_TABLE);
+  if (list.length) {
+    const children = list.map(({mid, title}) => {
+      return {
+        mid,
+        title
+      };
+    });
+    target.push({
+      id: COMMAND_ID[GIF_TABLE],
+      text: COMMAND_TEXT[GIF_TABLE],
+      type: COMMAND_TYPE[GIF_TABLE],
+      children
+    });
+  }
+};
+
 const _getFeature = (target = []) => {
   const singleList = getSingleTable(FEATURE_TABLE);
   const children = [];
@@ -158,9 +185,10 @@ const _getSeries = (tabName = SERIES_TABLE, target = []) => {
 const getCatalog = () => {
   const result = [];
 
+  _getGif(result);
   _getStory(result);
-  _getSeries(SERIES_TABLE, result);
   _getFeature(result);
+  _getSeries(SERIES_TABLE, result);
   _getSeries(SPECIAL_TABLE, result);
 
   return result;
@@ -175,20 +203,9 @@ const open = (mid, type) => {
 };
 
 const create = options => {
-  const result = getDataByColumn(options.title, 'title', STORY_TABLE);
-
-  const singleList = getSingleTable(FEATURE_TABLE);
-  const children = singleList.map(({mid, feature}) => {
-    return {
-      mid,
-      title: feature
-    };
-  });
-
-  if (result.mid || children.some(item => item.title === options.title)) {
-    return error({
-      title: options.title
-    }, CREATE_REPEAT_TITLE);
+  const result = checkRepeat(options.title);
+  if (result) {
+    return result;
   }
 
   const data = insertTable(options);
@@ -311,6 +328,67 @@ const updateAdditional = options => {
   return emptySucess();
 };
 
+const openGif = mid => {
+  const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE);
+  const {title, image, x, y, max, font, color, stroke, swidth, align, direction, frame} = gifList[0];
+  const cell = {
+    mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame
+  };
+  return sucess(cell);
+};
+
+const updateGif = options => {
+  const data = updateGifTable(options);
+  if (data) {
+    return error(data, UPDATE_GIF_FAIL);
+  }
+  return emptySucess();
+};
+
+const checkRepeat = title => {
+  const story = getDataByColumn(title, 'title', STORY_TABLE);
+  const gif = getColumnByTable(title, 'title', GIF_TABLE);
+
+  const singleList = getSingleTable(FEATURE_TABLE);
+  const children = singleList.map(({mid, feature}) => {
+    return {
+      mid,
+      title: feature
+    };
+  });
+
+  if (story.mid || gif.mid || children.some(item => item.title === title)) {
+    return error({
+      title: title
+    }, CREATE_REPEAT_TITLE);
+  }
+  return false;
+};
+
+const createGif = options => {
+  const result = checkRepeat(options.title);
+  if (result) {
+    return result;
+  }
+
+  const data = insertGifTable(options);
+  if (data.error) {
+    return error(data.data, UPDATE_GIF_FAIL);
+  }
+
+  return sucess({
+    mid: data.data
+  });
+};
+
+const updateGifBase = options => {
+  const data = updateGifBaseTable(options);
+  if (data) {
+    return error(data, UPDATE_GIF_FAIL);
+  }
+  return emptySucess();
+};
+
 export {
   normalMenu,
   seniorMenu,
@@ -328,5 +406,9 @@ export {
   getMaterialCatalog,
   getRandomImageName,
   openAdditional,
-  updateAdditional
+  updateAdditional,
+  openGif,
+  updateGif,
+  createGif,
+  updateGifBase
 };

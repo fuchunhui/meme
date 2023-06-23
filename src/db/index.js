@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
-import uuid from '../utils/uuid.js';
+import {getMid} from '../utils/keys.js';
 
 export const STORY_TABLE = 'STORY';
 export const TEXT_TABLE = 'TEXT';
@@ -70,7 +70,7 @@ const getTable = (tableName = STORY_TABLE, join = true) => {
 const insertTable = (options, write = true, tableName = STORY_TABLE) => {
   const {mid: _mid, title, feature, image, senior = 0, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down', blur = 0, degree = 0} = options;
-  const mid = _mid && /^meme_/g.test(_mid) ? _mid : uuid();
+  const mid = getMid(_mid);
 
   const sql = `INSERT INTO ${tableName} (mid, title, feature, image, senior) `
     + `VALUES ('${mid}', '${title}', '${feature}', '${image}', '${senior}');`;
@@ -250,6 +250,60 @@ const updateAdditionalTable = options => {
   }
 };
 
+const getGifTable = () => {
+ // ...
+};
+
+const updateGifTable = options => {
+  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start', direction = 'down',
+    stroke = 'transparent', swidth = 1, frame = 'NORMAL'} = options;
+  const sql = `UPDATE ${GIF_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}',`
+    + ` color = '${color}', align = '${align}', direction = '${direction}', stroke = '${stroke}',`
+    + ` swidth = ${swidth}, frame = '${frame}' WHERE mid = '${mid}';`;
+  try {
+    getDB().run(sql);
+    writeDB();
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const insertGifTable = options => {
+  const {mid: _mid, title, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start',
+    direction = 'down', stroke = 'transparent', swidth = 1, frame = 'NORMAL'} = options;
+  const mid = getMid(_mid);
+
+  const sql = `INSERT INTO ${GIF_TABLE} (mid, title, image, x, y, max, font, color, align, direction, stroke, `
+    + `swidth, frame) VALUES ('${mid}', '${title}', '${image}', ${x}, ${y}, ${max}, '${font}', '${color}', `
+    + `'${align}', '${direction}', '${stroke}', ${swidth}, '${frame}');`;
+
+  try {
+    getDB().run(sql);
+    writeDB();
+    return {
+      error: false,
+      data: mid
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error.toString()
+    };
+  }
+};
+
+const updateGifBaseTable = options => {
+  const {mid, title} = options;
+  const sql = `UPDATE ${GIF_TABLE} SET title = '${title}' WHERE mid = '${mid}';`;
+  try {
+    getDB().run(sql);
+
+    writeDB();
+  } catch (error) {
+    return error.toString();
+  }
+};
+
 export {
   writeDB,
   getDB,
@@ -268,5 +322,9 @@ export {
   updateFeatureTable,
   getNamedColumnFromTable,
   getRandom,
-  updateAdditionalTable
+  updateAdditionalTable,
+  getGifTable,
+  updateGifTable,
+  insertGifTable,
+  updateGifBaseTable
 };

@@ -10,7 +10,11 @@ import {
   getBase64,
   getMaterialCatalog,
   openAdditional,
-  updateAdditional
+  updateAdditional,
+  openGif,
+  updateGif,
+  createGif,
+  updateGifBase
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -117,6 +121,31 @@ const listen = app => {
   app.post('/image/additional/update', (req, res) => {
     console.log('request: ', JSON.stringify(req.body));
     const data = updateAdditional(req.body);
+    res.send(data);
+  });
+
+  app.get('/image/gif/open', (req, res) => {
+    const {mid} = req.query;
+    const data = openGif(mid);
+
+    res.send(data);
+  });
+
+  app.post('/image/gif/save', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = updateGif(req.body);
+    res.send(data);
+  });
+
+  app.post('/image/gif/create', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = createGif(req.body);
+    res.send(data);
+  });
+
+  app.post('/image/gif/update', (req, res) => {
+    console.log('request: ', JSON.stringify(req.body));
+    const data = updateGifBase(req.body);
     res.send(data);
   });
 };
