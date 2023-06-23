@@ -11,6 +11,7 @@ export const MATERIAL_TABLE = 'MATERIAL';
 export const SPECIAL_TABLE = 'SPECIAL';
 export const LOG_TABLE = 'LOGGER';
 export const ADDITIONAL_TABLE = 'ADDITIONAL';
+export const GIF_TABLE = 'GIF';
 
 export const FEATURE_TYPE = {
   'COMMAND': 'COMMAND',

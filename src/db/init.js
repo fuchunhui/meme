@@ -8,6 +8,7 @@ import mysteryData from '../config/mystery.js';
 import specialData from '../config/special/index.js';
 import materialData from '../config/material.js';
 import additionalData from '../config/additional.js';
+import gifData from '../config/gif.js';
 
 import {
   STORY_TABLE,
@@ -19,6 +20,7 @@ import {
   SPECIAL_TABLE,
   LOG_TABLE,
   ADDITIONAL_TABLE,
+  GIF_TABLE,
   FEATURE_TYPE,
   FEATURE_SOURCE_NAME,
   FEATURE_IMAGE_TYPE,
@@ -36,7 +38,8 @@ const _resetDB = () => {
     MATERIAL_TABLE,
     SPECIAL_TABLE,
     LOG_TABLE,
-    ADDITIONAL_TABLE
+    ADDITIONAL_TABLE,
+    GIF_TABLE
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getDB().run(sql);
@@ -57,6 +60,7 @@ const initDB = () => {
   _initMaterial();
   _initLog();
   _initAdditional();
+  _initGif();
 
   writeDB();
 };
@@ -260,6 +264,38 @@ const _initAdditional = () => {
     return _run(statement, mid);
   });
 };
+
+const _initGif = () => {
+  const sql = `CREATE TABLE ${GIF_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(50) NOT NULL,
+    title CHAR(100) COLLATE NOCASE,
+    image TEXT NOT NULL,
+    x INT DEFAULT 0,
+    y INT DEFAULT 0,
+    max INT DEFAULT 100,
+    font CHAR(50) NOT NULL,
+    color CHAR(20) NOT NULL DEFAULT white,
+    stroke CHAR(20) NOT NULL DEFAULT transparent,
+    swidth CHAR(20) NOT NULL DEFAULT 1,
+    align CHAR(10) NOT NULL,
+    direction CHAR(10) NOT NULL,
+    frame CHAR(100) NOT NULL DEFAULT NORMAL
+  );`;
+  getDB().run(sql);
+
+  gifData.forEach(({mid: _mid, title, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
+    color = 'black', stroke = 'white', swidth = 1, align = 'start', direction = 'down', frame = 'NORMAL'}) => {
+    const mid = _getMid(_mid);
+    const statement = `INSERT INTO ${GIF_TABLE} `
+      + `(mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame) `
+      + `VALUES ('${mid}', '${title}', '${image}', ${x}, ${y}, ${max}, '${font}', '${color}', '${stroke}', `
+      + `'${swidth}', '${align}', '${direction}', '${frame}');`;
+
+    return _run(statement, mid);
+  });
+};
+
 
 export {
   initDB

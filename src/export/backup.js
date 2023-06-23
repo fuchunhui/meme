@@ -9,6 +9,7 @@ import {
   MATERIAL_TABLE,
   SPECIAL_TABLE,
   ADDITIONAL_TABLE,
+  GIF_TABLE,
   getSingleTable
 } from '../db/index.js';
 
@@ -35,6 +36,7 @@ const backup = base => {
   saveSingle(base, 'material', getMaterialData());
   saveSingle(base, 'special', getStoryData(SPECIAL_TABLE));
   saveSingle(base, 'additional', getAdditionalData());
+  saveSingle(base, 'gif', getGifData());
 };
 
 const getStoryData = (tableName = STORY_TABLE) => {
@@ -127,6 +129,15 @@ const getAdditionalData = () => {
       mid,
       text
     };
+  });
+
+  return result;
+};
+
+const getGifData = () => {
+  const list = getSingleTable(GIF_TABLE);
+  const result = list.map(({mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame}) => {
+    return {mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame};
   });
 
   return result;
