@@ -97,6 +97,11 @@ const imageMenu = () => {
   };
 };
 
+const gifMenu = () => {
+  const list = getTable(GIF_TABLE, false);
+  return list.map(item => item.title);
+};
+
 const _getStory = (target = []) => {
   const list = getTable(STORY_TABLE, false);
   if (list.length) {
@@ -410,5 +415,6 @@ export {
   openGif,
   updateGif,
   createGif,
-  updateGifBase
+  updateGifBase,
+  gifMenu
 };

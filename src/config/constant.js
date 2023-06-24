@@ -10,7 +10,8 @@ export const COMMAND_LIST = [
   'image', // 图片菜单
   'release', // 最近版本发布changelog
   '*', // 随机内容
-  '中秋'
+  '中秋',
+  'gif'
 ];
 
 // 按照拼音顺序排列，避免重复添加

@@ -20,6 +20,7 @@ import {
 import {make, getFontSize, makeMenu} from './convert/make.js';
 import {
   formatAllMenu,
+  formatMenu,
   formatSeriesMenu,
   formatNull,
   formatHelp,
@@ -35,7 +36,8 @@ import {
   seriesMenu,
   imageMenu,
   getBase64,
-  getRandomImageName
+  getRandomImageName,
+  gifMenu
 } from './service/data.js';
 import {COMMAND_LIST, getRole} from './config/constant.js';
 import {getConfig} from './config/index.js';
@@ -105,8 +107,9 @@ const control = ({fromid, toid, command, text, params, key}) => {
     const storyList = normalMenu();
     const seniorList = seniorMenu();
     const seriesMap = seriesMenu();
+    const gifList = gifMenu(); // 与 story 菜单和在一起
 
-    const content = formatAllMenu(name, storyList, seniorList, seriesMap);
+    const content = formatAllMenu(name, storyList.concat(gifList), seniorList, seriesMap);
     send(key, toid, content, 'MD');
 
     return;
@@ -126,6 +129,8 @@ const control = ({fromid, toid, command, text, params, key}) => {
       return;
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
+    } else if (command === 'gif') { // gif 菜单
+      content = formatMenu(gifMenu(), 'gif 动图菜单');
     } else if (command === '*') {
       const {command, text, params, mystery} = random();
       if (mystery) {
