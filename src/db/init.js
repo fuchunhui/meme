@@ -123,6 +123,8 @@ const _initText = () => {
     max INT DEFAULT 100,
     font CHAR(50) NOT NULL,
     color CHAR(20) NOT NULL,
+    stroke CHAR(20) NOT NULL DEFAULT transparent,
+    swidth INT DEFAULT 1,
     align CHAR(10) NOT NULL,
     direction CHAR(10) NOT NULL,
     blur REAL DEFAULT 0,
@@ -131,11 +133,13 @@ const _initText = () => {
   getDB().run(sql);
 
   textData.forEach(({mid: _mid, x = 0, y = 0, max = 100, font = '32px sans-serif',
-    color = 'black', align = 'start', direction = 'down', blur = 0, degree = 0}) => {
+    color = 'black', align = 'start', direction = 'down',
+    blur = 0, degree = 0, stroke = 'transparent', swidth = 1}) => {
     const mid = getMid(_mid);
-    const statement = `INSERT INTO ${TEXT_TABLE} (mid, x, y, max, font, color, align, direction, blur, degree) `
-      + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', `
-      + `'${direction}', ${blur}, ${degree});`;
+    const statement = `INSERT INTO ${TEXT_TABLE} `
+      + `(mid, x, y, max, font, color, align, direction, blur, degree, stroke, swidth) `
+      + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}', ${blur}, `
+      + `${degree}, '${stroke}', ${swidth});`;
 
     return _run(statement, mid);
   });
@@ -286,7 +290,7 @@ const _initGif = () => {
     const statement = `INSERT INTO ${GIF_TABLE} `
       + `(mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame) `
       + `VALUES ('${mid}', '${title}', '${image}', ${x}, ${y}, ${max}, '${font}', '${color}', '${stroke}', `
-      + `'${swidth}', '${align}', '${direction}', '${frame}');`;
+      + `${swidth}, '${align}', '${direction}', '${frame}');`;
 
     return _run(statement, mid);
   });

@@ -56,7 +56,7 @@ const getStoryData = (tableName = STORY_TABLE) => {
 
 const getTextData = () => {
   const list = getSingleTable(TEXT_TABLE);
-  const result = list.map(({mid, x, y, font, color, align, max, direction, blur, degree}) => {
+  const result = list.map(({mid, x, y, font, color, align, max, direction, blur, degree, stroke = 'transparent', swidth = 1}) => {
     return {
       mid,
       x,
@@ -67,7 +67,9 @@ const getTextData = () => {
       max,
       direction,
       blur,
-      degree
+      degree,
+      stroke,
+      swidth
     };
   });
 

@@ -7,6 +7,8 @@ export default {
   senior: 0,
   font: '32px sans-serif',
   color: '#FF0000',
+  stroke: 'transparent',
+  swidth: 1,
   align: 'start',
   direction: 'down',
   blur: 0,
