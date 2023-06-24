@@ -1,5 +1,6 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
+import {writeImg} from './write.js';
 
 const {createCanvas, Image} = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
@@ -54,6 +55,7 @@ const make = (text, options, extensions) => {
     };
     img.src = base64Img;
   }
+  writeImg(base64);
   return base64;
 };
 
@@ -63,13 +65,15 @@ const getFontSize = font => {
 };
 
 const fillText = (ctx, width, text, options) => {
-  const {x, y, font, color, align, max, direction, blur, degree} = options;
+  const {x, y, font, color, align, max, direction, blur, degree, stroke, swidth} = options;
   ctx.font = font || '32px sans-serif';
   ctx.fillStyle = color || '#000000';
   if (blur) {
     ctx.filter = `blur(${blur}px)`;
   }
   ctx.textAlign = align || 'center';
+  ctx.strokeStyle = stroke || 'transparent';
+  ctx.lineWidth = swidth || 1;
 
   const maxWidth = max || width;
   const size = getFontSize(font);
@@ -88,8 +92,10 @@ const fillText = (ctx, width, text, options) => {
     if (degree) {
       ctx.translate(x, y + offset * size * LINE_HEIGHT);
       ctx.rotate(degree * Math.PI / 180);
+      ctx.strokeText(item, 0, 0, maxWidth);
       ctx.fillText(item, 0, 0, maxWidth);
     } else {
+      ctx.strokeText(item, x, y + offset * size * LINE_HEIGHT, maxWidth);
       ctx.fillText(item, x, y + offset * size * LINE_HEIGHT, maxWidth);
     }
     ctx.restore();
