@@ -1,10 +1,10 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
 import {writeImg} from './write.js';
+import {fillText} from './base.js';
 
 const {createCanvas, Image} = pkg;
 const NOT_SUPPORT = ['image/gif', 'image/bmp'];
-const LINE_HEIGHT = 1.2;
 
 const extImg = new Image();
 extImg.onerror = err => {
@@ -57,99 +57,6 @@ const make = (text, options, extensions) => {
   }
   writeImg(base64);
   return base64;
-};
-
-const getFontSize = font => {
-  const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
-  return Number(fontSize[1]);
-};
-
-const fillText = (ctx, width, text, options) => {
-  const {x, y, font, color, align, max, direction, blur, degree, stroke, swidth} = options;
-  ctx.font = font || '32px sans-serif';
-  ctx.fillStyle = color || '#000000';
-  if (blur) {
-    ctx.filter = `blur(${blur}px)`;
-  }
-  ctx.textAlign = align || 'center';
-  ctx.strokeStyle = stroke || 'transparent';
-  ctx.lineWidth = swidth || 1;
-
-  const maxWidth = max || width;
-  const size = getFontSize(font);
-  const lines = _breakLines(text, maxWidth, ctx);
-  lines.forEach((item, index) => {
-    let offset = 0;
-    if (direction === 'down') {
-      offset = index;
-    } else if (direction === 'center') {
-      offset = index - (lines.length - 1) / 2;
-    } else { // up
-      offset = index - (lines.length - 1);
-    }
-
-    ctx.save();
-    if (degree) {
-      ctx.translate(x, y + offset * size * LINE_HEIGHT);
-      ctx.rotate(degree * Math.PI / 180);
-      ctx.strokeText(item, 0, 0, maxWidth);
-      ctx.fillText(item, 0, 0, maxWidth);
-    } else {
-      ctx.strokeText(item, x, y + offset * size * LINE_HEIGHT, maxWidth);
-      ctx.fillText(item, x, y + offset * size * LINE_HEIGHT, maxWidth);
-    }
-    ctx.restore();
-  });
-};
-
-const cook = () => { // eslint-disable-line
-  // 用于制作图片，修剪操作。
-  // 图片的剪切，打补丁等操作。
-};
-
-const _findBreakPoint = (text, width, ctx) => {
-  let min = 0;
-  let max = text.length - 1;
-
-  while (min <= max) {
-    const middle = Math.floor((min + max) / 2);
-    const startWidth = ctx.measureText(text.substring(0, middle)).width;
-    const surplusWidth = ctx.measureText(text.substring(0, middle + 1)).width;
-
-    if (startWidth <= width && surplusWidth > width) {
-      return middle;
-    }
-    if (startWidth < width) {
-      min = middle + 1;
-    } else {
-      max = middle - 1;
-    }
-  }
-
-  return -1;
-};
-
-/**
- * 按照给定的宽度，文本截取处理。需要提前设置好ctx的字体大小。
- * @param {string} text
- * @param {number} width
- * @param {CanvasRenderingContext2D} ctx
- * @returns 截取后的文本数组
- */
-const _breakLines = (text, width, ctx) => {
-  const lines = [];
-  let breakPoint = 0;
-
-  while ((breakPoint = _findBreakPoint(text, width, ctx)) !== -1) {
-    lines.push(text.substring(0, breakPoint));
-    text = text.substring(breakPoint);
-  }
-
-  if (text) {
-    lines.push(text);
-  }
-
-  return lines;
 };
 
 const makeMenu = (images, options) => {
@@ -232,6 +139,5 @@ const makeMenu = (images, options) => {
 
 export {
   make,
-  getFontSize,
   makeMenu
 };
