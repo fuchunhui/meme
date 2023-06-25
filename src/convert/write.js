@@ -43,11 +43,16 @@ const getRandomPath = (ipath = 'random', targetDir = 'lib') => {
   return path.resolve(tardir, file);
 };
 
+const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
+  return `${targetDir}/${fileName}.${type}`;
+};
+
 export {
   named,
   writeImg,
   removeImg,
   testFile,
   getFileName,
-  getRandomPath
+  getRandomPath,
+  tempFile
 };
