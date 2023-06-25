@@ -15,9 +15,12 @@ import {
   SERIES_TABLE,
   FEATURE_TABLE,
   ADDITIONAL_TABLE,
-  FEATURE_TYPE
+  FEATURE_TYPE,
+  GIF_TABLE
 } from './db/index.js';
-import {make, getFontSize, makeMenu} from './convert/make.js';
+import {make, makeMenu} from './convert/make.js';
+import {getFontSize} from './convert/base.js';
+import {makeGif} from './convert/gif.js';
 import {
   formatAllMenu,
   formatMenu,
@@ -243,6 +246,14 @@ const control = ({fromid, toid, command, text, params, key}) => {
     return;
   }
 
+  const gifList = getDataListByColumn(command, 'title', GIF_TABLE);
+  if (gifList.length) {
+    makeGif(text, gifList[0]).then(base64 => {
+      send(key, toid, base64);
+    });
+    return;
+  }
+
   const data = getDataByColumn(command);
   if (data.image) {
     let content = text;
@@ -279,6 +290,9 @@ const control = ({fromid, toid, command, text, params, key}) => {
 const main = encryption => {
   const {fromid, toid, command, text, params, key} = parser(encryption);
   control({fromid, toid, command, text, params, key});
+
+  // console.log(fromid, toid, command, text, params, key);
+  // control({fromid, toid, command: '粉丝', text: '你好啊', params, key});
 };
 
 export default main;
