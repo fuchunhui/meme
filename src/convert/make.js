@@ -1,6 +1,5 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
-import {writeImg} from './write.js';
 import {fillText} from './base.js';
 
 const {createCanvas, Image} = pkg;
@@ -55,7 +54,6 @@ const make = (text, options, extensions) => {
     };
     img.src = base64Img;
   }
-  writeImg(base64);
   return base64;
 };
 

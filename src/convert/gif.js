@@ -9,7 +9,7 @@ const makeGif = async (text, options) => {
     file_path: image,
     options: {x, y, max, font, color, stroke, swidth, align, direction}
   });
-  
+
   // you dont have to manually handle this but you can if you want to record the time or something
   // gif.on('extraction complete', async () => {
   //   gif.textGif({
@@ -27,11 +27,11 @@ const makeGif = async (text, options) => {
   //   }
   // });
 
-  //encoding the frames back into a gif
+  // encoding the frames back into a gif
   // gif.on('progress', percentage => {
   //   console.log(percentage + '% encoding done :)');
   // });
-  
+
   // gif.on('finished', () => {
   //   console.log('gif encoding finished!');
   // });

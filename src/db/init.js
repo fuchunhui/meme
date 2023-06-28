@@ -82,7 +82,6 @@ const _run = (sql, data) => {
 
 /**
  * 保留建表语句
- * 
  * senior含义说明
  *  0：常规 story 文本类型
  *  1：高级类型，包含 COMMAND、REPEAT、TEXT、IMAGE
@@ -137,7 +136,7 @@ const _initText = () => {
     blur = 0, degree = 0, stroke = 'transparent', swidth = 1}) => {
     const mid = getMid(_mid);
     const statement = `INSERT INTO ${TEXT_TABLE} `
-      + `(mid, x, y, max, font, color, align, direction, blur, degree, stroke, swidth) `
+      + '(mid, x, y, max, font, color, align, direction, blur, degree, stroke, swidth) '
       + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}', ${blur}, `
       + `${degree}, '${stroke}', ${swidth});`;
 
@@ -288,7 +287,7 @@ const _initGif = () => {
     color = 'black', stroke = 'white', swidth = 1, align = 'start', direction = 'down', frame = 'NORMAL'}) => {
     const mid = getMid(_mid);
     const statement = `INSERT INTO ${GIF_TABLE} `
-      + `(mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame) `
+      + '(mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame) '
       + `VALUES ('${mid}', '${title}', '${image}', ${x}, ${y}, ${max}, '${font}', '${color}', '${stroke}', `
       + `${swidth}, '${align}', '${direction}', '${frame}');`;
 
