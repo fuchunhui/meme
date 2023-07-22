@@ -76,6 +76,7 @@ const formatHelp = name => {
   const list = [
     '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
     `- 菜单：\`@${name}\`，查询命令列表`,
+    `- 动图：\`@${name} gif\`，查询 gif 动图列表`,
     `- 图片：\`@${name} image\`，查询图片列表`,
     `- 使用：\`@${name} 命令\`，获取原始表情`,
     `- 文字：\`@${name} 命令 文字\`，返回拼接文字的表情`,

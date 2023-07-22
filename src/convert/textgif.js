@@ -113,6 +113,10 @@ class TextGif extends Events {
 
     for (let index = 0; index < this.extractedFrames.length; index++) {
       this.emit('on frame', index + 1);
+      // if (index > -1) {
+      //   ctx.fillStyle = '#ffffff';
+      //   ctx.fillRect(0, 0, this.#width, this.#height);
+      // }
 
       if (!this.#retained) {
         ctx.drawImage(this.extractedFrames[index].imageData, 0, 0);
@@ -218,17 +222,17 @@ class TextGif extends Events {
     }
   }
 
-    get noOfFrames() {
-      if (this.#noOfFrames) {
-        return Promise.resolve(this.#noOfFrames);
-      } else {
-        return new Promise(resolve => {
-          this.on('extracted frame info', () => {
-            resolve(this.#noOfFrames);
-          });
+  get noOfFrames() {
+    if (this.#noOfFrames) {
+      return Promise.resolve(this.#noOfFrames);
+    } else {
+      return new Promise(resolve => {
+        this.on('extracted frame info', () => {
+          resolve(this.#noOfFrames);
         });
-      }
+      });
     }
+  }
 
   get file_path() {
     return this.#file_path;
