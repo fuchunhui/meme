@@ -5,11 +5,11 @@
   "main": "app.js",
   "scripts": {
     "tsh": "sh .draft/test.sh",
-    "tjs": "node .draft/test.js",
+    "tjs": "node .draft/test-msg.js",
     "tsvg": "node .draft/test-svg.js",
     "t64": "node .draft/convert.js",
     "db": "sh .draft/db.sh",
-    "test": "cross-env NODE_ENV=test node app.js",
+    "test": "cross-env NODE_ENV=test node .draft/test.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
     "import": "node build/import.js",
     "backup": "node build/backup.js",
