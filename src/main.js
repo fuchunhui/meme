@@ -194,6 +194,11 @@ const control = ({fromid, toid, command, text, params, key}) => {
         if (textStyles.length) {
           options = textStyles[0];
         }
+
+        // param 和 text 互换，是为了保证，文本内容在前，参数在后。对应解析过程中，text 是取得最后的文本内容。
+        const tempText = param;
+        param = text;
+        text = tempText;
       }
 
       if (type === FEATURE_TYPE.IMAGE) {
@@ -292,7 +297,7 @@ const main = encryption => {
   control({fromid, toid, command, text, params, key});
 
   // console.log(fromid, toid, command, text, params, key);
-  // control({fromid, toid, command: '粉丝', text: '你好啊', params, key});
+  // control({fromid, toid, command: '破防', params: ['不开心'], text: '开心', key});
 };
 
 export default main;

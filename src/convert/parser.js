@@ -90,7 +90,7 @@ const parser = encryption => {
           param = surplus.slice(0, tIndex).trim();
         }
       } else {
-        const lastIndex = surplus.lastIndexOf(' '); // 查找空格，从后面获取 text 内容
+        const lastIndex = surplus.lastIndexOf(' '); // 查找空格，从后面获取 text 内容，文本后置是保证，命令和参数的紧密结合，像函数调用一样
         if (lastIndex !== -1) {
           text = surplus.slice(lastIndex + 1);
           param = surplus.slice(0, lastIndex);
