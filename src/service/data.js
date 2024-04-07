@@ -34,7 +34,8 @@ import {
   UPDATE_STORY_FAIL,
   CREATE_REPEAT_TITLE,
   UPDATE_ADDITIONAL_FAIL,
-  UPDATE_GIF_FAIL
+  UPDATE_GIF_FAIL,
+  GET_FEATURE_FAIL
 } from '../config/constant.js';
 
 const COMMAND_ID = {
@@ -241,6 +242,11 @@ const updateText = options => {
 
 const openFeature = mid => {
   const featureList = getDataListByColumn(mid, 'mid', FEATURE_TABLE);
+  if (!featureList.length) {
+    return error({
+      mid
+    }, GET_FEATURE_FAIL);
+  }
   const {feature, type, sid, sname, tid, x, y, width, height, ipath} = featureList[0];
   const story = open(sid, sname);
   let cell = {
