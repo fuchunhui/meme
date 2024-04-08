@@ -23,7 +23,14 @@ const removeImg = path => {
 
 const testFile = (ipath = 'svg', name = '', targetDir = 'lib') => {
   const filePath = path.resolve(__dirname, targetDir, ipath, `${name}.${ipath}`);
-  return fs.existsSync(filePath) ? filePath : false;
+  const backPath = path.resolve(__dirname, targetDir, 'png', `${name}.png`); // 兼容 png 路径
+
+  const existPath = fs.existsSync(filePath)
+    ? filePath
+    : fs.existsSync(backPath)
+      ? backPath
+      : false;
+  return existPath;
 };
 
 const getFileName = (ipath = 'svg', targetDir = 'lib') => {
