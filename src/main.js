@@ -297,7 +297,7 @@ const main = encryption => {
   control({fromid, toid, command, text, params, key});
 
   // console.log(fromid, toid, command, text, params, key);
-  // control({fromid, toid, command: '破防', params: ['不开心'], text: '开心', key});
+  // control({fromid, toid, command: '上号', params: ['网易云'], text: '大佬', key});
 };
 
 export default main;
