@@ -10,6 +10,9 @@ const makeGif = async (text, options) => {
     options: {x, y, max, font, color, stroke, swidth, align, direction}
   });
 
+  // 改造 options，把 text 当成一个配置参数，传入到内部，不需要每次单独调用传递，默认空文本。
+  // 通过监听 on frame 事件，在不同的帧索引，修改配置信息即可实现对文本的细节控制。
+
   // you dont have to manually handle this but you can if you want to record the time or something
   // gif.on('extraction complete', async () => {
   //   gif.textGif({
