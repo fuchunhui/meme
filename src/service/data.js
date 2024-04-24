@@ -400,6 +400,32 @@ const updateGifBase = options => {
   return emptySucess();
 };
 
+const getLatestMid = time => {
+  const midList = [];
+
+  const storyList = getTable(STORY_TABLE, false);
+  storyList.forEach(({mid, title}) => {
+    midList.push({mid, title});
+  });
+  const featureList = getTable(FEATURE_TABLE, false);
+  featureList.forEach(({mid, feature}) => {
+    midList.push({mid, title: feature});
+  });
+  const gifList = getTable(GIF_TABLE, false);
+  gifList.forEach(({mid, title}) => {
+    midList.push({mid, title});
+  });
+
+  const result = [];
+  midList.forEach(({mid, title}) => {
+    if (mid.replace('meme_', '') >= time) {
+      result.push(title);
+    }
+  });
+
+  return Array.from(new Set(result));
+};
+
 export {
   normalMenu,
   seniorMenu,
@@ -422,5 +448,6 @@ export {
   updateGif,
   createGif,
   updateGifBase,
-  gifMenu
+  gifMenu,
+  getLatestMid
 };

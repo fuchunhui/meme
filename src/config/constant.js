@@ -12,7 +12,8 @@ export const COMMAND_LIST = [
   'release', // 最近版本发布changelog
   '*', // 随机内容
   '中秋',
-  'gif'
+  'gif',
+  'news' // 最近上新的内容
 ];
 
 // 按照拼音顺序排列，避免重复添加

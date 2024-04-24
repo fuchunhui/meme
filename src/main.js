@@ -30,7 +30,8 @@ import {
   formatError,
   formatOther,
   formatGuide,
-  formatImageMenu
+  formatImageMenu,
+  formatNewsMenu
 } from './convert/format.js';
 import {send} from './service/index.js';
 import {
@@ -40,7 +41,8 @@ import {
   imageMenu,
   getBase64,
   getRandomImageName,
-  gifMenu
+  gifMenu,
+  getLatestMid
 } from './service/data.js';
 import {COMMAND_LIST, getRole} from './config/constant.js';
 import {getConfig} from './config/index.js';
@@ -134,6 +136,10 @@ const control = ({fromid, toid, command, text, params, key}) => {
       content = '彩蛋or💣';
     } else if (command === 'gif') { // gif 菜单
       content = formatMenu(gifMenu(), 'gif 动图菜单');
+    } else if (command === 'news') {
+      const duration = new Date().getTime() - 30 * 24 * 60 * 60 * 1000 * 0.00000000001; // 统计近一个月数据
+      const commandList = getLatestMid(duration);
+      content = formatNewsMenu(commandList);
     } else if (command === '*') {
       const {command, text, params, mystery} = random();
       if (mystery) {

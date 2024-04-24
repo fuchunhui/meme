@@ -76,8 +76,9 @@ const formatHelp = name => {
   const list = [
     '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
     `- 菜单：\`@${name}\`，查询命令列表`,
-    `- 动图：\`@${name} gif\`，查询 gif 动图列表`,
-    `- 图片：\`@${name} image\`，查询图片列表`,
+    `- 动图：\`@${name} gif\`，查询 gif 动图命令列表`,
+    `- 图片：\`@${name} image\`，以图片形式查询命令列表`,
+    `- 上新：\`@${name} news\`，查询近期新增的命令列表`,
     `- 使用：\`@${name} 命令\`，获取原始表情`,
     `- 文字：\`@${name} 命令 文字\`，返回拼接文字的表情`,
     `- 参数：\`@${name} 命令 参数 文字\`，返回符合输入参数的文字表情`,
@@ -118,6 +119,23 @@ const formatImageMenu = name => {
   };
 };
 
+const news = [
+  '%E6%88%91%E6%9C%80%E8%BF%91%E5%81%B7%E6%87%92%E4%BA%86%EF%BC%8C%E8%BF%98%E6%B2%A1%E6%9C%89%E6%96%B0%E6'
+    + '%8C%87%E4%BB%A4%EF%BC%8C%E8%AF%B7%E5%86%8D%E8%80%90%E5%BF%83%E7%AD%89%E7%AD%89',
+  '%E4%BD%A0%E6%9C%89%E5%95%A5%E9%9C%80%E6%B1%82%EF%BC%8C%E5%8F%AF%E4%BB%A5%E9%9A%8F%E6%97%B6%E5%92%8C%E6'
+    + '%88%91%E8%AE%B2%EF%BC%8C%E6%9C%80%E5%A5%BD%E6%98%AF%E5%86%99%E5%88%B0%E6%96%87%E6%A1%A3%E4%B8%AD'
+];
+
+const formatNewsMenu = commandList => {
+  let content = '';
+  if (commandList.length) {
+    content = `#### 近期新增指令：<font color="green">${commandList.join('、')}</font>`;
+  } else {
+    content = formatNull(news);
+  }
+  return content;
+};
+
 const others = [
   '%E8%BF%99%E5%8F%AF%E8%83%BD%E4%B8%8D%E6%98%AF%E6%88%91%E7%9A%84%E5%8A%9F%E8%83%BD%EF%BC%8C%E4%BD%A0%E9%97%AE'
     + '%E9%97%AE%E5%8F%A6%E4%B8%80%E4%B8%AA%E5%91%86%E5%A4%B4%E5%91%86%E8%84%91%E7%9A%84%E5%AE%B6%E4%BC%99',
@@ -152,5 +170,6 @@ export {
   formatHelp,
   formatError,
   formatOther,
-  formatGuide
+  formatGuide,
+  formatNewsMenu
 };
