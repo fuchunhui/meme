@@ -64,16 +64,20 @@ const makeMenu = (images, options) => {
     {
       title: normal,
       children: inor
-    },
-    {
-      title: senior,
-      children: isen
-    },
-    {
-      title: series,
-      children: iser
     }
   ];
+  if (isen.length) {
+    data.push({
+      title: senior,
+      children: isen
+    });
+  }
+  if (iser.length) {
+    data.push({
+      title: series,
+      children: iser
+    });
+  }
 
   const gap = 10;
   const secondHeight = 30;

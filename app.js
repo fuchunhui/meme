@@ -1,7 +1,7 @@
-import {initDB} from './src/db/init.js'; // eslint-disable-line
+// import {initDB} from './src/db/init.js'; // eslint-disable-line
 import main, {listen, backup} from './src/main.js';
 
-// initDB();
+// initDB('meme'); // 初始化数据库，传入 path
 
 const come = encryption => {
   main(encryption);
