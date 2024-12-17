@@ -6,7 +6,8 @@ const formatMenu = (data, title = '常用菜单') => {
   const list = data.map(item => {
     return `- ${item}`;
   });
-  const menu = `#### ${title}：\n` + list.join('\n');
+  const content = `#### ${title}：\n` + list.join('\n');
+  const menu = list.length ? content : `目前不存在 ${title} \n`;
   return menu;
 };
 
@@ -72,8 +73,9 @@ const formatError = () => {
   return formatNull(errors);
 };
 
-const formatHelp = name => {
-  const list = [
+const formatHelp = ctx => {
+  const {name, help} = ctx;
+  let list = [
     '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
     `- 菜单：\`@${name}\`，查询命令列表`,
     `- 动图：\`@${name} gif\`，查询 gif 动图命令列表`,
@@ -82,8 +84,12 @@ const formatHelp = name => {
     `- 使用：\`@${name} 命令\`，获取原始表情`,
     `- 文字：\`@${name} 命令 文字\`，返回拼接文字的表情`,
     `- 参数：\`@${name} 命令 参数 文字\`，返回符合输入参数的文字表情`,
-    `- 文字支持空格: 使用双引号包裹文字内容，\`@${name} 鲁迅 “这句话 是我说的”\``
+    `- 支持空格: 请使用双引号包裹文字内容，\`@${name} 命令 “这句话 是我说的”\``
   ];
+  if (help.length) {
+    list = list.concat(ctx.help);
+  }
+
   return list.join('\n');
 };
 
@@ -97,15 +103,23 @@ const formatAllMenu = (name, storyList, seniorList, seriesMap) => {
   });
   const series = seriesList.map(item => `- ${item}`).join('\n');
 
-  const content = [
+  let content = [
     '#### 常用菜单：',
     `常规用法：\`@${name} 加油 打工人\``,
-    normal,
-    `高级用法：\`@${name} 上号 vscode 打工人\``,
-    senior,
-    `固定参数用法：\`@${name} 周报 张飞 打工人\``,
-    series
+    normal
   ];
+  if (senior.length) {
+    content = content.concat([
+      `高级用法：\`@${name} 上号 vscode 打工人\``,
+      senior,
+    ]);
+  }
+  if (series.length) {
+    content = content.concat([
+      `固定参数用法：\`@${name} 周报 张飞 打工人\``,
+      series
+    ]);
+  }
 
   return content.join('\n');
 };

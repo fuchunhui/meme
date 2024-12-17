@@ -28,6 +28,16 @@ import {
   writeDB
 } from './index.js';
 
+let currentDB = '';
+
+const _setLocalDB = path => {
+  currentDB = path || 'meme';
+};
+
+const _getLocalDB = () => {
+  return getDB(currentDB);
+};
+
 const _resetDB = () => {
   const nameList = [
     STORY_TABLE,
@@ -42,13 +52,15 @@ const _resetDB = () => {
     GIF_TABLE
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 };
 
 /**
  * 所有初始化脚本中，不负责数据库的写入，最后一步统一写入数据库。
  */
-const initDB = () => {
+const initDB = path => {
+  _setLocalDB(path);
+
   _resetDB();
 
   _initStory();
@@ -62,12 +74,12 @@ const initDB = () => {
   _initAdditional();
   _initGif();
 
-  writeDB();
+  writeDB(currentDB);
 };
 
 const _run = (sql, data) => {
   try {
-    getDB().run(sql);
+    _getLocalDB().run(sql);
     return {
       error: false,
       data
@@ -97,7 +109,7 @@ const _initStory = () => {
     image TEXT NOT NULL,
     senior INTEGER CHECK(senior IN (0, 1, 2, 3)) NOT NULL DEFAULT 0
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   storyData.forEach(item => {
     _insertStory(item, STORY_TABLE);
@@ -129,7 +141,7 @@ const _initText = () => {
     blur REAL DEFAULT 0,
     degree REAL DEFAULT 0
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   textData.forEach(({mid: _mid, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', align = 'start', direction = 'down',
@@ -154,7 +166,7 @@ const _initSeries = () => {
     senior INTEGER CHECK(senior IN (0, 1, 2, 3)) NOT NULL DEFAULT 0
   );`;
 
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   seriesData.forEach(item => {
     _insertStory(item, SERIES_TABLE);
@@ -179,7 +191,7 @@ const _initFeature = () => {
     ipath CHAR(50) CHECK(ipath IN ('${FEATURE_IMAGE_TYPE.DB}', '${FEATURE_IMAGE_TYPE.SVG}', `
       + `'${FEATURE_IMAGE_TYPE.PNG}')) NOT NULL DEFAULT '${FEATURE_IMAGE_TYPE.DB}'
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   featureData.forEach(({mid: _mid, feature, type = 'COMMAND', sid = '', sname = FEATURE_SOURCE_NAME.COMMON,
     tid = '', x = 0, y = 0, width = 100, height = 100, ipath = FEATURE_IMAGE_TYPE.DB}) => {
@@ -198,7 +210,7 @@ const _initMystery = () => {
     text CHAR(200) NOT NULL,
     param CHAR(200) NOT NULL
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   mysteryData.forEach(({title, text, param}) => {
     const statement = `INSERT INTO ${MYSTERY_TABLE} (title, text, param) VALUES ('${title}', '${text}', '${param}');`;
@@ -215,7 +227,7 @@ const _initSpecial = () => {
     image TEXT NOT NULL,
     senior INTEGER CHECK(senior IN (0, 1, 2, 3)) NOT NULL DEFAULT 0
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   specialData.forEach(item => {
     _insertStory(item, SPECIAL_TABLE);
@@ -229,7 +241,7 @@ const _initMaterial = () => {
     title CHAR(100) COLLATE NOCASE,
     image TEXT NOT NULL
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   materialData.forEach(({mid: _mid, title, image}) => {
     const mid = getMid(_mid);
@@ -245,7 +257,7 @@ const _initLog = () => {
     text CHAR(200) NOT NULL,
     date Date
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 };
 
 const _initAdditional = () => {
@@ -254,7 +266,7 @@ const _initAdditional = () => {
     mid CHAR(50) NOT NULL,
     text CHAR(100) COLLATE NOCASE
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   additionalData.forEach(({mid: _mid, text}) => {
     const mid = getMid(_mid);
@@ -281,7 +293,7 @@ const _initGif = () => {
     direction CHAR(10) NOT NULL,
     frame CHAR(100) NOT NULL DEFAULT NORMAL
   );`;
-  getDB().run(sql);
+  _getLocalDB().run(sql);
 
   gifData.forEach(({mid: _mid, title, image, x = 0, y = 0, max = 100, font = '32px sans-serif',
     color = 'black', stroke = 'white', swidth = 1, align = 'start', direction = 'down', frame = 'NORMAL'}) => {
