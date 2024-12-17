@@ -58,18 +58,18 @@ const COMMAND_TYPE = {
   [GIF_TABLE]: GIF_TABLE
 };
 
-const normalMenu = () => {
-  const list = getTable(STORY_TABLE, false);
+const normalMenu = ctx => {
+  const list = getTable(STORY_TABLE, false, ctx);
   return list.filter(item => item.senior === 0 || item.senior === 2).map(item => item.title);
 };
 
-const seniorMenu = () => {
-  const list = getSingleTable(FEATURE_TABLE);
+const seniorMenu = ctx => {
+  const list = getSingleTable(FEATURE_TABLE, ctx);
   return list.filter(item => item.type !== FEATURE_TYPE.COMMAND).map(item => item.feature);
 };
 
-const seriesMenu = () => {
-  const list = getTable(SERIES_TABLE, false);
+const seriesMenu = ctx => {
+  const list = getTable(SERIES_TABLE, false, ctx);
   const map = new Map();
   if (list.length) {
     list.forEach(({title, feature}) => {
@@ -83,11 +83,11 @@ const seriesMenu = () => {
   return map;
 };
 
-const imageMenu = () => {
-  const list = getTable(STORY_TABLE, false);
+const imageMenu = ctx => {
+  const list = getTable(STORY_TABLE, false, ctx);
   const [normal, senior] = group(list, story => story.senior === 0 || story.senior === 2);
 
-  const series = getTable(SERIES_TABLE, false);
+  const series = getTable(SERIES_TABLE, false, ctx);
   series.forEach(item => item.title = `${item.feature} ${item.title}`);
   sortBykey(series, 'title');
 
@@ -98,13 +98,13 @@ const imageMenu = () => {
   };
 };
 
-const gifMenu = () => {
-  const list = getTable(GIF_TABLE, false);
+const gifMenu = ctx => {
+  const list = getTable(GIF_TABLE, false, ctx);
   return list.map(item => item.title);
 };
 
-const _getStory = (target = []) => {
-  const list = getTable(STORY_TABLE, false);
+const _getStory = (target = [], ctx) => {
+  const list = getTable(STORY_TABLE, false, ctx);
   if (list.length) {
     const children = list.map(({mid, title}) => {
       return {
@@ -121,8 +121,8 @@ const _getStory = (target = []) => {
   }
 };
 
-const _getGif = (target = []) => {
-  const list = getSingleTable(GIF_TABLE);
+const _getGif = (target = [], ctx) => {
+  const list = getSingleTable(GIF_TABLE, ctx);
   if (list.length) {
     const children = list.map(({mid, title}) => {
       return {
@@ -139,31 +139,33 @@ const _getGif = (target = []) => {
   }
 };
 
-const _getFeature = (target = []) => {
-  const singleList = getSingleTable(FEATURE_TABLE);
-  const children = [];
-  singleList.length && singleList.forEach(({mid, feature, type}) => {
-    if (type === FEATURE_TYPE.COMMAND) {
-      return;
-    }
-    let cell = {
-      mid,
-      title: feature,
-      type
-    };
-    children.push(cell);
-  });
+const _getFeature = (target = [], ctx) => {
+  const singleList = getSingleTable(FEATURE_TABLE, ctx);
+  if (singleList.length) {
+    const children = [];
+    singleList.length && singleList.forEach(({mid, feature, type}) => {
+      if (type === FEATURE_TYPE.COMMAND) {
+        return;
+      }
+      let cell = {
+        mid,
+        title: feature,
+        type
+      };
+      children.push(cell);
+    });
 
-  target.push({
-    id: COMMAND_ID[FEATURE_TABLE],
-    text: COMMAND_TEXT[FEATURE_TABLE],
-    type: COMMAND_TYPE[FEATURE_TABLE],
-    children
-  });
+    target.push({
+      id: COMMAND_ID[FEATURE_TABLE],
+      text: COMMAND_TEXT[FEATURE_TABLE],
+      type: COMMAND_TYPE[FEATURE_TABLE],
+      children
+    });
+  }
 };
 
-const _getSeries = (tabName = SERIES_TABLE, target = []) => {
-  const list = getTable(tabName, false);
+const _getSeries = (tabName = SERIES_TABLE, target = [], ctx) => {
+  const list = getTable(tabName, false, ctx);
   if (list.length) {
     const map = new Map();
     list.forEach(({mid, title, feature}) => {
@@ -188,33 +190,33 @@ const _getSeries = (tabName = SERIES_TABLE, target = []) => {
   }
 };
 
-const getCatalog = () => {
+const getCatalog = ctx => {
   const result = [];
 
-  _getGif(result);
-  _getStory(result);
-  _getFeature(result);
-  _getSeries(SERIES_TABLE, result);
-  _getSeries(SPECIAL_TABLE, result);
+  _getGif(result, ctx);
+  _getStory(result, ctx);
+  _getFeature(result, ctx);
+  _getSeries(SERIES_TABLE, result, ctx);
+  _getSeries(SPECIAL_TABLE, result, ctx);
 
   return result;
 };
 
-const open = (mid, type) => {
+const open = (mid, type, ctx) => {
   const tabName = COMMAND_TYPE[type];
-  const data = getDataByColumn(mid, 'mid', tabName);
+  const data = getDataByColumn(mid, 'mid', tabName, ctx);
   const {title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree, stroke, swidth} = data;
 
   return {mid, title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree, stroke, swidth};
 };
 
-const create = options => {
-  const result = checkRepeat(options.title);
+const create = (options, ctx) => {
+  const result = checkRepeat(options.title, ctx);
   if (result) {
     return result;
   }
 
-  const data = insertTable(options);
+  const data = insertTable(options, true, STORY_TABLE, ctx);
   if (data.error) {
     return error(data.data, UPDATE_TEXT_FAIL);
   }
@@ -224,31 +226,31 @@ const create = options => {
   });
 };
 
-const update = options => {
-  const data = updateTable(options);
+const update = (options, ctx) => {
+  const data = updateTable(options, STORY_TABLE, ctx);
   if (data) {
     return error(data, UPDATE_STORY_FAIL);
   }
   return emptySucess();
 };
 
-const updateText = options => {
-  const data = updateTextTable(options);
+const updateText = (options, ctx) => {
+  const data = updateTextTable(options, ctx);
   if (data) {
     return error(data, UPDATE_TEXT_FAIL);
   }
   return emptySucess();
 };
 
-const openFeature = mid => {
-  const featureList = getDataListByColumn(mid, 'mid', FEATURE_TABLE);
+const openFeature = (mid, ctx) => {
+  const featureList = getDataListByColumn(mid, 'mid', FEATURE_TABLE, ctx);
   if (!featureList.length) {
     return error({
       mid
     }, GET_FEATURE_FAIL);
   }
   const {feature, type, sid, sname, tid, x, y, width, height, ipath} = featureList[0];
-  const story = open(sid, sname);
+  const story = open(sid, sname, ctx);
   let cell = {
     mid,
     feature,
@@ -257,7 +259,7 @@ const openFeature = mid => {
   };
 
   if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
-    const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE);
+    const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE, ctx);
     cell.et = textStyles.length ? textStyles[0] : null;
   } else if (type === FEATURE_TYPE.IMAGE) {
     cell.ei = {x, y, width, height, ipath};
@@ -266,8 +268,8 @@ const openFeature = mid => {
   return sucess(cell);
 };
 
-const updateFeature = options => {
-  const data = updateFeatureTable(options);
+const updateFeature = (options, ctx) => {
+  const data = updateFeatureTable(options, ctx);
   if (data) {
     return error(data, UPDATE_TEXT_FAIL);
   }
@@ -278,10 +280,10 @@ const getImagePaths = () => {
   return Object.values(FEATURE_IMAGE_TYPE);
 };
 
-const getBase64 = (type, title) => {
+const getBase64 = (type, title, ctx) => {
   let imageBase64 = '';
   if (type === FEATURE_IMAGE_TYPE.DB) {
-    const materialData = getDataListByColumn(title, 'title', MATERIAL_TABLE);
+    const materialData = getDataListByColumn(title, 'title', MATERIAL_TABLE, ctx);
     imageBase64 = materialData.image || '';
   } else if (type === FEATURE_IMAGE_TYPE.RANDOM) {
     const filePath = getRandomPath();
@@ -296,11 +298,11 @@ const getBase64 = (type, title) => {
   return imageBase64;
 };
 
-const getMaterialCatalog = type => {
+const getMaterialCatalog = (type, ctx) => {
   // 根据不同的 type 查找不同的表内容
   let result = [];
   if (type === FEATURE_IMAGE_TYPE.DB) {
-    result = getNamedColumnFromTable(MATERIAL_TABLE, ['mid', 'title']);
+    result = getNamedColumnFromTable(MATERIAL_TABLE, ['mid', 'title'], ctx);
   } else {
     // 读取不同的物理目录
   }
@@ -308,20 +310,20 @@ const getMaterialCatalog = type => {
   return result;
 };
 
-const getRandomImageName = (type, ipath) => {
+const getRandomImageName = (ipath, ctx) => {
   let content = '';
-  if (type === FEATURE_IMAGE_TYPE.DB) {
-    const {title} = getRandom(MATERIAL_TABLE, 'title');
+  if (ipath === FEATURE_IMAGE_TYPE.DB) {
+    const {title} = getRandom(MATERIAL_TABLE, 'title', '', ctx);
     content = title;
   } else {
-    content = getFileName(ipath);
+    content = getFileName(ipath.toLowerCase());
   }
 
   return content;
 };
 
-const openAdditional = mid => {
-  const additionalList = getDataListByColumn(mid, 'mid', ADDITIONAL_TABLE);
+const openAdditional = (mid, ctx) => {
+  const additionalList = getDataListByColumn(mid, 'mid', ADDITIONAL_TABLE, ctx);
   const {text} = additionalList[0];
   let cell = {
     mid,
@@ -331,16 +333,16 @@ const openAdditional = mid => {
   return sucess(cell);
 };
 
-const updateAdditional = options => {
-  const data = updateAdditionalTable(options);
+const updateAdditional = (options, ctx) => {
+  const data = updateAdditionalTable(options, ctx);
   if (data) {
     return error(data, UPDATE_ADDITIONAL_FAIL);
   }
   return emptySucess();
 };
 
-const openGif = mid => {
-  const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE);
+const openGif = (mid, ctx) => {
+  const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE, ctx);
   const {title, image, x, y, max, font, color, stroke, swidth, align, direction, frame} = gifList[0];
   const cell = {
     mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame
@@ -348,19 +350,19 @@ const openGif = mid => {
   return sucess(cell);
 };
 
-const updateGif = options => {
-  const data = updateGifTable(options);
+const updateGif = (options, ctx) => {
+  const data = updateGifTable(options, ctx);
   if (data) {
     return error(data, UPDATE_GIF_FAIL);
   }
   return emptySucess();
 };
 
-const checkRepeat = title => {
-  const story = getDataByColumn(title, 'title', STORY_TABLE);
-  const gif = getColumnByTable(title, 'title', GIF_TABLE);
+const checkRepeat = (title, ctx) => {
+  const story = getDataByColumn(title, 'title', STORY_TABLE, ctx);
+  const gif = getColumnByTable(title, 'title', GIF_TABLE, ctx);
 
-  const singleList = getSingleTable(FEATURE_TABLE);
+  const singleList = getSingleTable(FEATURE_TABLE, ctx);
   const children = singleList.map(({mid, feature}) => {
     return {
       mid,
@@ -376,13 +378,13 @@ const checkRepeat = title => {
   return false;
 };
 
-const createGif = options => {
-  const result = checkRepeat(options.title);
+const createGif = (options, ctx) => {
+  const result = checkRepeat(options.title, ctx);
   if (result) {
     return result;
   }
 
-  const data = insertGifTable(options);
+  const data = insertGifTable(options, ctx);
   if (data.error) {
     return error(data.data, UPDATE_GIF_FAIL);
   }
@@ -392,26 +394,26 @@ const createGif = options => {
   });
 };
 
-const updateGifBase = options => {
-  const data = updateGifBaseTable(options);
+const updateGifBase = (options, ctx) => {
+  const data = updateGifBaseTable(options, ctx);
   if (data) {
     return error(data, UPDATE_GIF_FAIL);
   }
   return emptySucess();
 };
 
-const getLatestMid = time => {
+const getLatestMid = (time, ctx) => {
   const midList = [];
 
-  const storyList = getTable(STORY_TABLE, false);
+  const storyList = getTable(STORY_TABLE, false, ctx);
   storyList.forEach(({mid, title}) => {
     midList.push({mid, title});
   });
-  const featureList = getTable(FEATURE_TABLE, false);
+  const featureList = getTable(FEATURE_TABLE, false, ctx);
   featureList.forEach(({mid, feature}) => {
     midList.push({mid, title: feature});
   });
-  const gifList = getTable(GIF_TABLE, false);
+  const gifList = getTable(GIF_TABLE, false, ctx);
   gifList.forEach(({mid, title}) => {
     midList.push({mid, title});
   });

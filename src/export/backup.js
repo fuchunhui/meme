@@ -28,19 +28,22 @@ const saveSingle = (base, fileName, list) => {
 };
 
 const backup = base => {
-  saveSingle(base, 'story', getStoryData(STORY_TABLE));
-  saveSingle(base, 'text', getTextData());
-  saveSingle(base, 'series', getStoryData(SERIES_TABLE));
-  saveSingle(base, 'feature', getFeatureData());
-  saveSingle(base, 'mystery', getMysteryData());
-  saveSingle(base, 'material', getMaterialData());
-  saveSingle(base, 'special', getStoryData(SPECIAL_TABLE));
-  saveSingle(base, 'additional', getAdditionalData());
-  saveSingle(base, 'gif', getGifData());
+  const ctx = {
+    name: 'meme',
+  };
+  saveSingle(base, 'story', getStoryData(STORY_TABLE, ctx));
+  saveSingle(base, 'text', getTextData(ctx));
+  saveSingle(base, 'series', getStoryData(SERIES_TABLE, ctx));
+  saveSingle(base, 'feature', getFeatureData(ctx));
+  saveSingle(base, 'mystery', getMysteryData(ctx));
+  saveSingle(base, 'material', getMaterialData(ctx));
+  saveSingle(base, 'special', getStoryData(SPECIAL_TABLE, ctx));
+  saveSingle(base, 'additional', getAdditionalData(ctx));
+  saveSingle(base, 'gif', getGifData(ctx));
 };
 
-const getStoryData = (tableName = STORY_TABLE) => {
-  const list = getSingleTable(tableName);
+const getStoryData = (tableName = STORY_TABLE, ctx) => {
+  const list = getSingleTable(tableName, ctx);
   const result = list.map(({mid, title, feature, image, senior}) => {
     return {
       mid,
@@ -54,8 +57,8 @@ const getStoryData = (tableName = STORY_TABLE) => {
   return result;
 };
 
-const getTextData = () => {
-  const list = getSingleTable(TEXT_TABLE);
+const getTextData = ctx => {
+  const list = getSingleTable(TEXT_TABLE, ctx);
   const result = list.map(({mid, x, y, font, color, align, max, direction, blur, degree,
     stroke = 'transparent', swidth = 1}) => {
     return {
@@ -77,8 +80,8 @@ const getTextData = () => {
   return result;
 };
 
-const getFeatureData = () => {
-  const list = getSingleTable(FEATURE_TABLE);
+const getFeatureData = ctx => {
+  const list = getSingleTable(FEATURE_TABLE, ctx);
   const result = list.map(({mid, feature, type, sid, sname, tid, x, y, width, height, ipath}) => {
     return {
       mid,
@@ -98,8 +101,8 @@ const getFeatureData = () => {
   return result;
 };
 
-const getMaterialData = () => {
-  const list = getSingleTable(MATERIAL_TABLE);
+const getMaterialData = ctx => {
+  const list = getSingleTable(MATERIAL_TABLE, ctx);
   const result = list.map(({mid, feature, title, image}) => {
     return {
       mid,
@@ -112,8 +115,8 @@ const getMaterialData = () => {
   return result;
 };
 
-const getMysteryData = () => {
-  const list = getSingleTable(MYSTERY_TABLE);
+const getMysteryData = ctx => {
+  const list = getSingleTable(MYSTERY_TABLE, ctx);
   const result = list.map(({title, text, param}) => {
     return {
       title,
@@ -125,8 +128,8 @@ const getMysteryData = () => {
   return result;
 };
 
-const getAdditionalData = () => {
-  const list = getSingleTable(ADDITIONAL_TABLE);
+const getAdditionalData = ctx => {
+  const list = getSingleTable(ADDITIONAL_TABLE, ctx);
   const result = list.map(({mid, text}) => {
     return {
       mid,
@@ -137,8 +140,8 @@ const getAdditionalData = () => {
   return result;
 };
 
-const getGifData = () => {
-  const list = getSingleTable(GIF_TABLE);
+const getGifData = ctx => {
+  const list = getSingleTable(GIF_TABLE, ctx);
   const result = list.map(({mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame}) => {
     return {mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame};
   });

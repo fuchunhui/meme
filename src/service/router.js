@@ -19,9 +19,26 @@ import {
 
 import {COMMAND_LIST} from '../config/constant.js';
 
+const DB_NAME = 'db-name';
+
+const buildCtx = req => {
+  const name = req.get(DB_NAME) || 'meme';
+  return {
+    name
+  };
+};
+
 const listen = app => {
+  app.use('/butter', (req, res, next) => {
+    req.url = req.url.replace('/butter', '/image');
+    req.headers[DB_NAME] = 'butter';
+
+    next();
+  });
+
   app.get('/image/catalog', (req, res) => {
-    const data = getCatalog();
+    const ctx = buildCtx(req);
+    const data = getCatalog(ctx);
 
     res.send({
       data,
@@ -31,8 +48,9 @@ const listen = app => {
   });
 
   app.get('/image/open', (req, res) => {
+    const ctx = buildCtx(req);
     const {mid, type} = req.query;
-    const data = open(mid, type);
+    const data = open(mid, type, ctx);
 
     res.send({
       data,
@@ -42,29 +60,32 @@ const listen = app => {
   });
 
   app.post('/image/save', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = updateText(req.body);
+    console.info('image save: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = updateText(req.body, ctx);
     res.send(data);
   });
 
   app.post('/image/create', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = create(req.body);
+    console.info('image create: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = create(req.body, ctx);
     res.send(data);
   });
 
   app.post('/image/update', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = update(req.body);
+    console.info('image update: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = update(req.body, ctx);
     res.send(data);
   });
 
   app.get('/image/download', (req, res) => {
-    console.log('备用接口', req, res);
+    console.info('备用接口', req, res);
   });
 
   app.get('/image/export', (req, res) => {
-    console.log('备用接口', req, res);
+    console.info('备用接口', req, res);
   });
 
   app.get('/image/config', (req, res) => {
@@ -80,31 +101,23 @@ const listen = app => {
   });
 
   app.get('/image/feature/open', (req, res) => {
+    const ctx = buildCtx(req);
     const {mid} = req.query;
-    const data = openFeature(mid);
+    const data = openFeature(mid, ctx);
     res.send(data);
   });
 
   app.post('/image/feature/save', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = updateFeature(req.body);
+    console.info('image feature save: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = updateFeature(req.body, ctx);
     res.send(data);
   });
 
-  app.get('/material/base64', (req, res) => {
+  app.get('/image/base64', (req, res) => {
+    const ctx = buildCtx(req);
     const {ipath, value} = req.query;
-    const data = getBase64(ipath, value);
-    res.send({
-      data,
-      errNo: 0,
-      message: 'success'
-    });
-  });
-
-  app.get('/material/catalog', (req, res) => {
-    const {type} = req.query;
-    const data = getMaterialCatalog(type.toUpperCase());
-
+    const data = getBase64(ipath, value, ctx);
     res.send({
       data,
       errNo: 0,
@@ -113,40 +126,58 @@ const listen = app => {
   });
 
   app.get('/image/additional', (req, res) => {
+    const ctx = buildCtx(req);
     const {mid} = req.query;
-    const data = openAdditional(mid);
+    const data = openAdditional(mid, ctx);
     res.send(data);
   });
 
   app.post('/image/additional/update', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = updateAdditional(req.body);
+    console.info('additional update: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = updateAdditional(req.body, ctx);
     res.send(data);
   });
 
   app.get('/image/gif/open', (req, res) => {
+    const ctx = buildCtx(req);
     const {mid} = req.query;
-    const data = openGif(mid);
+    const data = openGif(mid, ctx);
 
     res.send(data);
   });
 
   app.post('/image/gif/save', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = updateGif(req.body);
+    console.info('gif save: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = updateGif(req.body, ctx);
     res.send(data);
   });
 
   app.post('/image/gif/create', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = createGif(req.body);
+    console.info('gif create: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = createGif(req.body, ctx);
     res.send(data);
   });
 
   app.post('/image/gif/update', (req, res) => {
-    console.log('request: ', JSON.stringify(req.body));
-    const data = updateGifBase(req.body);
+    console.info('gif update: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = updateGifBase(req.body, ctx);
     res.send(data);
+  });
+
+  app.get('/material/catalog', (req, res) => {
+    const ctx = buildCtx(req);
+    const {type} = req.query;
+    const data = getMaterialCatalog(type.toUpperCase(), ctx);
+
+    res.send({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
   });
 };
 
