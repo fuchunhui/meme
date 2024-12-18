@@ -16,7 +16,7 @@ app.use(cors());
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.all('*', (req, res, next) => {
+app.all(/(.*)/, (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
   res.header('Content-Type', 'application/json;charset=utf-8');
@@ -34,7 +34,7 @@ app.get('/test', (req, res) => {
 
 listen(app);
 
-app.post('*', (req, res) => {
+app.post(/(.*)/, (req, res) => {
   console.log('request: ', JSON.stringify(req.body));
 
   if (req.body.echostr) {
