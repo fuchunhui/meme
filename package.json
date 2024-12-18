@@ -10,6 +10,7 @@
     "t64": "node .draft/convert.js",
     "db": "sh .draft/lodash-away.sh",
     "view": "sh .draft/view-sync.sh",
+    "copy": "sh .draft/view-copy.sh",
     "test": "cross-env NODE_ENV=test node .draft/test.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
     "import": "node build/import.js",

@@ -50,7 +50,6 @@ const listen = app => {
   });
 
   app.get('/image/open', (req, res) => {
-    console.info('image ope1n: ', ctx, req.query);
     const ctx = buildCtx(req);
     const {mid, type} = req.query;
     const data = open(mid, type, ctx);
