@@ -22,16 +22,18 @@ import {COMMAND_LIST} from '../config/constant.js';
 const DB_NAME = 'db-name';
 
 const buildCtx = req => {
-  const name = req.get(DB_NAME) || 'meme';
+  const path = req.get(DB_NAME) || 'meme';
   return {
-    name
+    path
   };
 };
 
 const listen = app => {
-  app.use('/butter', (req, res, next) => {
-    req.url = req.url.replace('/butter', '/image');
-    req.headers[DB_NAME] = 'butter';
+  app.use('/', (req, res, next) => {
+    if (req.path.startsWith('/butter')) {
+      req.url = req.url.replace('/butter', '/image');
+      req.headers[DB_NAME] = 'butter';
+    }
 
     next();
   });
@@ -48,6 +50,7 @@ const listen = app => {
   });
 
   app.get('/image/open', (req, res) => {
+    console.info('image ope1n: ', ctx, req.query);
     const ctx = buildCtx(req);
     const {mid, type} = req.query;
     const data = open(mid, type, ctx);

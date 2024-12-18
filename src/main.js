@@ -2,7 +2,7 @@
  * @file 主控流程，负责整个消息的控制
  */
 
-import {parser} from './convert/parser.js';
+import {createContext} from './convert/context.js';
 import {
   getDataByColumn,
   getDataListByColumn,
@@ -44,14 +44,14 @@ import {
   gifMenu,
   getLatestMid
 } from './service/data.js';
+
 import {COMMAND_LIST, getRole} from './config/constant.js';
-import {getConfig} from './config/index.js';
 
 export * from './service/router.js';
 export * from './export/backup.js';
 
-const special = (command, key, toid, text) => {
-  const commands = getSpecialDataListByColumn(command);
+const special = (command, key, toid, text, ctx) => {
+  const commands = getSpecialDataListByColumn(command, 'feature', ctx);
   const specialCommand = commands.length > 0;
 
   if (specialCommand) {
@@ -66,24 +66,24 @@ const special = (command, key, toid, text) => {
   return specialCommand;
 };
 
-const random = () => {
+const random = ctx => {
   let command = '';
   let text = getRole();
   let params = [];
 
   const percent = Math.floor(Math.random() * 100);
   if (percent < 20) {
-    const {title} = getRandom(STORY_TABLE, 'title', 'senior = 0');
+    const {title} = getRandom(STORY_TABLE, 'title', 'senior = 0', ctx);
     command = title;
   } else if (percent < 30) {
-    const {feature, type, ipath} = getRandom(FEATURE_TABLE, ['feature', 'type', 'ipath']);
+    const {feature, type, ipath} = getRandom(FEATURE_TABLE, ['feature', 'type', 'ipath'], '', ctx);
 
     let content = '';
     if (type === FEATURE_TYPE.COMMAND) {
-      const {title} = getRandom(SERIES_TABLE, 'title', `feature = '${feature}'`);
+      const {title} = getRandom(SERIES_TABLE, 'title', `feature = '${feature}'`, ctx);
       content = title;
     } else if (type === FEATURE_TYPE.IMAGE) {
-      content = getRandomImageName(ipath);
+      content = getRandomImageName(ipath, ctx);
     } else {
       content = getRole();
     }
@@ -106,13 +106,12 @@ const random = () => {
   };
 };
 
-const control = ({fromid, toid, command, text, params, key}) => {
-  const name = getConfig(key).name;
+const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
   if (command === '') {
-    const storyList = normalMenu();
-    const seniorList = seniorMenu();
-    const seriesMap = seriesMenu();
-    const gifList = gifMenu(); // 与 story 菜单和在一起
+    const storyList = normalMenu(ctx);
+    const seniorList = seniorMenu(ctx);
+    const seriesMap = seriesMenu(ctx);
+    const gifList = gifMenu(ctx); // 与 story 菜单和在一起
 
     const content = formatAllMenu(name, storyList.concat(gifList), seniorList, seriesMap);
     send(key, toid, content, 'MD');
@@ -123,10 +122,10 @@ const control = ({fromid, toid, command, text, params, key}) => {
   if (COMMAND_LIST.includes(command)) {
     let content = '';
     if (command === 'help') {
-      content = formatHelp(name);
+      content = formatHelp(ctx);
     } else if (command === 'image') {
-      // 当前每次600ms 左右，根据实际情况，考虑是否优化为每天生成一次固定菜单。
-      const imageList = imageMenu();
+      // 当前每次 600ms 左右，根据实际情况，考虑是否优化为每天生成一次固定菜单。
+      const imageList = imageMenu(ctx);
       const options = formatImageMenu(name);
 
       const base64 = makeMenu(imageList, options);
@@ -135,18 +134,18 @@ const control = ({fromid, toid, command, text, params, key}) => {
     } else if (command === 'special') { // 特殊节日、彩蛋命令
       content = '彩蛋or💣';
     } else if (command === 'gif') { // gif 菜单
-      content = formatMenu(gifMenu(), 'gif 动图菜单');
+      content = formatMenu(gifMenu(ctx), 'gif 动图菜单');
     } else if (command === 'news') {
-      const duration = new Date().getTime() - 30 * 24 * 60 * 60 * 1000 * 0.00000000001; // 统计近一个月数据
-      const commandList = getLatestMid(duration);
+      const duration = new Date().getTime() - 30 * 24 * 60 * 60 * 1000; // 统计近一个月数据
+      const commandList = getLatestMid(duration, ctx);
       content = formatNewsMenu(commandList);
     } else if (command === '*') {
-      const {command, text, params, mystery} = random();
+      const {command, text, params, mystery} = random(ctx);
       if (mystery) {
-        const base64 = getBase64('RANDOM');
+        const base64 = getBase64('RANDOM', '', ctx);
         send(key, toid, base64);
       } else {
-        control({fromid, toid, command, text, params, key});
+        control({fromid, toid, command, text, params, key, name}, ctx);
       }
       return;
     }
@@ -155,16 +154,16 @@ const control = ({fromid, toid, command, text, params, key}) => {
     return;
   }
 
-  const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE);
+  const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE, ctx);
   if (singleList.length) {
     const {type, sid, sname, tid} = singleList[0];
     let param = params.length ? params[0] : '';
 
     if (type === FEATURE_TYPE.COMMAND) {
-      const commands = getDataListByColumn(command, 'feature', SERIES_TABLE);
+      const commands = getDataListByColumn(command, 'feature', SERIES_TABLE, ctx);
       const commandList = commands.map(item => item.title);
       if (param && commandList.includes(param)) {
-        const commandData = getDataByColumn(param, 'title', SERIES_TABLE);
+        const commandData = getDataByColumn(param, 'title', SERIES_TABLE, ctx);
         const base64 = make(text, commandData);
         send(key, toid, base64);
         return;
@@ -174,7 +173,7 @@ const control = ({fromid, toid, command, text, params, key}) => {
       return;
     }
 
-    const imageData = getDataByColumn(sid, 'mid', sname);
+    const imageData = getDataByColumn(sid, 'mid', sname, ctx);
     if (!imageData.image) {
       const content = formatError();
       send(key, toid, content, 'TEXT');
@@ -182,7 +181,8 @@ const control = ({fromid, toid, command, text, params, key}) => {
       insertLog({
         fromid,
         text: `miss ${sid} in ${sname}. title is [${command}].`,
-        date: new Date()
+        date: new Date(),
+        ctx
       });
       return;
     }
@@ -196,7 +196,7 @@ const control = ({fromid, toid, command, text, params, key}) => {
       let imageBase64 = '';
 
       if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
-        const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE);
+        const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE, ctx);
         if (textStyles.length) {
           options = textStyles[0];
         }
@@ -209,7 +209,7 @@ const control = ({fromid, toid, command, text, params, key}) => {
 
       if (type === FEATURE_TYPE.IMAGE) {
         const {x, y, width, height, ipath} = singleList[0];
-        imageBase64 = getBase64(ipath, param);
+        imageBase64 = getBase64(ipath, param, ctx);
 
         if (imageBase64) {
           options = {
@@ -238,7 +238,8 @@ const control = ({fromid, toid, command, text, params, key}) => {
           insertLog({
             fromid,
             text: `[${command}], missing [${param}].`,
-            date: new Date()
+            date: new Date(),
+            ctx
           });
         }
       }
@@ -253,11 +254,11 @@ const control = ({fromid, toid, command, text, params, key}) => {
     }
   }
 
-  if (special(command, key, toid, text)) {
+  if (special(command, key, toid, text, ctx)) {
     return;
   }
 
-  const gifList = getDataListByColumn(command, 'title', GIF_TABLE);
+  const gifList = getDataListByColumn(command, 'title', GIF_TABLE, ctx);
   if (gifList.length) {
     makeGif(text, gifList[0]).then(base64 => {
       send(key, toid, base64);
@@ -265,11 +266,11 @@ const control = ({fromid, toid, command, text, params, key}) => {
     return;
   }
 
-  const data = getDataByColumn(command);
+  const data = getDataByColumn(command, 'title', STORY_TABLE, ctx);
   if (data.image) {
     let content = text;
     if (data.senior === 2) {
-      const additional = getColumnByTable(data.mid, 'mid', ADDITIONAL_TABLE);
+      const additional = getColumnByTable(data.mid, 'mid', ADDITIONAL_TABLE, ctx);
       content += additional.text; // 补充的文本，后置处理
     }
 
@@ -293,14 +294,16 @@ const control = ({fromid, toid, command, text, params, key}) => {
     insertLog({
       fromid,
       text: command,
-      date: new Date()
+      date: new Date(),
+      ctx
     });
   }
 };
 
 const main = encryption => {
-  const {fromid, toid, command, text, params, key} = parser(encryption);
-  control({fromid, toid, command, text, params, key});
+  const ctx = createContext(encryption);
+  const {fromid, toid, command, text, params, key, name} = ctx;
+  control({fromid, toid, command, text, params, key, name}, ctx);
 
   // console.log(fromid, toid, command, text, params, key);
   // control({fromid, toid, command: '上号', params: ['网易云'], text: '大佬', key});

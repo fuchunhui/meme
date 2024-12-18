@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import md5 from 'md5';
 import path from 'path';
 import {come, listen} from './app.js';
@@ -10,15 +11,14 @@ app.use(express.json({limit: '10mb'}));
 app.use(express.text());
 app.use(express.raw());
 app.use(express.urlencoded({extended: false, limit: '10mb'}));
+app.use(cors());
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.all('*', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-  res.header('X-Powered-By', '3.2.1');
   res.header('Content-Type', 'application/json;charset=utf-8');
   next();
 });
