@@ -304,9 +304,6 @@ const main = encryption => {
   const ctx = createContext(encryption);
   const {fromid, toid, command, text, params, key, name} = ctx;
   control({fromid, toid, command, text, params, key, name}, ctx);
-
-  // console.log(fromid, toid, command, text, params, key);
-  // control({fromid, toid, command: '上号', params: ['网易云'], text: '大佬', key});
 };
 
 export default main;
