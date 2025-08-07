@@ -1,9 +1,11 @@
 {
   "name": "meme",
   "version": "2.1.0",
-  "description": "a robot",
+  "description": "a meme robot",
   "main": "app.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
     "tsh": "sh .draft/test.sh",
     "tjs": "node .draft/test-msg.js",
     "tsvg": "node .draft/test-svg.js",
@@ -14,25 +16,23 @@
     "test": "cross-env NODE_ENV=test node .draft/test.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
     "import": "node build/import.js",
-    "backup": "node build/backup.js",
-    "start": "node server.js",
-    "dev": "node server.js"
+    "backup": "node build/backup.js"
   },
   "type": "module",
   "dependencies": {
-    "axios": "^1.7.9",
-    "canvas": "^3.0.0-rc3",
+    "axios": "^1.11.0",
+    "canvas": "^3.1.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
-    "express": "^5.0.0-beta.2",
+    "express": "^5.1.0",
     "gif-encoder-2": "^1.0.5",
     "gif-frames": "^1.0.1",
     "md5": "^2.3.0",
-    "sql.js": "^1.12.0"
+    "sql.js": "^1.13.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
-    "eslint": "^9.17.0"
+    "cross-env": "^10.0.0",
+    "eslint": "^9.32.0"
   },
   "repository": {
     "type": "git",
@@ -40,15 +40,28 @@
   },
   "keywords": [
     "robot",
-    "webhook",
+    "ai",
     "image",
     "text",
-    "meme"
+    "meme",
+    "funny",
+    "gif",
+    "emoji",
+    "meme-generator",
+    "meme-generator-robot"
   ],
   "author": "fuchunhui",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/fuchunhui/meme/issues"
   },
-  "homepage": "https://github.com/fuchunhui/meme#readme"
+  "homepage": "https://github.com/fuchunhui/meme#readme",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "canvas"
+    ],
+    "onlyBuiltDependencies": [
+      "canvas"
+    ]
+  }
 }
