@@ -6,17 +6,16 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "tsh": "sh .draft/test.sh",
-    "tjs": "node .draft/test-msg.js",
-    "tsvg": "node .draft/test-svg.js",
-    "t64": "node .draft/convert.js",
-    "db": "sh .draft/lodash-away.sh",
-    "view": "sh .draft/view-sync.sh",
-    "copy": "sh .draft/view-copy.sh",
-    "test": "cross-env NODE_ENV=test node .draft/test.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
-    "import": "node build/import.js",
-    "backup": "node build/backup.js"
+    "test": "cross-env NODE_ENV=test node .draft/test.js",
+    "test:shell": "sh .draft/test.sh",
+    "test:message": "node .draft/test-msg.js",
+    "test:svg": "node .draft/test-svg.js",
+    "test:convert": "node .draft/test-convert.js",
+    "view:db": "sh .draft/view-db.sh",
+    "view:sync": "sh .draft/view-sync.sh",
+    "view:public": "sh .draft/view-public.sh",
+    "import": "node build/import.js"
   },
   "type": "module",
   "dependencies": {

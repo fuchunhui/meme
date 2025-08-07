@@ -48,7 +48,6 @@ import {
 import {COMMAND_LIST, getRole} from './config/constant.js';
 
 export * from './service/router.js';
-export * from './export/backup.js';
 
 const special = (command, key, toid, text, ctx) => {
   const commands = getSpecialDataListByColumn(command, 'feature', ctx);

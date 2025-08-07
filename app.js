@@ -1,5 +1,5 @@
 // import {initDB} from './src/db/init.js'; // eslint-disable-line
-import main, {listen, backup} from './src/main.js';
+import main, {listen} from './src/main.js';
 
 // initDB('meme'); // 初始化数据库，传入 path
 
@@ -9,6 +9,5 @@ const come = encryption => {
 
 export {
   come,
-  listen,
-  backup
+  listen
 };

@@ -65,9 +65,23 @@ const filterKeys = (array, keys = ['title', 'image']) => {
   });
 };
 
+
+
+/**
+ * 格式化日期为 YYYY-MM-DD
+ * @param {*} date 日期对象，默认为当前日期
+ * @returns {string} 格式化后的日期字符串
+ */
+const getDatePath = (date = new Date()) => {
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+};
+
 export {
   splitArray,
   group,
   sortBykey,
-  filterKeys
+  filterKeys,
+  getDatePath
 };
