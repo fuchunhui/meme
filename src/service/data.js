@@ -9,11 +9,8 @@ import {
   getSingleTable,
   updateFeatureTable,
   getNamedColumnFromTable,
-  getRandom,
   updateAdditionalTable,
   updateGifTable,
-  insertGifTable,
-  updateGifBaseTable,
   STORY_TABLE,
   SPECIAL_TABLE,
   SERIES_TABLE,
@@ -242,6 +239,7 @@ const updateText = (options, ctx) => {
   return emptySucess();
 };
 
+// 待删除，代码供参考
 const openFeature = (mid, ctx) => {
   const featureList = getDataListByColumn(mid, 'mid', FEATURE_TABLE, ctx);
   if (!featureList.length) {
@@ -268,18 +266,11 @@ const openFeature = (mid, ctx) => {
   return sucess(cell);
 };
 
-const updateFeature = (options, ctx) => {
-  const data = updateFeatureTable(options, ctx);
-  if (data) {
-    return error(data, UPDATE_TEXT_FAIL);
-  }
-  return emptySucess();
-};
-
 const getImagePaths = () => {
   return Object.values(FEATURE_IMAGE_TYPE);
 };
 
+// 待优化，初步判断可删除
 const getBase64 = (type, title, ctx) => {
   let imageBase64 = '';
   if (type === FEATURE_IMAGE_TYPE.DB) {
@@ -298,130 +289,60 @@ const getBase64 = (type, title, ctx) => {
   return imageBase64;
 };
 
-const getMaterialCatalog = (type, ctx) => {
-  // 根据不同的 type 查找不同的表内容
-  let result = [];
-  if (type === FEATURE_IMAGE_TYPE.DB) {
-    result = getNamedColumnFromTable(MATERIAL_TABLE, ['mid', 'title'], ctx);
-  } else {
-    // 读取不同的物理目录
-  }
+// const openAdditional = (mid, ctx) => {
+//   const additionalList = getDataListByColumn(mid, 'mid', ADDITIONAL_TABLE, ctx);
+//   const {text} = additionalList[0];
+//   let cell = {
+//     mid,
+//     text
+//   };
 
-  return result;
-};
+//   return sucess(cell);
+// };
 
-const getRandomImageName = (ipath, ctx) => {
-  let content = '';
-  if (ipath === FEATURE_IMAGE_TYPE.DB) {
-    const {title} = getRandom(MATERIAL_TABLE, 'title', '', ctx);
-    content = title;
-  } else {
-    content = getFileName(ipath.toLowerCase());
-  }
+// const updateAdditional = (options, ctx) => {
+//   const data = updateAdditionalTable(options, ctx);
+//   if (data) {
+//     return error(data, UPDATE_ADDITIONAL_FAIL);
+//   }
+//   return emptySucess();
+// };
 
-  return content;
-};
+// const openGif = (mid, ctx) => {
+//   const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE, ctx);
+//   const {title, image, x, y, max, font, color, stroke, swidth, align, direction, frame} = gifList[0];
+//   const cell = {
+//     mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame
+//   };
+//   return sucess(cell);
+// };
 
-const openAdditional = (mid, ctx) => {
-  const additionalList = getDataListByColumn(mid, 'mid', ADDITIONAL_TABLE, ctx);
-  const {text} = additionalList[0];
-  let cell = {
-    mid,
-    text
-  };
+// const updateGif = (options, ctx) => {
+//   const data = updateGifTable(options, ctx);
+//   if (data) {
+//     return error(data, UPDATE_GIF_FAIL);
+//   }
+//   return emptySucess();
+// };
 
-  return sucess(cell);
-};
+// 已优化 ✅
+const checkRepeat = (name, ctx) => {
+  const story = getDataByColumn(name, 'name', STORY_TABLE, ctx);
 
-const updateAdditional = (options, ctx) => {
-  const data = updateAdditionalTable(options, ctx);
-  if (data) {
-    return error(data, UPDATE_ADDITIONAL_FAIL);
-  }
-  return emptySucess();
-};
-
-const openGif = (mid, ctx) => {
-  const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE, ctx);
-  const {title, image, x, y, max, font, color, stroke, swidth, align, direction, frame} = gifList[0];
-  const cell = {
-    mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame
-  };
-  return sucess(cell);
-};
-
-const updateGif = (options, ctx) => {
-  const data = updateGifTable(options, ctx);
-  if (data) {
-    return error(data, UPDATE_GIF_FAIL);
-  }
-  return emptySucess();
-};
-
-const checkRepeat = (title, ctx) => {
-  const story = getDataByColumn(title, 'title', STORY_TABLE, ctx);
-  const gif = getColumnByTable(title, 'title', GIF_TABLE, ctx);
-
-  const singleList = getSingleTable(FEATURE_TABLE, ctx);
-  const children = singleList.map(({mid, feature}) => {
-    return {
-      mid,
-      title: feature
-    };
-  });
-
-  if (story.mid || gif.mid || children.some(item => item.title === title)) {
-    return error({
-      title: title
-    }, CREATE_REPEAT_TITLE);
+  if (story.mid) {
+    return error({ name }, CREATE_REPEAT_TITLE);
   }
   return false;
 };
 
-const createGif = (options, ctx) => {
-  const result = checkRepeat(options.title, ctx);
-  if (result) {
-    return result;
-  }
-
-  const data = insertGifTable(options, ctx);
-  if (data.error) {
-    return error(data.data, UPDATE_GIF_FAIL);
-  }
-
-  return sucess({
-    mid: data.data
-  });
-};
-
-const updateGifBase = (options, ctx) => {
-  const data = updateGifBaseTable(options, ctx);
-  if (data) {
-    return error(data, UPDATE_GIF_FAIL);
-  }
-  return emptySucess();
-};
-
+// 命令使用，获取最近的更新，已处理 ✅
 const getLatestMid = (time, ctx) => {
-  const midList = [];
+  const result = [];
 
   const storyList = getTable(STORY_TABLE, false, ctx);
-  storyList.forEach(({mid, title}) => {
-    midList.push({mid, title});
-  });
-  const featureList = getTable(FEATURE_TABLE, false, ctx);
-  featureList.forEach(({mid, feature}) => {
-    midList.push({mid, title: feature});
-  });
-  const gifList = getTable(GIF_TABLE, false, ctx);
-  gifList.forEach(({mid, title}) => {
-    midList.push({mid, title});
-  });
-
-  const result = [];
-  midList.forEach(({mid, title}) => {
+  storyList.forEach(({mid, name}) => {
     if (mid.replace('meme_', '') >= time) {
-      result.push(title);
+      result.push(name);
     }
   });
 
@@ -439,17 +360,13 @@ export {
   update,
   updateText,
   openFeature,
-  updateFeature,
   getImagePaths,
   getBase64,
-  getMaterialCatalog,
-  getRandomImageName,
   openAdditional,
   updateAdditional,
   openGif,
   updateGif,
   createGif,
-  updateGifBase,
   gifMenu,
   getLatestMid
 };

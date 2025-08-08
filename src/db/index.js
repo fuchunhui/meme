@@ -22,15 +22,8 @@ export const IMAGE_TYPE = {
   'SVG': 'SVG',
   'PNG': 'PNG',
   'DB': 'DB',
-  'RANDOM': 'RANDOM'
+  'RANDOM': 'RANDOM' // TODO 是否删除，哪里在使用？？
 };
-
-export const FEATURE_SOURCE_NAME = {
-  'COMMON': STORY_TABLE,
-  'SPECIAL': SPECIAL_TABLE,
-  'SERIES': SERIES_TABLE
-};
-
 
 const SQL = await initSqlJs({
   locateFile: file => `./public/db/${file}`
@@ -229,7 +222,8 @@ const getSingleTable = (tableName = STORY_TABLE, ctx) => {
   return contents;
 };
 
-const getNamedColumnFromTable = (tableName = MATERIAL_TABLE, columns = [], ctx) => {
+// 获取指定表的指定列数据 ✅
+const getNamedColumnFromTable = (tableName = STORY_TABLE, columns = [], ctx) => {
   const columnSQL = columns.length ? columns.join(', ') : '*';
   const sql = `SELECT ${columnSQL} FROM ${tableName};`;
   return _getDataFromTable(sql, ctx);
@@ -291,6 +285,7 @@ const updateGifTable = (options, ctx) => {
   }
 };
 
+// 保留表名，需要优化处理
 const insertGifTable = (options, ctx) => {
   const {mid: _mid, title, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start',
     direction = 'down', stroke = 'transparent', swidth = 1, frame = 'NORMAL'} = options;
@@ -315,18 +310,6 @@ const insertGifTable = (options, ctx) => {
   }
 };
 
-const updateGifBaseTable = (options, ctx) => {
-  const {mid, title} = options;
-  const sql = `UPDATE ${GIF_TABLE} SET title = '${title}' WHERE mid = '${mid}';`;
-  try {
-    getDB(ctx.path).run(sql);
-
-    writeDB(ctx.path);
-  } catch (error) {
-    return error.toString();
-  }
-};
-
 export {
   writeDB,
   getDB,
@@ -348,6 +331,5 @@ export {
   updateAdditionalTable,
   getGifTable,
   updateGifTable,
-  insertGifTable,
-  updateGifBaseTable
+  insertGifTable
 };
