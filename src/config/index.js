@@ -6,7 +6,6 @@ if (env === 'test') {
   process.env.MEME_BASE_URL = 'http://localhost:8080';
 }
 
-
 const getConfig = key => {
   return config.find(item => item.key === key);
 };

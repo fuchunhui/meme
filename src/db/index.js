@@ -4,33 +4,33 @@ import {getMid} from '../utils/keys.js';
 import {config} from '../config/index.js';
 
 export const STORY_TABLE = 'STORY';
-export const TEXT_TABLE = 'TEXT';
-export const SERIES_TABLE = 'SERIES';
-export const FEATURE_TABLE = 'FEATURE';
-export const MYSTERY_TABLE = 'MYSTERY';
-export const MATERIAL_TABLE = 'MATERIAL';
-export const SPECIAL_TABLE = 'SPECIAL';
-export const LOG_TABLE = 'LOGGER';
-export const ADDITIONAL_TABLE = 'ADDITIONAL';
 export const GIF_TABLE = 'GIF';
+export const IMAGE_TABLE = 'IMAGE';
+export const ADDITIONAL_TABLE = 'ADDITIONAL';
+export const TEXT_TABLE = 'TEXT';
+export const LOG_TABLE = 'LOGGER';
 
-export const FEATURE_TYPE = {
-  'COMMAND': 'COMMAND',
+export const STORY_TYPE = {
   'TEXT': 'TEXT',
+  'REPEAT': 'REPEAT',
+  'GIF': 'GIF',
   'IMAGE': 'IMAGE',
-  'REPEAT': 'REPEAT'
+  'ADDITIONAL': 'ADDITIONAL',
 };
-export const FEATURE_SOURCE_NAME = {
-  'COMMON': STORY_TABLE,
-  'SPECIAL': SPECIAL_TABLE,
-  'SERIES': SERIES_TABLE
-};
-export const FEATURE_IMAGE_TYPE = {
+
+export const IMAGE_TYPE = {
   'SVG': 'SVG',
   'PNG': 'PNG',
   'DB': 'DB',
   'RANDOM': 'RANDOM'
 };
+
+export const FEATURE_SOURCE_NAME = {
+  'COMMON': STORY_TABLE,
+  'SPECIAL': SPECIAL_TABLE,
+  'SERIES': SERIES_TABLE
+};
+
 
 const SQL = await initSqlJs({
   locateFile: file => `./public/db/${file}`
