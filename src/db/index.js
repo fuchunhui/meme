@@ -68,6 +68,28 @@ const queryAllTables = ctx => {
   return getDB(ctx.path).exec('SELECT name, sql FROM sqlite_master;');
 };
 
+const insertStoryTable = (options, ctx) => {
+  const {mid, name, md5, type, feature = ''} = options;
+
+  const sql = `INSERT INTO ${STORY_TABLE} (mid, name, md5, type, feature) `
+    + `VALUES ('${mid}', '${name}', '${md5}', '${type}', '${feature}');`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+    return {
+      error: false,
+      data: mid
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error.toString()
+    };
+  }
+};
+
+
 const getTable = (tableName = STORY_TABLE, join = true, ctx) => {
   const contents = [];
   const sqlplus = join ? ` INNER JOIN ${TEXT_TABLE} USING(mid)` : '';
@@ -146,7 +168,7 @@ const deleteTable = (like, ctx) => {
 };
 
 const getDataByColumn = (value, column = 'title', name = STORY_TABLE, ctx) => {
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${name} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = :val`);
+  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${name} WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;
@@ -313,6 +335,8 @@ const insertGifTable = (options, ctx) => {
 export {
   writeDB,
   getDB,
+  insertStoryTable,
+
   queryAllTables,
   getTable,
   insertTable,

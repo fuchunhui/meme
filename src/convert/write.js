@@ -7,7 +7,24 @@ const named = () => {
   return `meme_${new Date().getTime()}`.padEnd(18, '0');
 };
 
-const writeImg = (base64Img, fileName = named(), targetDir = 'output') => {
+const writeImg = (fileName, base64Img) => {
+  const parts = base64Img.split(';base64,');
+  const base64Image = parts.pop();
+  const type = parts.pop().split('/').pop();
+
+  const targetDir = path.resolve(__dirname, 'lib', type === 'gif' ? 'gif' : 'image');
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, {recursive: true});
+  }
+
+  fs.writeFileSync(`${targetDir}/${fileName}.${type}`, base64Image, {encoding: 'base64'});
+};
+
+// TODO // 同时也需要提供文件读取接口，传入 type 和 md5，返回图片的 base64 编码
+// getImg
+
+// 暂时没用，原来用于测试生成效果的函数
+const writeTempImg = (base64Img, fileName = named(), targetDir = 'output') => {
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, {recursive: true});
   }

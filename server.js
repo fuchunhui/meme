@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import md5 from 'md5';
+import crypto from 'crypto';
 import path from 'path';
 import {come, listen} from './app.js';
 import {config} from './src/config/index.js';
@@ -41,7 +41,7 @@ app.post(/(.*)/, (req, res) => {
     const {signature, rn, timestamp, echostr} = req.body;
     let auth = false;
     for (const {token} of config) {
-      const str = md5(`${rn}${timestamp}${token}`);
+      const str = crypto.createHash('md5').update(`${rn}${timestamp}${token}`).digest('hex');
       if (signature === str) {
         auth = true;
         res.send(echostr);

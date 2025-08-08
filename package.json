@@ -26,7 +26,6 @@
     "express": "^5.1.0",
     "gif-encoder-2": "^1.0.5",
     "gif-frames": "^1.0.1",
-    "md5": "^2.3.0",
     "sql.js": "^1.13.0"
   },
   "devDependencies": {

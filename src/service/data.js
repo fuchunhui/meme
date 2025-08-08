@@ -1,4 +1,11 @@
+import crypto from 'crypto';
+import {getMid} from '../utils/keys.js';
+import {writeImg} from '../convert/write.js';
+
 import {
+  insertStoryTable,
+
+
   getTable,
   insertTable,
   updateTable,
@@ -12,13 +19,13 @@ import {
   updateAdditionalTable,
   updateGifTable,
   STORY_TABLE,
-  SPECIAL_TABLE,
-  SERIES_TABLE,
-  FEATURE_TABLE,
-  FEATURE_TYPE,
+  // SPECIAL_TABLE,
+  // SERIES_TABLE,
+  // FEATURE_TABLE,
+  // FEATURE_TYPE,
   TEXT_TABLE,
-  FEATURE_IMAGE_TYPE,
-  MATERIAL_TABLE,
+  // FEATURE_IMAGE_TYPE,
+  // MATERIAL_TABLE,
   ADDITIONAL_TABLE,
   GIF_TABLE
 } from '../db/index.js';
@@ -27,6 +34,8 @@ import {testFile, getFileName, getRandomPath} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
+  CREATE_STORY,
+
   UPDATE_TEXT_FAIL,
   UPDATE_STORY_FAIL,
   CREATE_REPEAT_TITLE,
@@ -37,21 +46,21 @@ import {
 
 const COMMAND_ID = {
   [STORY_TABLE]: 'meme_common',
-  [FEATURE_TABLE]: 'meme_feature',
+  // [FEATURE_TABLE]: 'meme_feature',
   [GIF_TABLE]: 'meme_gif'
 };
 
 const COMMAND_TEXT = {
   [STORY_TABLE]: '常用',
-  [FEATURE_TABLE]: '高级',
+  // [FEATURE_TABLE]: '高级',
   [GIF_TABLE]: '动图'
 };
 
 const COMMAND_TYPE = {
   [STORY_TABLE]: STORY_TABLE,
-  [SPECIAL_TABLE]: SPECIAL_TABLE,
-  [SERIES_TABLE]: SERIES_TABLE,
-  [FEATURE_TABLE]: FEATURE_TABLE,
+  // [SPECIAL_TABLE]: SPECIAL_TABLE,
+  // [SERIES_TABLE]: SERIES_TABLE,
+  // [FEATURE_TABLE]: FEATURE_TABLE,
   [GIF_TABLE]: GIF_TABLE
 };
 
@@ -208,15 +217,32 @@ const open = (mid, type, ctx) => {
 };
 
 const create = (options, ctx) => {
-  const result = checkRepeat(options.title, ctx);
+  const result = checkRepeat(options.name, ctx);
   if (result) {
     return result;
   }
 
-  const data = insertTable(options, true, STORY_TABLE, ctx);
+  const {name, type, image} = options;
+  const mid = getMid();
+  const md5 = crypto.createHash('md5').update(name).digest('hex');
+
+  const data = insertStoryTable({
+    mid,
+    name,
+    md5,
+    type
+  }, ctx);
   if (data.error) {
-    return error(data.data, UPDATE_TEXT_FAIL);
+    return error(data.data, CREATE_STORY);
   }
+
+  writeImg(md5, image);
+
+  // 根据不同的 type，初始化不同的逻辑。
+  // text\repeat
+  // image
+  // gif
+  // additional
 
   return sucess({
     mid: data.data
@@ -362,11 +388,10 @@ export {
   openFeature,
   getImagePaths,
   getBase64,
-  openAdditional,
-  updateAdditional,
-  openGif,
-  updateGif,
-  createGif,
+  // openAdditional,
+  // updateAdditional,
+  // openGif,
+  // updateGif,
   gifMenu,
   getLatestMid
 };
