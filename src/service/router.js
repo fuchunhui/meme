@@ -3,7 +3,7 @@ import {
   open,
   create,
   update,
-  updateTitle,
+  updateStoryName,
   getImagePaths,
   getBase64
 } from './data.js';
@@ -54,14 +54,6 @@ const listen = app => {
     });
   });
 
-  // TODO 不同类型，不同的保存接口，基础调用统一逻辑，然后差别处理不同部分
-  app.post('/image/update', (req, res) => {
-    console.info('image update: ', JSON.stringify(req.body));
-    const ctx = buildCtx(req);
-    const data = update(req.body, ctx);
-    res.send(data);
-  });
-
   // 单图上传，然后选择类型，调用不同类型的初始化方案，确认功能。接口验证通过 ✅
   app.post('/image/create', (req, res) => {
     console.info('image create: ', JSON.stringify(req.body));
@@ -70,13 +62,21 @@ const listen = app => {
     res.send(data);
   });
 
+  // TODO 不同类型，不同的保存接口，基础调用统一逻辑，然后差别处理不同部分 ✅
+  app.post('/image/update', (req, res) => {
+    console.info('image update: ', JSON.stringify(req.body));
+    const ctx = buildCtx(req);
+    const data = update(req.body, ctx);
+    res.send(data);
+  });
+
   // image/upload 上传图片接口，支持多个图片上传
 
-  // 把这个接口和 update 兑换下，把它改成专门的更新 title 的接口
-  app.post('/image/save/title', (req, res) => {
+  // 更新 Story name 的接口 ✅
+  app.post('/image/update/name', (req, res) => {
     console.info('image save: ', JSON.stringify(req.body));
     const ctx = buildCtx(req);
-    const data = updateTitle(req.body, ctx);
+    const data = updateStoryName(req.body, ctx);
     res.send(data);
   });
 

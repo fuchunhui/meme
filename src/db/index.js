@@ -206,6 +206,18 @@ const updateAdditionalTable = (options, ctx) => {
   }
 };
 
+const updateStoryName = (options, ctx) => {
+  const {mid, name} = options;
+  const sql = `UPDATE ${STORY_TABLE} SET name = '${name}' WHERE mid = '${mid}';`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
 // 注释上面的内容，是经过检查和验证的
 
 
@@ -220,18 +232,6 @@ const getTable = (tableName = STORY_TABLE, join = true, ctx) => {
   }
   stmt.free();
   return contents;
-};
-
-const updateTable = (options, tableName = STORY_TABLE, ctx) => {
-  const {mid, title, feature, image} = options;
-  const sql = `UPDATE ${tableName} SET title = '${title}', feature = '${feature}', image = '${image}' WHERE mid = '${mid}';`;
-
-  try {
-    getDB(ctx.path).run(sql);
-    writeDB(ctx.path);
-  } catch (error) {
-    return error.toString();
-  }
 };
 
 const deleteTable = (like, ctx) => {
@@ -370,12 +370,11 @@ export {
   updateGifTable,
   updateImageTable,
   updateAdditionalTable,
-
+  updateStoryName,
 
 
   queryAllTables,
   getTable,
-  updateTable,
   deleteTable,
   getDataByColumn,
   getColumnByTable,

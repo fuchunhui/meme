@@ -16,10 +16,10 @@ import {
   updateTextTable,
   updateImageTable,
   updateAdditionalTable,
+  updateStoryName,
 
 
   getTable,
-  updateTable,
   getDataByColumn,
   getDataListByColumn,
   getColumnByTable,
@@ -324,14 +324,16 @@ const update = (params, ctx) => {
   return emptySucess();
 };
 
-
-const updateTitle = (options, ctx) => {
-  const data = updateTextTable(options, ctx);
+// 此接口已可以正常工作，更新接口处理完毕 ✅
+const updateStoryName = (options, ctx) => {
+  const data = updateStoryName(options, ctx);
   if (data) {
     return error(data, UPDATE_NAME_FAIL);
   }
   return emptySucess();
 };
+
+
 
 // 待删除，代码供参考
 const openFeature = (mid, ctx) => {
@@ -436,7 +438,7 @@ export {
   open,
   create,
   update,
-  updateTitle,
+  updateStoryName,
   openFeature,
   getImagePaths,
   getBase64,
