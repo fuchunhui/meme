@@ -109,6 +109,9 @@ async function testCreateInterface(imageName, type = 'TEXT') {
   }
 }
 
-// 执行测试
+// 执行 create 接口测试
 testCreateInterface('张飞', 'TEXT').catch(console.error);
 testCreateInterface('清醒一下', 'GIF').catch(console.error);
+testCreateInterface('大佬', 'ADDITIONAL').catch(console.error);
+testCreateInterface('王有胜', 'REPEAT').catch(console.error);
+testCreateInterface('上号', 'IMAGE').catch(console.error);

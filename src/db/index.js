@@ -89,6 +89,126 @@ const insertStoryTable = (options, ctx) => {
   }
 };
 
+const insertTextTable = (options, ctx) => {
+  const {
+    mid, x = 0, y = 0, max = 100,
+    size = 32, font = 'sans-serif', color = 'black', stroke = 'transparent', swidth = 1,
+    align = 'start', direction = 'down',
+    blur = 0, degree = 0,
+    senior = 1,
+  } = options;
+
+  const sql = `INSERT INTO ${TEXT_TABLE} `
+    + `(mid, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree, senior) `
+    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${size}', '${font}', '${color}', '${stroke}', ${swidth}, `
+    + `'${align}', '${direction}', ${blur}, ${degree}, ${senior});`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const insertGifTable = (options, ctx) => {
+  const {mid, frame = ''} = options;
+  const sql = `INSERT INTO ${GIF_TABLE} (mid, frame) VALUES ('${mid}', '${frame}');`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const insertImageTable = (options, ctx) => {
+  const {mid, x = 0, y = 0, width = 100, height = 100, ipath = IMAGE_TYPE.SVG} = options;
+
+  const sql = `INSERT INTO ${IMAGE_TABLE} (mid, x, y, width, height, ipath) `
+    + `VALUES ('${mid}', ${x}, ${y}, ${width}, ${height}, '${ipath}');`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const insertAdditionalTable = (options, ctx) => {
+  const {mid, text = ''} = options;
+  const sql = `INSERT INTO ${ADDITIONAL_TABLE} (mid, text) VALUES ('${mid}', '${text}');`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const updateTextTable = (options, ctx) => {
+  const {
+    mid, x = 0, y = 0, max = 100,
+    size = 32, font = 'sans-serif', color = 'black', stroke = 'transparent', swidth = 1,
+    align = 'start', direction = 'down',
+    blur = 0, degree = 0,
+    senior = 1,
+  } = options;
+  const sql = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, size = ${size}, font = '${font}',`
+    + ` color = '${color}', stroke = '${stroke}', swidth = ${swidth}, align = '${align}', direction = '${direction}',`
+    + ` blur = ${blur}, degree = ${degree}, senior = ${senior} WHERE mid = '${mid}';`;
+  try {
+    getDB(ctx.path).run(sql);
+
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+// 功能保留，页面上暂时不涉及到对 frame 模式的调整
+const updateGifTable = (options, ctx) => {
+  const {mid, frame = ''} = options;
+  const sql = `UPDATE ${GIF_TABLE} SET frame = '${frame}' WHERE mid = '${mid}';`;
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const updateImageTable = (options, ctx) => {
+  const {mid, x = 0, y = 0, width = 100, height = 100, ipath = IMAGE_TYPE.SVG} = options;
+  const sql = `UPDATE ${IMAGE_TABLE} SET x = ${x}, y = ${y}, width = ${width}, height = ${height},`
+    + ` ipath = '${ipath}' WHERE mid = '${mid}';`;
+  try {
+    getDB(ctx.path).run(sql);
+
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+const updateAdditionalTable = (options, ctx) => {
+  const {mid, text} = options;
+  const sql = `UPDATE ${ADDITIONAL_TABLE} SET text = '${text}' WHERE mid = '${mid}';`;
+
+  try {
+    getDB(ctx.path).run(sql);
+    writeDB(ctx.path);
+  } catch (error) {
+    return error.toString();
+  }
+};
+
+// 注释上面的内容，是经过检查和验证的
+
+
 
 const getTable = (tableName = STORY_TABLE, join = true, ctx) => {
   const contents = [];
@@ -102,55 +222,12 @@ const getTable = (tableName = STORY_TABLE, join = true, ctx) => {
   return contents;
 };
 
-const insertTable = (options, write = true, tableName = STORY_TABLE, ctx) => {
-  const {mid: _mid, title, feature, image, senior = 0, x = 0, y = 0, max = 100, font = '32px sans-serif',
-    color = 'black', align = 'start', direction = 'down', blur = 0, degree = 0, stroke = 'transparent',
-    swidth = 1} = options;
-  const mid = getMid(_mid);
-
-  const sql = `INSERT INTO ${tableName} (mid, title, feature, image, senior) `
-    + `VALUES ('${mid}', '${title}', '${feature}', '${image}', '${senior}');`;
-  const text = `INSERT INTO ${TEXT_TABLE} `
-    + `(mid, x, y, max, font, color, align, direction, blur, degree, stroke, swidth) `
-    + `VALUES ('${mid}', ${x}, ${y}, ${max}, '${font}', '${color}', '${align}', '${direction}', `
-    + `${blur}, ${degree}, '${stroke}', ${swidth});`;
-
-  try {
-    getDB(ctx.path).run(sql + text);
-    write && writeDB(ctx.path);
-    return {
-      error: false,
-      data: mid
-    };
-  } catch (error) {
-    return {
-      error: true,
-      data: error.toString()
-    };
-  }
-};
-
 const updateTable = (options, tableName = STORY_TABLE, ctx) => {
   const {mid, title, feature, image} = options;
   const sql = `UPDATE ${tableName} SET title = '${title}', feature = '${feature}', image = '${image}' WHERE mid = '${mid}';`;
 
   try {
     getDB(ctx.path).run(sql);
-    writeDB(ctx.path);
-  } catch (error) {
-    return error.toString();
-  }
-};
-
-const updateTextTable = (options, ctx) => {
-  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start',
-    direction = 'down', blur = 0, degree = 0, stroke = 'transparent', swidth = 1} = options;
-  const text = `UPDATE ${TEXT_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}',`
-    + ` color = '${color}', align = '${align}', direction = '${direction}', blur = ${blur},`
-    + ` degree = ${degree}, stroke = '${stroke}', swidth = ${swidth} WHERE mid = '${mid}';`;
-  try {
-    getDB(ctx.path).run(text);
-
     writeDB(ctx.path);
   } catch (error) {
     return error.toString();
@@ -277,83 +354,37 @@ const getRandom = (tableName = MYSTERY_TABLE, columns = [], condition = '', ctx)
   return result;
 };
 
-const updateAdditionalTable = (options, ctx) => {
-  const {mid, text} = options;
-  const sql = `UPDATE ${ADDITIONAL_TABLE} SET text = '${text}' WHERE mid = '${mid}';`;
-
-  try {
-    getDB(ctx.path).run(sql);
-    writeDB(ctx.path);
-  } catch (error) {
-    return error.toString();
-  }
-};
-
 const getGifTable = () => {
  // ...
-};
-
-const updateGifTable = (options, ctx) => {
-  const {mid, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start', direction = 'down',
-    stroke = 'transparent', swidth = 1, frame = 'NORMAL'} = options;
-  const sql = `UPDATE ${GIF_TABLE} SET x = ${x}, y = ${y}, max = ${max}, font = '${font}', `
-    + `color = '${color}', align = '${align}', direction = '${direction}', stroke = '${stroke}', `
-    + `swidth = ${swidth}, frame = '${frame}' WHERE mid = '${mid}';`;
-  try {
-    getDB(ctx.path).run(sql);
-    writeDB(ctx.path);
-  } catch (error) {
-    return error.toString();
-  }
-};
-
-// 保留表名，需要优化处理
-const insertGifTable = (options, ctx) => {
-  const {mid: _mid, title, image, x = 0, y = 0, max = 100, font = '32px sans-serif', color = 'black', align = 'start',
-    direction = 'down', stroke = 'transparent', swidth = 1, frame = 'NORMAL'} = options;
-  const mid = getMid(_mid);
-
-  const sql = `INSERT INTO ${GIF_TABLE} (mid, title, image, x, y, max, font, color, align, direction, stroke, `
-    + `swidth, frame) VALUES ('${mid}', '${title}', '${image}', ${x}, ${y}, ${max}, '${font}', '${color}', `
-    + `'${align}', '${direction}', '${stroke}', ${swidth}, '${frame}');`;
-
-  try {
-    getDB(ctx.path).run(sql);
-    writeDB(ctx.path);
-    return {
-      error: false,
-      data: mid
-    };
-  } catch (error) {
-    return {
-      error: true,
-      data: error.toString()
-    };
-  }
 };
 
 export {
   writeDB,
   getDB,
   insertStoryTable,
+  insertTextTable,
+  insertGifTable,
+  insertImageTable,
+  insertAdditionalTable,
+  updateTextTable,
+  updateGifTable,
+  updateImageTable,
+  updateAdditionalTable,
+
+
 
   queryAllTables,
   getTable,
-  insertTable,
   updateTable,
   deleteTable,
   getDataByColumn,
   getColumnByTable,
   getDataListByColumn,
   getSpecialDataListByColumn,
-  updateTextTable,
   insertLog,
   getSingleTable,
   updateFeatureTable,
   getNamedColumnFromTable,
   getRandom,
-  updateAdditionalTable,
-  getGifTable,
-  updateGifTable,
-  insertGifTable
+  getGifTable
 };

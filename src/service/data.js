@@ -3,45 +3,50 @@ import {getMid} from '../utils/keys.js';
 import {writeImg} from '../convert/write.js';
 
 import {
+  STORY_TABLE,
+  TEXT_TABLE,
+  GIF_TABLE,
+  STORY_TYPE,
+  IMAGE_TYPE,
   insertStoryTable,
+  insertTextTable,
+  insertGifTable,
+  insertImageTable,
+  insertAdditionalTable,
+  updateTextTable,
+  updateImageTable,
+  updateAdditionalTable,
 
 
   getTable,
-  insertTable,
   updateTable,
-  updateTextTable,
   getDataByColumn,
   getDataListByColumn,
   getColumnByTable,
   getSingleTable,
   updateFeatureTable,
   getNamedColumnFromTable,
-  updateAdditionalTable,
-  updateGifTable,
-  STORY_TABLE,
-  // SPECIAL_TABLE,
-  // SERIES_TABLE,
-  // FEATURE_TABLE,
-  // FEATURE_TYPE,
-  TEXT_TABLE,
-  // FEATURE_IMAGE_TYPE,
-  // MATERIAL_TABLE,
-  ADDITIONAL_TABLE,
-  GIF_TABLE
+  updateGifTable
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {testFile, getFileName, getRandomPath} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
-  CREATE_STORY,
+  CREATE_STORY_FAIL,
+  CREATE_TEXT_FAIL,
+  CREATE_GIF_FAIL,
+  CREATE_IMAGE_FAIL,
+  CREATE_ADDITIONAL_FAIL,
 
   UPDATE_TEXT_FAIL,
+  UPDATE_IMAGE_FAIL,
+  UPDATE_ADDITIONAL_FAIL,
+  UPDATE_NAME_FAIL,
+
   UPDATE_STORY_FAIL,
   CREATE_REPEAT_TITLE,
-  UPDATE_ADDITIONAL_FAIL,
-  UPDATE_GIF_FAIL,
-  GET_FEATURE_FAIL
+  GET_FEATURE_FAIL,
 } from '../config/constant.js';
 
 const COMMAND_ID = {
@@ -216,6 +221,7 @@ const open = (mid, type, ctx) => {
   return {mid, title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree, stroke, swidth};
 };
 
+// 此接口已可以正常工作，新建接口完毕 ✅
 const create = (options, ctx) => {
   const result = checkRepeat(options.name, ctx);
   if (result) {
@@ -233,34 +239,96 @@ const create = (options, ctx) => {
     type
   }, ctx);
   if (data.error) {
-    return error(data.data, CREATE_STORY);
+    return error(data.data, CREATE_STORY_FAIL);
   }
 
   writeImg(md5, image);
 
-  // 根据不同的 type，初始化不同的逻辑。
-  // text\repeat
-  // image
-  // gif
-  // additional
+  const textData = { // 初始化 text 表
+    mid,
+    x: 0,
+    y: 0,
+    max: 100,
+    size: 32,
+    font: 'sans-serif',
+    color: '#000000',
+    stroke: 'transparent',
+    swidth: 1,
+    align: 'start',
+    direction: 'down',
+    blur: 0,
+    degree: 0,
+    senior: 1
+  };
+  const textResult = insertTextTable(textData, ctx);
+  if (textResult) {
+    return error(textResult, CREATE_TEXT_FAIL);
+  }
+
+  if (type === STORY_TYPE.GIF) { // 初始化 GIF 表
+    const gifResult = insertGifTable({
+      mid,
+      frame: 'NORMAL'
+    }, ctx);
+    if (gifResult) {
+      return error(gifResult, CREATE_GIF_FAIL);
+    }
+  } else if (type === STORY_TYPE.IMAGE) { // 初始化 IMAGE 表
+    const imageData = {
+      mid,
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      ipath: IMAGE_TYPE.SVG // 默认使用 SVG
+    };
+    const imageResult = insertImageTable(imageData, ctx);
+    if (imageResult) {
+      return error(imageResult, CREATE_IMAGE_FAIL);
+    }
+  } else if (type === STORY_TYPE.ADDITIONAL) { // 初始化 ADDITIONAL 表
+    const additionalData = {
+      mid,
+      text: ''
+    };
+    const data = insertAdditionalTable(additionalData, ctx);
+    if (data) {
+      return error(data, CREATE_ADDITIONAL_FAIL);
+    }
+  }
 
   return sucess({
     mid: data.data
   });
 };
 
-const update = (options, ctx) => {
-  const data = updateTable(options, STORY_TABLE, ctx);
+// 此接口已可以正常工作，更新接口处理完毕 ✅
+const update = (params, ctx) => {
+  const {mid, options, more, type} = params;
+
+  const data = updateTextTable({mid, ...options}, ctx);
   if (data) {
-    return error(data, UPDATE_STORY_FAIL);
+    return error(data, UPDATE_TEXT_FAIL);
+  }
+  if (type === STORY_TYPE.IMAGE) {
+    const imageData = updateImageTable({mid, ...more}, ctx);
+    if (imageData) {
+      return error(imageData, UPDATE_IMAGE_FAIL);
+    }
+  } else if (type === STORY_TYPE.ADDITIONAL) {
+    const additionalData = updateAdditionalTable({mid, ...more}, ctx);
+    if (additionalData) {
+      return error(additionalData, UPDATE_ADDITIONAL_FAIL);
+    }
   }
   return emptySucess();
 };
 
-const updateText = (options, ctx) => {
+
+const updateTitle = (options, ctx) => {
   const data = updateTextTable(options, ctx);
   if (data) {
-    return error(data, UPDATE_TEXT_FAIL);
+    return error(data, UPDATE_NAME_FAIL);
   }
   return emptySucess();
 };
@@ -326,14 +394,6 @@ const getBase64 = (type, title, ctx) => {
 //   return sucess(cell);
 // };
 
-// const updateAdditional = (options, ctx) => {
-//   const data = updateAdditionalTable(options, ctx);
-//   if (data) {
-//     return error(data, UPDATE_ADDITIONAL_FAIL);
-//   }
-//   return emptySucess();
-// };
-
 // const openGif = (mid, ctx) => {
 //   const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE, ctx);
 //   const {title, image, x, y, max, font, color, stroke, swidth, align, direction, frame} = gifList[0];
@@ -341,14 +401,6 @@ const getBase64 = (type, title, ctx) => {
 //     mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame
 //   };
 //   return sucess(cell);
-// };
-
-// const updateGif = (options, ctx) => {
-//   const data = updateGifTable(options, ctx);
-//   if (data) {
-//     return error(data, UPDATE_GIF_FAIL);
-//   }
-//   return emptySucess();
 // };
 
 // 已优化 ✅
@@ -384,14 +436,12 @@ export {
   open,
   create,
   update,
-  updateText,
+  updateTitle,
   openFeature,
   getImagePaths,
   getBase64,
   // openAdditional,
-  // updateAdditional,
   // openGif,
-  // updateGif,
   gifMenu,
   getLatestMid
 };
