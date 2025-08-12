@@ -6,6 +6,8 @@ import {
   STORY_TABLE,
   TEXT_TABLE,
   GIF_TABLE,
+  IMAGE_TABLE,
+  ADDITIONAL_TABLE,
   STORY_TYPE,
   IMAGE_TYPE,
   insertStoryTable,
@@ -22,7 +24,7 @@ import {
   getDataListByColumn
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
-import {testFile, getBase64Img, getRandomPath} from '../convert/write.js';
+import {getBase64Img} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
@@ -31,36 +33,12 @@ import {
   CREATE_GIF_FAIL,
   CREATE_IMAGE_FAIL,
   CREATE_ADDITIONAL_FAIL,
-
   UPDATE_TEXT_FAIL,
   UPDATE_IMAGE_FAIL,
   UPDATE_ADDITIONAL_FAIL,
   UPDATE_NAME_FAIL,
-
-  UPDATE_STORY_FAIL,
-  CREATE_REPEAT_TITLE,
-  GET_FEATURE_FAIL,
+  CREATE_REPEAT_TITLE
 } from '../config/constant.js';
-
-const COMMAND_ID = {
-  [STORY_TABLE]: 'meme_common',
-  // [FEATURE_TABLE]: 'meme_feature',
-  [GIF_TABLE]: 'meme_gif'
-};
-
-const COMMAND_TEXT = {
-  [STORY_TABLE]: '常用',
-  // [FEATURE_TABLE]: '高级',
-  [GIF_TABLE]: '动图'
-};
-
-const COMMAND_TYPE = {
-  [STORY_TABLE]: STORY_TABLE,
-  // [SPECIAL_TABLE]: SPECIAL_TABLE,
-  // [SERIES_TABLE]: SERIES_TABLE,
-  // [FEATURE_TABLE]: FEATURE_TABLE,
-  [GIF_TABLE]: GIF_TABLE
-};
 
 const normalMenu = ctx => {
   const list = getTable(STORY_TABLE, false, ctx);
@@ -107,67 +85,6 @@ const gifMenu = ctx => {
   return list.map(item => item.title);
 };
 
-const _getStory = (target = [], ctx) => {
-  const list = getTable(STORY_TABLE, false, ctx);
-  if (list.length) {
-    const children = list.map(({mid, title}) => {
-      return {
-        mid,
-        title
-      };
-    });
-    target.push({
-      id: COMMAND_ID[STORY_TABLE],
-      text: COMMAND_TEXT[STORY_TABLE],
-      type: COMMAND_TYPE[STORY_TABLE],
-      children
-    });
-  }
-};
-
-const _getGif = (target = [], ctx) => {
-  const list = getTable(GIF_TABLE, ctx);
-  if (list.length) {
-    const children = list.map(({mid, title}) => {
-      return {
-        mid,
-        title
-      };
-    });
-    target.push({
-      id: COMMAND_ID[GIF_TABLE],
-      text: COMMAND_TEXT[GIF_TABLE],
-      type: COMMAND_TYPE[GIF_TABLE],
-      children
-    });
-  }
-};
-
-const _getFeature = (target = [], ctx) => {
-  const singleList = getTable(FEATURE_TABLE, ctx);
-  if (singleList.length) {
-    const children = [];
-    singleList.length && singleList.forEach(({mid, feature, type}) => {
-      if (type === FEATURE_TYPE.COMMAND) {
-        return;
-      }
-      let cell = {
-        mid,
-        title: feature,
-        type
-      };
-      children.push(cell);
-    });
-
-    target.push({
-      id: COMMAND_ID[FEATURE_TABLE],
-      text: COMMAND_TEXT[FEATURE_TABLE],
-      type: COMMAND_TYPE[FEATURE_TABLE],
-      children
-    });
-  }
-};
-
 // 此接口已可以正常工作，新建接口完毕 ✅
 const getCatalog = ctx => {
   let result = [];
@@ -180,18 +97,30 @@ const getCatalog = ctx => {
   return result;
 };
 
-// TODO
+// 此接口已可以正常工作，新建接口完毕 ✅
 const open = (mid, ctx) => {
   const {name, md5, type} = getDataByColumn(mid, 'mid', STORY_TABLE, ctx);
   const image = getBase64Img(type, md5);
   const children = getDataListByColumn(mid, 'mid', TEXT_TABLE, ctx);
+
+  let more = '';
+  if (type === STORY_TYPE.IMAGE) {
+    const imageData = getDataByColumn(mid, 'mid', IMAGE_TABLE, ctx);
+    const {x, y, width, height, ipath} = imageData;
+    more = {x, y, width, height, ipath};
+  } else if (type === STORY_TYPE.ADDITIONAL) {
+    const additionalData = getDataByColumn(mid, 'mid', ADDITIONAL_TABLE, ctx);
+    const {text} = additionalData;
+    more = {text};
+  }
 
   return {
     mid,
     name,
     type,
     image,
-    children
+    children,
+    more
   };
 };
 
@@ -307,77 +236,19 @@ const updateStoryName = (options, ctx) => {
   return emptySucess();
 };
 
-
-
-// 待删除，代码供参考
-const openFeature = (mid, ctx) => {
-  const featureList = getDataListByColumn(mid, 'mid', FEATURE_TABLE, ctx);
-  if (!featureList.length) {
-    return error({
-      mid
-    }, GET_FEATURE_FAIL);
-  }
-  const {feature, type, sid, sname, tid, x, y, width, height, ipath} = featureList[0];
-  const story = open(sid, sname, ctx);
-  let cell = {
-    mid,
-    feature,
-    type,
-    story
-  };
-
-  if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
-    const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE, ctx);
-    cell.et = textStyles.length ? textStyles[0] : null;
-  } else if (type === FEATURE_TYPE.IMAGE) {
-    cell.ei = {x, y, width, height, ipath};
-  }
-
-  return sucess(cell);
-};
-
-const getImagePaths = () => {
-  return Object.values(FEATURE_IMAGE_TYPE);
-};
-
-// 待优化，初步判断可删除
+// 待优化，为【上号】类的需求，提供物理文件的信息
 const getBase64 = (type, title, ctx) => {
   let imageBase64 = '';
-  if (type === FEATURE_IMAGE_TYPE.DB) {
-    const materialData = getDataListByColumn(title, 'title', MATERIAL_TABLE, ctx);
-    imageBase64 = materialData.image || '';
-  } else if (type === FEATURE_IMAGE_TYPE.RANDOM) {
-    const filePath = getRandomPath();
-    imageBase64 = convert(filePath);
-  } else {
-    const filePath = testFile(type.toLowerCase(), title);
-    if (filePath) {
-      imageBase64 = convert(filePath);
-    }
-  }
+  // const filePath = getRandomPath();
+  // imageBase64 = convert(filePath);
+
+  // const filePath = testFile(type.toLowerCase(), title);
+  // if (filePath) {
+  //   imageBase64 = convert(filePath);
+  // }
 
   return imageBase64;
 };
-
-// const openAdditional = (mid, ctx) => {
-//   const additionalList = getDataListByColumn(mid, 'mid', ADDITIONAL_TABLE, ctx);
-//   const {text} = additionalList[0];
-//   let cell = {
-//     mid,
-//     text
-//   };
-
-//   return sucess(cell);
-// };
-
-// const openGif = (mid, ctx) => {
-//   const gifList = getDataListByColumn(mid, 'mid', GIF_TABLE, ctx);
-//   const {title, image, x, y, max, font, color, stroke, swidth, align, direction, frame} = gifList[0];
-//   const cell = {
-//     mid, title, image, x, y, max, font, color, stroke, swidth, align, direction, frame
-//   };
-//   return sucess(cell);
-// };
 
 // 已优化 ✅
 const checkRepeat = (name, ctx) => {
@@ -413,8 +284,6 @@ export {
   create,
   update,
   updateStoryName,
-  openFeature,
-  getImagePaths,
   getBase64,
   gifMenu,
   getLatestMid

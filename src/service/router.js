@@ -4,7 +4,6 @@ import {
   create,
   update,
   updateStoryName,
-  getImagePaths,
   getBase64
 } from './data.js';
 
@@ -89,17 +88,17 @@ const listen = app => {
   });
 
   // 作用是啥？统一从后端获取对应的结构吗？但产品功能也是和这个对应的，前端自己对应一份如何呢？为啥要走接口形式，有必要吗
-  app.get('/image/config', (req, res) => {
-    const data = {
-      commands: COMMAND_LIST,
-      paths: getImagePaths()
-    };
-    res.send({
-      data,
-      errNo: 0,
-      message: 'success'
-    });
-  });
+  // app.get('/image/config', (req, res) => {
+  //   const data = {
+  //     commands: COMMAND_LIST,
+  //     paths: getImagePaths()
+  //   };
+  //   res.send({
+  //     data,
+  //     errNo: 0,
+  //     message: 'success'
+  //   });
+  // });
 
   // 暂时保留，原始从 Feature 表获取 IMAGE 类型的图片 base64数据，可以废弃
   app.get('/image/base64', (req, res) => {

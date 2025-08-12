@@ -9,7 +9,6 @@ import {
   getSpecialDataListByColumn,
   getColumnByTable,
   insertLog,
-  getRandom,
   STORY_TABLE,
   TEXT_TABLE,
   SERIES_TABLE,
@@ -40,12 +39,11 @@ import {
   seriesMenu,
   imageMenu,
   getBase64,
-  getRandomImageName,
   gifMenu,
   getLatestMid
 } from './service/data.js';
 
-import {COMMAND_LIST, getRole} from './config/constant.js';
+import {COMMAND_LIST} from './config/constant.js';
 
 export * from './service/router.js';
 
@@ -63,46 +61,6 @@ const special = (command, key, toid, text, ctx) => {
   }
 
   return specialCommand;
-};
-
-const random = ctx => {
-  let command = '';
-  let text = getRole();
-  let params = [];
-
-  const percent = Math.floor(Math.random() * 100);
-  if (percent < 20) {
-    const {title} = getRandom(STORY_TABLE, 'title', 'senior = 0', ctx);
-    command = title;
-  } else if (percent < 30) {
-    const {feature, type, ipath} = getRandom(FEATURE_TABLE, ['feature', 'type', 'ipath'], '', ctx);
-
-    let content = '';
-    if (type === FEATURE_TYPE.COMMAND) {
-      const {title} = getRandom(SERIES_TABLE, 'title', `feature = '${feature}'`, ctx);
-      content = title;
-    } else if (type === FEATURE_TYPE.IMAGE) {
-      content = getRandomImageName(ipath, ctx);
-    } else {
-      content = getRole();
-    }
-    params = [content];
-  } else if (percent < 50) {
-    const {title, text: _randomText, param} = getRandom();
-    command = title;
-    text = _randomText;
-    if (param) {
-      params.push(param);
-    }
-  } else {
-    return {mystery: true};
-  }
-
-  return {
-    command,
-    text,
-    params
-  };
 };
 
 const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
@@ -139,14 +97,7 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
       const commandList = getLatestMid(duration, ctx);
       content = formatNewsMenu(commandList);
     } else if (command === '*') {
-      const {command, text, params, mystery} = random(ctx);
-      if (mystery) {
-        const base64 = getBase64('RANDOM', '', ctx);
-        send(key, toid, base64);
-      } else {
-        control({fromid, toid, command, text, params, key, name}, ctx);
-      }
-      return;
+      console.log('随机操作已下线');
     }
 
     send(key, toid, content, 'MD');

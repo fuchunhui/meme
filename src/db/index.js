@@ -20,8 +20,7 @@ export const STORY_TYPE = {
 export const IMAGE_TYPE = {
   'SVG': 'SVG',
   'PNG': 'PNG',
-  'DB': 'DB',
-  'RANDOM': 'RANDOM' // TODO 是否删除，哪里在使用？？
+  'DB': 'DB'
 };
 
 const SQL = await initSqlJs({
@@ -258,28 +257,11 @@ const getNamedColumnFromTable = (tableName = STORY_TABLE, columns = [], ctx) => 
 };
 
 // TODO 考虑后续扩充日志记录
-const insertLog = ({fromid, text, date, ctx}, write = true) => {
+const insertLog = ({fromid, text, date, ctx}) => {
   const sql = `INSERT INTO ${LOG_TABLE} (fromid, text, date) VALUES ('${fromid}', '${text}', '${date}');`;
   getDB(ctx.path).run(sql);
 
-  write && writeDB(ctx.path);
-};
-
-// 注释上面的内容，是经过检查和验证的
-
-const getRandom = (tableName = MYSTERY_TABLE, columns = [], condition = '', ctx) => {
-  const expression = condition ? `where ${condition}` : '';
-
-  const column = typeof columns === 'string'
-    ? columns
-    : columns.length
-      ? columns.length > 1 ? columns.join(', ') : columns[0]
-      : '*';
-  const sql = `SELECT ${column} FROM ${tableName} ${expression} ORDER BY RANDOM() limit 1`;
-  const stmt = getDB(ctx.path).prepare(sql);
-  const result = stmt.getAsObject({});
-  stmt.free();
-  return result;
+  writeDB(ctx.path);
 };
 
 export {
@@ -297,10 +279,7 @@ export {
   updateName,
   getTable,
   getDataByColumn,
-  insertLog,
-
-
   getDataListByColumn,
   getNamedColumnFromTable,
-  getRandom,
+  insertLog
 };

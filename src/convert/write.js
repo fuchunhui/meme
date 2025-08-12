@@ -69,14 +69,6 @@ const getFileName = (ipath = 'svg', targetDir = 'lib') => {
   return file.slice(0, file.length - ext.length);
 };
 
-const getRandomPath = (ipath = 'random', targetDir = 'lib') => {
-  const tardir = path.resolve(__dirname, targetDir, ipath);
-  const files = fs.readdirSync(tardir);
-  const index = Math.floor(Math.random() * files.length);
-  const file = files[index];
-  return path.resolve(tardir, file);
-};
-
 const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
   return path.resolve(__dirname, targetDir, `${fileName}.${type}`);
 };
@@ -90,6 +82,5 @@ export {
   removeImg,
   testFile,
   getFileName,
-  getRandomPath,
   tempFile
 };

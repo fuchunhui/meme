@@ -12,11 +12,9 @@ export const UPDATE_ADDITIONAL_FAIL = '更新故事附加文本失败';
 
 export const UPDATE_NAME_FAIL = '更新表情名称失败';
 
-
 // 注释上面的是已经确认过的
 
 export const UPDATE_STORY_FAIL = '更新故事内容失败';
-export const GET_FEATURE_FAIL = '获取 Feature 失败';
 
 export const COMMAND_LIST = [
   'special', // 彩蛋菜单
