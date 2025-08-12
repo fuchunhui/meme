@@ -29,7 +29,7 @@ const listen = app => {
     next();
   });
 
-  // TODO 简化返回结果
+  // 此接口已可以正常工作，新建接口完毕 ✅
   app.get('/image/catalog', (req, res) => {
     const ctx = buildCtx(req);
     const data = getCatalog(ctx);
@@ -72,7 +72,7 @@ const listen = app => {
 
   // image/upload 上传图片接口，支持多个图片上传
 
-  // 更新 Story name 的接口 ✅
+  // 更新 story name 的接口 ✅
   app.post('/image/update/name', (req, res) => {
     console.info('image save: ', JSON.stringify(req.body));
     const ctx = buildCtx(req);

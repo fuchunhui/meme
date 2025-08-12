@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import initSqlJs from 'sql.js';
-import {getMid} from '../utils/keys.js';
 import {config} from '../config/index.js';
 
 export const STORY_TABLE = 'STORY';
@@ -206,7 +205,7 @@ const updateAdditionalTable = (options, ctx) => {
   }
 };
 
-const updateStoryName = (options, ctx) => {
+const updateName = (options, ctx) => {
   const {mid, name} = options;
   const sql = `UPDATE ${STORY_TABLE} SET name = '${name}' WHERE mid = '${mid}';`;
 
@@ -218,14 +217,9 @@ const updateStoryName = (options, ctx) => {
   }
 };
 
-// 注释上面的内容，是经过检查和验证的
-
-
-
-const getTable = (tableName = STORY_TABLE, join = true, ctx) => {
+const getTable = (tableName = STORY_TABLE, ctx) => {
   const contents = [];
-  const sqlplus = join ? ` INNER JOIN ${TEXT_TABLE} USING(mid)` : '';
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${tableName}${sqlplus};`);
+  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${tableName};`);
   while (stmt.step()) {
     const cell = stmt.getAsObject();
     contents.push(cell);
@@ -234,85 +228,17 @@ const getTable = (tableName = STORY_TABLE, join = true, ctx) => {
   return contents;
 };
 
-const deleteTable = (like, ctx) => {
-  const text = `DELETE FROM ${TEXT_TABLE} WHERE mid in `
-    + `(SELECT mid FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}');`;
-  const sql = `DELETE FROM ${STORY_TABLE} WHERE title NOT LIKE '${like}';`;
-  getDB(ctx.path).run(text);
-  getDB(ctx.path).run(sql);
-
-  writeDB(ctx.path);
-};
-
-const getDataByColumn = (value, column = 'title', name = STORY_TABLE, ctx) => {
+// TODO 和 getNamedColumnFromTable 仅保留一个函数就行，不需要两个都保留。
+const getDataByColumn = (value, column = 'name', name = STORY_TABLE, ctx) => {
   const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${name} WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;
 };
 
-const getDataListByColumn = (value, column = 'title', name = STORY_TABLE, ctx) => {
+const _getDataFromTable = (sql, ctx) => {
   const contents = [];
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${name} WHERE ${column} = '${value}'`);
-  while (stmt.step()) {
-    const cell = stmt.getAsObject();
-    contents.push(cell);
-  }
-  stmt.free();
-  return contents;
-};
-
-const insertLog = ({fromid, text, date, ctx}, write = true) => {
-  const sql = `INSERT INTO ${LOG_TABLE} (fromid, text, date) VALUES ('${fromid}', '${text}', '${date}');`;
-  getDB(ctx.path).run(sql);
-
-  write && writeDB(ctx.path);
-};
-
-const getColumnByTable = (value, column, table, ctx) => {
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${table} WHERE ${column} = :val`);
-  const result = stmt.getAsObject({':val': value});
-  stmt.free();
-  return result;
-};
-
-const getSpecialDataListByColumn = (value, column = 'feature', ctx) => {
-  const contents = [];
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${SPECIAL_TABLE} INNER JOIN ${TEXT_TABLE} USING(mid) WHERE ${column} = '${value}'`);
-  while (stmt.step()) {
-    const cell = stmt.getAsObject();
-    contents.push(cell);
-  }
-  stmt.free();
-  return contents;
-};
-
-const updateFeatureTable = (options, ctx) => {
-  const list = [];
-  Object.keys(options).forEach(key => {
-    if (key === 'mid') {
-      return;
-    }
-    const value = options[key];
-    const realValue = typeof value === 'string' ? `'${value}'` : value;
-    list.push(`${key}=${realValue}`);
-  });
-
-  const append = list.join(', ');
-  const sql = `UPDATE ${FEATURE_TABLE} SET ${append} WHERE mid = '${options.mid}';`;
-
-  try {
-    getDB(ctx.path).run(sql);
-
-    writeDB(ctx.path);
-  } catch (error) {
-    return error.toString();
-  }
-};
-
-const getSingleTable = (tableName = STORY_TABLE, ctx) => {
-  const contents = [];
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${tableName};`);
+  const stmt = getDB(ctx.path).prepare(sql);
   while (stmt.step()) {
     const cell = stmt.getAsObject();
     contents.push(cell);
@@ -328,16 +254,21 @@ const getNamedColumnFromTable = (tableName = STORY_TABLE, columns = [], ctx) => 
   return _getDataFromTable(sql, ctx);
 };
 
-const _getDataFromTable = (sql, ctx) => {
-  const contents = [];
-  const stmt = getDB(ctx.path).prepare(sql);
-  while (stmt.step()) {
-    const cell = stmt.getAsObject();
-    contents.push(cell);
-  }
-  stmt.free();
-  return contents;
+// 应该是没有使用场景，考虑删除
+const getDataListByColumn = (value, column = 'name', tableName = STORY_TABLE, ctx) => {
+  const sql = `SELECT * FROM ${tableName} WHERE ${column} = '${value}';`;
+  return _getDataFromTable(sql, ctx);
 };
+
+// TODO 考虑后续扩充日志记录
+const insertLog = ({fromid, text, date, ctx}, write = true) => {
+  const sql = `INSERT INTO ${LOG_TABLE} (fromid, text, date) VALUES ('${fromid}', '${text}', '${date}');`;
+  getDB(ctx.path).run(sql);
+
+  write && writeDB(ctx.path);
+};
+
+// 注释上面的内容，是经过检查和验证的
 
 const getRandom = (tableName = MYSTERY_TABLE, columns = [], condition = '', ctx) => {
   const expression = condition ? `where ${condition}` : '';
@@ -354,10 +285,6 @@ const getRandom = (tableName = MYSTERY_TABLE, columns = [], condition = '', ctx)
   return result;
 };
 
-const getGifTable = () => {
- // ...
-};
-
 export {
   writeDB,
   getDB,
@@ -370,20 +297,13 @@ export {
   updateGifTable,
   updateImageTable,
   updateAdditionalTable,
-  updateStoryName,
-
-
-  queryAllTables,
+  updateName,
   getTable,
-  deleteTable,
-  getDataByColumn,
-  getColumnByTable,
-  getDataListByColumn,
-  getSpecialDataListByColumn,
   insertLog,
-  getSingleTable,
-  updateFeatureTable,
+
+
+  getDataByColumn,
+  getDataListByColumn,
   getNamedColumnFromTable,
   getRandom,
-  getGifTable
 };

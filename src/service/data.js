@@ -16,17 +16,12 @@ import {
   updateTextTable,
   updateImageTable,
   updateAdditionalTable,
-  updateStoryName,
-
-
+  updateName,
   getTable,
+
+
   getDataByColumn,
-  getDataListByColumn,
-  getColumnByTable,
-  getSingleTable,
-  updateFeatureTable,
-  getNamedColumnFromTable,
-  updateGifTable
+  getDataListByColumn
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {testFile, getFileName, getRandomPath} from '../convert/write.js';
@@ -75,7 +70,7 @@ const normalMenu = ctx => {
 };
 
 const seniorMenu = ctx => {
-  const list = getSingleTable(FEATURE_TABLE, ctx);
+  const list = getTable(FEATURE_TABLE, ctx);
   return list.filter(item => item.type !== FEATURE_TYPE.COMMAND).map(item => item.feature);
 };
 
@@ -133,7 +128,7 @@ const _getStory = (target = [], ctx) => {
 };
 
 const _getGif = (target = [], ctx) => {
-  const list = getSingleTable(GIF_TABLE, ctx);
+  const list = getTable(GIF_TABLE, ctx);
   if (list.length) {
     const children = list.map(({mid, title}) => {
       return {
@@ -151,7 +146,7 @@ const _getGif = (target = [], ctx) => {
 };
 
 const _getFeature = (target = [], ctx) => {
-  const singleList = getSingleTable(FEATURE_TABLE, ctx);
+  const singleList = getTable(FEATURE_TABLE, ctx);
   if (singleList.length) {
     const children = [];
     singleList.length && singleList.forEach(({mid, feature, type}) => {
@@ -175,40 +170,14 @@ const _getFeature = (target = [], ctx) => {
   }
 };
 
-const _getSeries = (tabName = SERIES_TABLE, target = [], ctx) => {
-  const list = getTable(tabName, false, ctx);
-  if (list.length) {
-    const map = new Map();
-    list.forEach(({mid, title, feature}) => {
-      let value = [{
-        mid,
-        title
-      }];
-      if (map.has(feature)) {
-        value = [...map.get(feature), ...value];
-      }
-      map.set(feature, value);
-    });
-
-    map.forEach((value, key) => {
-      target.push({
-        id: key,
-        text: key,
-        type: COMMAND_TYPE[tabName],
-        children: value
-      });
-    });
-  }
-};
-
+// 此接口已可以正常工作，新建接口完毕 ✅
 const getCatalog = ctx => {
-  const result = [];
+  let result = [];
 
-  _getGif(result, ctx);
-  _getStory(result, ctx);
-  _getFeature(result, ctx);
-  _getSeries(SERIES_TABLE, result, ctx);
-  _getSeries(SPECIAL_TABLE, result, ctx);
+  const list = getTable(STORY_TABLE, ctx);
+  if (list.length) {
+    result = list.map(({mid, name, type}) => ({mid, name, type}));
+  }
 
   return result;
 };
@@ -326,7 +295,7 @@ const update = (params, ctx) => {
 
 // 此接口已可以正常工作，更新接口处理完毕 ✅
 const updateStoryName = (options, ctx) => {
-  const data = updateStoryName(options, ctx);
+  const data = updateName(options, ctx);
   if (data) {
     return error(data, UPDATE_NAME_FAIL);
   }
@@ -442,8 +411,6 @@ export {
   openFeature,
   getImagePaths,
   getBase64,
-  // openAdditional,
-  // openGif,
   gifMenu,
   getLatestMid
 };
