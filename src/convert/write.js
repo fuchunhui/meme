@@ -12,7 +12,7 @@ const writeImg = (fileName, base64Img) => {
   const base64Image = parts.pop();
   const type = parts.pop().split('/').pop();
 
-  const targetDir = path.resolve(__dirname, 'lib', type === 'gif' ? 'gif' : 'image');
+  const targetDir = path.resolve(__dirname, 'lib', type === 'gif' ? 'gif' : 'png');
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, {recursive: true});
   }
@@ -20,8 +20,18 @@ const writeImg = (fileName, base64Img) => {
   fs.writeFileSync(`${targetDir}/${fileName}.${type}`, base64Image, {encoding: 'base64'});
 };
 
-// TODO // 同时也需要提供文件读取接口，传入 type 和 md5，返回图片的 base64 编码
-// getImg
+const getBase64Img = (type, md5) => {
+  const ext = type.toLowerCase() === 'gif' ? 'gif' : 'png';
+  const filePath = path.resolve(__dirname, 'lib', ext, `${md5}.${ext}`);
+  if (!fs.existsSync(filePath)) {
+    return '';
+  }
+
+  const base64Image = fs.readFileSync(filePath, {encoding: 'base64'});
+  return `data:image/${ext};base64,${base64Image}`;
+};
+
+
 
 // 暂时没用，原来用于测试生成效果的函数
 const writeTempImg = (base64Img, fileName = named(), targetDir = 'output') => {
@@ -72,8 +82,11 @@ const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
 };
 
 export {
-  named,
   writeImg,
+  getBase64Img,
+
+
+  named,
   removeImg,
   testFile,
   getFileName,

@@ -41,11 +41,11 @@ const listen = app => {
     });
   });
 
-  // TODO 根据不同的类型，返回不同的明细数据
+  // TODO 0812 根据不同的类型，返回不同的明细数据
   app.get('/image/open', (req, res) => {
     const ctx = buildCtx(req);
-    const {mid, type} = req.query;
-    const data = open(mid, type, ctx);
+    const {mid} = req.query;
+    const data = open(mid, ctx);
 
     res.send({
       data,

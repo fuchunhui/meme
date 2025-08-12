@@ -228,9 +228,8 @@ const getTable = (tableName = STORY_TABLE, ctx) => {
   return contents;
 };
 
-// TODO 和 getNamedColumnFromTable 仅保留一个函数就行，不需要两个都保留。
-const getDataByColumn = (value, column = 'name', name = STORY_TABLE, ctx) => {
-  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${name} WHERE ${column} = :val`);
+const getDataByColumn = (value, column = 'name', tableName = STORY_TABLE, ctx) => {
+  const stmt = getDB(ctx.path).prepare(`SELECT * FROM ${tableName} WHERE ${column} = :val`);
   const result = stmt.getAsObject({':val': value});
   stmt.free();
   return result;
@@ -247,16 +246,14 @@ const _getDataFromTable = (sql, ctx) => {
   return contents;
 };
 
-// 获取指定表的指定列数据 ✅
-const getNamedColumnFromTable = (tableName = STORY_TABLE, columns = [], ctx) => {
-  const columnSQL = columns.length ? columns.join(', ') : '*';
-  const sql = `SELECT ${columnSQL} FROM ${tableName};`;
+const getDataListByColumn = (value, column = 'name', tableName = STORY_TABLE, ctx) => {
+  const sql = `SELECT * FROM ${tableName} WHERE ${column} = '${value}';`;
   return _getDataFromTable(sql, ctx);
 };
 
-// 应该是没有使用场景，考虑删除
-const getDataListByColumn = (value, column = 'name', tableName = STORY_TABLE, ctx) => {
-  const sql = `SELECT * FROM ${tableName} WHERE ${column} = '${value}';`;
+const getNamedColumnFromTable = (tableName = STORY_TABLE, columns = [], ctx) => {
+  const columnSQL = columns.length ? columns.join(', ') : '*';
+  const sql = `SELECT ${columnSQL} FROM ${tableName};`;
   return _getDataFromTable(sql, ctx);
 };
 
@@ -299,10 +296,10 @@ export {
   updateAdditionalTable,
   updateName,
   getTable,
+  getDataByColumn,
   insertLog,
 
 
-  getDataByColumn,
   getDataListByColumn,
   getNamedColumnFromTable,
   getRandom,

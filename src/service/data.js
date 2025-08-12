@@ -18,13 +18,11 @@ import {
   updateAdditionalTable,
   updateName,
   getTable,
-
-
   getDataByColumn,
   getDataListByColumn
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
-import {testFile, getFileName, getRandomPath} from '../convert/write.js';
+import {testFile, getBase64Img, getRandomPath} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {group, sortBykey, filterKeys} from '../utils/utils.js';
 import {
@@ -182,12 +180,19 @@ const getCatalog = ctx => {
   return result;
 };
 
-const open = (mid, type, ctx) => {
-  const tabName = COMMAND_TYPE[type];
-  const data = getDataByColumn(mid, 'mid', tabName, ctx);
-  const {title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree, stroke, swidth} = data;
+// TODO
+const open = (mid, ctx) => {
+  const {name, md5, type} = getDataByColumn(mid, 'mid', STORY_TABLE, ctx);
+  const image = getBase64Img(type, md5);
+  const children = getDataListByColumn(mid, 'mid', TEXT_TABLE, ctx);
 
-  return {mid, title, feature, image, senior, x, y, max, font, color, align, direction, blur, degree, stroke, swidth};
+  return {
+    mid,
+    name,
+    type,
+    image,
+    children
+  };
 };
 
 // 此接口已可以正常工作，新建接口完毕 ✅
