@@ -20,12 +20,13 @@ import {
   updateName,
   getTable,
   getDataByColumn,
-  getDataListByColumn
+  getDataListByColumn,
+  getNamedColumnFromTable
 } from '../db/index.js';
 import {emptySucess, sucess, error} from './ajax.js';
 import {getBase64Img} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
-import {group} from '../utils/utils.js';
+import {group, arrayToCountObject} from '../utils/utils.js';
 import {
   CREATE_STORY_FAIL,
   CREATE_TEXT_FAIL,
@@ -41,7 +42,7 @@ import {
 
 const normalMenu = ctx => {
   const list = getTable(STORY_TABLE, ctx).map(({mid, name, md5, type}) => ({mid, name, md5, type}));
-  const textList = getNamedColumnFromTable(TEXT_TABLE, ['mid'], ctx);
+  const textList = getNamedColumnFromTable(TEXT_TABLE, ['mid'], ctx).map(item => item.mid);
   const countMap = arrayToCountObject(textList);
   const [normal, senior] = group(list, item => countMap[item.mid] === 1);
   return {
@@ -51,11 +52,10 @@ const normalMenu = ctx => {
 };
 
 const gifMenu = ctx => {
-  const list = getDataByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
+  const list = getDataListByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
   return list.map(item => item.name);
 };
 
-// 此接口已可以正常工作，新建接口完毕 ✅
 const getCatalog = ctx => {
   let result = [];
 
@@ -67,7 +67,6 @@ const getCatalog = ctx => {
   return result;
 };
 
-// 此接口已可以正常工作，新建接口完毕 ✅
 const open = (mid, ctx) => {
   const {name, md5, type} = getDataByColumn(mid, 'mid', STORY_TABLE, ctx);
   const image = getBase64Img(type, md5);
@@ -94,7 +93,6 @@ const open = (mid, ctx) => {
   };
 };
 
-// 此接口已可以正常工作，新建接口完毕 ✅
 const create = (options, ctx) => {
   const result = checkRepeat(options.name, ctx);
   if (result) {
@@ -175,7 +173,6 @@ const create = (options, ctx) => {
   });
 };
 
-// 此接口已可以正常工作，更新接口处理完毕 ✅
 const update = (params, ctx) => {
   const {mid, options, more, type} = params;
 
@@ -197,7 +194,6 @@ const update = (params, ctx) => {
   return emptySucess();
 };
 
-// 此接口已可以正常工作，更新接口处理完毕 ✅
 const updateStoryName = (options, ctx) => {
   const data = updateName(options, ctx);
   if (data) {
@@ -220,7 +216,6 @@ const getBase64 = (type, name, ctx) => {
   return imageBase64;
 };
 
-// 已优化 ✅
 const checkRepeat = (name, ctx) => {
   const story = getDataByColumn(name, 'name', STORY_TABLE, ctx);
 
@@ -230,7 +225,6 @@ const checkRepeat = (name, ctx) => {
   return false;
 };
 
-// 命令使用，获取最近的更新，已处理 ✅
 const getLatestMid = (time, ctx) => {
   const result = [];
 
