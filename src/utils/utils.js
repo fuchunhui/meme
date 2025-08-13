@@ -55,7 +55,7 @@ const sortBykey = (array, key) => {
  * @param {*} keys 关键字集合
  * @returns 过滤后的结果
  */
-const filterKeys = (array, keys = ['title', 'image']) => {
+const filterKeys = (array, keys = ['name', 'image']) => {
   return array.map(item => {
     const result = {};
     keys.forEach(key => {
@@ -65,7 +65,21 @@ const filterKeys = (array, keys = ['title', 'image']) => {
   });
 };
 
-
+/**
+ * 将数组转换为对象，统计每个元素的出现次数
+ * @param {Array} arr - 输入数组
+ * @returns {Object} - 返回对象，key为数组元素，value为出现次数
+ */
+const arrayToCountObject = arr => {
+  if (!Array.isArray(arr)) {
+    return {};
+  }
+  
+  return arr.reduce((acc, item) => {
+    acc[item] = (acc[item] || 0) + 1;
+    return acc;
+  }, {});
+};
 
 /**
  * 格式化日期为 YYYY-MM-DD
@@ -83,5 +97,6 @@ export {
   group,
   sortBykey,
   filterKeys,
-  getDatePath
+  getDatePath,
+  arrayToCountObject
 };

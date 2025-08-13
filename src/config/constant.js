@@ -1,4 +1,4 @@
-export const CREATE_REPEAT_TITLE = '已经存在相同命令的表情，你需要换个标题';
+export const CREATE_REPEAT_NAME = '已经存在相同命令的表情，你需要换个名称哦';
 export const CREATE_STORY_FAIL = '创建表情失败';
 export const CREATE_TEXT_FAIL = '创建默认文本失败';
 export const CREATE_GIF_FAIL = '创建动图失败';
@@ -11,10 +11,6 @@ export const UPDATE_IMAGE_FAIL = '更新图片表失败';
 export const UPDATE_ADDITIONAL_FAIL = '更新故事附加文本失败';
 
 export const UPDATE_NAME_FAIL = '更新表情名称失败';
-
-// 注释上面的是已经确认过的
-
-export const UPDATE_STORY_FAIL = '更新故事内容失败';
 
 export const COMMAND_LIST = [
   'special', // 彩蛋菜单

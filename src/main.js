@@ -11,7 +11,6 @@ import {
   insertLog,
   STORY_TABLE,
   TEXT_TABLE,
-  SERIES_TABLE,
   FEATURE_TABLE,
   ADDITIONAL_TABLE,
   FEATURE_TYPE,
@@ -23,7 +22,6 @@ import {makeGif} from './convert/gif.js';
 import {
   formatAllMenu,
   formatMenu,
-  formatSeriesMenu,
   formatNull,
   formatHelp,
   formatError,
@@ -35,9 +33,7 @@ import {
 import {send} from './service/index.js';
 import {
   normalMenu,
-  seniorMenu,
   seriesMenu,
-  imageMenu,
   getBase64,
   gifMenu,
   getLatestMid
@@ -66,11 +62,10 @@ const special = (command, key, toid, text, ctx) => {
 const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
   if (command === '') {
     const storyList = normalMenu(ctx);
-    const seniorList = seniorMenu(ctx);
     const seriesMap = seriesMenu(ctx);
     const gifList = gifMenu(ctx); // 与 story 菜单和在一起
 
-    const content = formatAllMenu(name, storyList.concat(gifList), seniorList, seriesMap);
+    const content = formatAllMenu(name, storyList.concat(gifList), seriesMap);
     send(key, toid, content, 'MD');
 
     return;
@@ -82,7 +77,7 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
       content = formatHelp(ctx);
     } else if (command === 'image') {
       // 当前每次 600ms 左右，根据实际情况，考虑是否优化为每天生成一次固定菜单。
-      const imageList = imageMenu(ctx);
+      const imageList = normalMenu(ctx); // 已调整成 normalMenu
       const options = formatImageMenu(name);
 
       const base64 = makeMenu(imageList, options);
@@ -108,20 +103,6 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
   if (singleList.length) {
     const {type, sid, sname, tid} = singleList[0];
     let param = params.length ? params[0] : '';
-
-    if (type === FEATURE_TYPE.COMMAND) {
-      const commands = getDataListByColumn(command, 'feature', SERIES_TABLE, ctx);
-      const commandList = commands.map(item => item.title);
-      if (param && commandList.includes(param)) {
-        const commandData = getDataByColumn(param, 'title', SERIES_TABLE, ctx);
-        const base64 = make(text, commandData);
-        send(key, toid, base64);
-        return;
-      }
-      const composeContent = formatSeriesMenu(name, commandList, command);
-      send(key, toid, composeContent, 'MD');
-      return;
-    }
 
     const imageData = getDataByColumn(sid, 'mid', sname, ctx);
     if (!imageData.image) {

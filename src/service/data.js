@@ -5,7 +5,6 @@ import {writeImg} from '../convert/write.js';
 import {
   STORY_TABLE,
   TEXT_TABLE,
-  GIF_TABLE,
   IMAGE_TABLE,
   ADDITIONAL_TABLE,
   STORY_TYPE,
@@ -26,7 +25,7 @@ import {
 import {emptySucess, sucess, error} from './ajax.js';
 import {getBase64Img} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
-import {group, sortBykey, filterKeys} from '../utils/utils.js';
+import {group} from '../utils/utils.js';
 import {
   CREATE_STORY_FAIL,
   CREATE_TEXT_FAIL,
@@ -37,52 +36,23 @@ import {
   UPDATE_IMAGE_FAIL,
   UPDATE_ADDITIONAL_FAIL,
   UPDATE_NAME_FAIL,
-  CREATE_REPEAT_TITLE
+  CREATE_REPEAT_NAME
 } from '../config/constant.js';
 
 const normalMenu = ctx => {
-  const list = getTable(STORY_TABLE, false, ctx);
-  return list.filter(item => item.senior === 0 || item.senior === 2).map(item => item.title);
-};
-
-const seniorMenu = ctx => {
-  const list = getTable(FEATURE_TABLE, ctx);
-  return list.filter(item => item.type !== FEATURE_TYPE.COMMAND).map(item => item.feature);
-};
-
-const seriesMenu = ctx => {
-  const list = getTable(SERIES_TABLE, false, ctx);
-  const map = new Map();
-  if (list.length) {
-    list.forEach(({title, feature}) => {
-      let value = [title];
-      if (map.has(feature)) {
-        value = [...map.get(feature), ...value];
-      }
-      map.set(feature, value);
-    });
-  }
-  return map;
-};
-
-const imageMenu = ctx => {
-  const list = getTable(STORY_TABLE, false, ctx);
-  const [normal, senior] = group(list, story => story.senior === 0 || story.senior === 2);
-
-  const series = getTable(SERIES_TABLE, false, ctx);
-  series.forEach(item => item.title = `${item.feature} ${item.title}`);
-  sortBykey(series, 'title');
-
+  const list = getTable(STORY_TABLE, ctx).map(({mid, name, md5, type}) => ({mid, name, md5, type}));
+  const textList = getNamedColumnFromTable(TEXT_TABLE, ['mid'], ctx);
+  const countMap = arrayToCountObject(textList);
+  const [normal, senior] = group(list, item => countMap[item.mid] === 1);
   return {
-    normal: filterKeys(normal),
-    senior: filterKeys(senior),
-    series: filterKeys(series)
+    normal,
+    senior
   };
 };
 
 const gifMenu = ctx => {
-  const list = getTable(GIF_TABLE, false, ctx);
-  return list.map(item => item.title);
+  const list = getDataByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
+  return list.map(item => item.name);
 };
 
 // 此接口已可以正常工作，新建接口完毕 ✅
@@ -237,12 +207,12 @@ const updateStoryName = (options, ctx) => {
 };
 
 // 待优化，为【上号】类的需求，提供物理文件的信息
-const getBase64 = (type, title, ctx) => {
+const getBase64 = (type, name, ctx) => {
   let imageBase64 = '';
   // const filePath = getRandomPath();
   // imageBase64 = convert(filePath);
 
-  // const filePath = testFile(type.toLowerCase(), title);
+  // const filePath = testFile(type.toLowerCase(), name);
   // if (filePath) {
   //   imageBase64 = convert(filePath);
   // }
@@ -255,7 +225,7 @@ const checkRepeat = (name, ctx) => {
   const story = getDataByColumn(name, 'name', STORY_TABLE, ctx);
 
   if (story.mid) {
-    return error({ name }, CREATE_REPEAT_TITLE);
+    return error({ name }, CREATE_REPEAT_NAME);
   }
   return false;
 };
@@ -264,7 +234,7 @@ const checkRepeat = (name, ctx) => {
 const getLatestMid = (time, ctx) => {
   const result = [];
 
-  const storyList = getTable(STORY_TABLE, false, ctx);
+  const storyList = getTable(STORY_TABLE, ctx);
   storyList.forEach(({mid, name}) => {
     if (mid.replace('meme_', '') >= time) {
       result.push(name);
@@ -276,15 +246,12 @@ const getLatestMid = (time, ctx) => {
 
 export {
   normalMenu,
-  seniorMenu,
-  seriesMenu,
-  imageMenu,
+  gifMenu,
   getCatalog,
   open,
   create,
   update,
   updateStoryName,
   getBase64,
-  gifMenu,
   getLatestMid
 };
