@@ -1,3 +1,4 @@
+import { getDB, writeDB } from './manager.js';
 import {
   STORY_TABLE,
   GIF_TABLE,
@@ -7,9 +8,7 @@ import {
   LOG_TABLE,
   STORY_TYPE,
   IMAGE_TYPE,
-  getDB,
-  writeDB
-} from './index.js';
+} from './constant.js';
 
 let currentDB = '';
 
@@ -17,9 +16,7 @@ const setLocalDB = path => {
   currentDB = path || 'meme';
 };
 
-const getLocalDB = () => {
-  return getDB(currentDB);
-};
+const getLocalDB = () => getDB(currentDB);
 
 const resetDB = () => {
   const nameList = [
