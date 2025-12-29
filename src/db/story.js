@@ -1,5 +1,5 @@
 import { run } from './query.js';
-import { STORY_TABLE } from './schema.js';
+import { STORY_TABLE } from './constant.js';
 
 const insertStoryTable = (options, ctx) => {
   const { mid, name, md5, type, feature = '' } = options;

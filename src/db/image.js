@@ -1,5 +1,5 @@
 import { run } from './query.js';
-import { IMAGE_TABLE, IMAGE_TYPE } from './schema.js';
+import { IMAGE_TABLE, IMAGE_TYPE } from './constant.js';
 
 const insertImageTable = (options, ctx) => {
   const {

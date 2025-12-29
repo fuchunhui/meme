@@ -1,5 +1,5 @@
 import { run } from './query.js';
-import { LOG_TABLE } from './schema.js';
+import { LOG_TABLE } from './constant.js';
 
 const insertLog = ({ fromid, text, date, ctx }) => {
   const sql = `INSERT INTO ${LOG_TABLE} (fromid, text, date) VALUES (:fromid, :text, :date);`;

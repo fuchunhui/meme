@@ -11,7 +11,7 @@ const formatMenu = (data, title = '常用菜单') => {
   return menu;
 };
 
-const formatMultiMenu = (data, length) => {
+const formatMultiLineMenu = (data, length) => {
   const source = data.sort().map(item => `• ${item} `);
   const list = splitArray(source, length);
   const menu = [];
@@ -19,12 +19,6 @@ const formatMultiMenu = (data, length) => {
     menu.push(item.join(''));
   });
   return menu.join('\n');
-};
-
-const formatSeriesMenu = (name, data, command) => {
-  const title = `固定参数参考：\`@${name} ${command} ${data[0]} 打工人\``;
-  const menu = formatMenu(data, command);
-  return `${title}\n${menu}`;
 };
 
 const warns = [
@@ -93,31 +87,19 @@ const formatHelp = ctx => {
   return list.join('\n');
 };
 
-const formatAllMenu = (name, storyList, seniorList, seriesMap) => {
-  const normal = formatMultiMenu(storyList, COMMAND_LENGTH);
-  const senior = formatMultiMenu(seniorList, COMMAND_LENGTH);
-
-  const seriesList = [];
-  seriesMap.forEach((value, key) => {
-    seriesList.push(`${key}(${value.join('/')})`);
-  });
-  const series = seriesList.map(item => `- ${item}`).join('\n');
+const formatAllMenu = (name, normal, senior) => {
+  const storyList = formatMultiLineMenu(normal, COMMAND_LENGTH);
+  const seniorList = formatMultiLineMenu(senior, COMMAND_LENGTH);
 
   let content = [
     '#### 常用菜单：',
     `常规用法：\`@${name} 加油 打工人\``,
-    normal
+    storyList
   ];
-  if (senior.length) {
+  if (seniorList.length) {
     content = content.concat([
       `高级用法：\`@${name} 上号 vscode 打工人\``,
-      senior,
-    ]);
-  }
-  if (series.length) {
-    content = content.concat([
-      `固定参数用法：\`@${name} 周报 张飞 打工人\``,
-      series
+      seniorList,
     ]);
   }
 
@@ -128,8 +110,7 @@ const formatImageMenu = name => {
   return {
     title: '', // 为空，则不绘制标题
     normal: `常规用法举例：@${name} 加油 打工人`,
-    senior: `高级用法举例：@${name} 上号 vscode 打工人`,
-    series: `参数用法举例：@${name} 周报 张飞 打工人`
+    senior: `高级用法举例：@${name} 上号 vscode 打工人`
   };
 };
 
@@ -176,8 +157,6 @@ const formatGuide = name => {
 
 export {
   formatMenu,
-  formatMultiMenu,
-  formatSeriesMenu,
   formatAllMenu,
   formatImageMenu,
   formatNull,

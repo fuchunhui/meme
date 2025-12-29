@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import path from 'path';
 
 const __dirname = path.resolve();
@@ -31,6 +31,9 @@ const getBase64Img = (type, md5) => {
   return `data:image/${ext};base64,${base64Image}`;
 };
 
+const removeImg = path => {
+  fs.rmSync(path);
+};
 
 
 // 暂时没用，原来用于测试生成效果的函数
@@ -42,10 +45,6 @@ const writeTempImg = (base64Img, fileName = named(), targetDir = 'output') => {
   const base64Image = parts.pop();
   const type = parts.pop().split('/').pop();
   fs.writeFileSync(`${targetDir}/${fileName}.${type}`, base64Image, {encoding: 'base64'});
-};
-
-const removeImg = path => {
-  fs.rmSync(path);
 };
 
 const testFile = (ipath = 'svg', name = '', targetDir = 'lib') => {
@@ -76,10 +75,10 @@ const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
 export {
   writeImg,
   getBase64Img,
+  removeImg,
 
 
   named,
-  removeImg,
   testFile,
   getFileName,
   tempFile

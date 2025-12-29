@@ -7,8 +7,13 @@ import {
   TEXT_TABLE,
   IMAGE_TABLE,
   ADDITIONAL_TABLE,
+  // GIF_TABLE,
+  // LOG_TABLE,
   STORY_TYPE,
   IMAGE_TYPE,
+} from '../db/constant.js';
+
+import {
   insertStoryTable,
   insertTextTable,
   insertGifTable,
@@ -23,6 +28,7 @@ import {
   getDataListByColumn,
   getNamedColumnFromTable
 } from '../db/index.js';
+
 import {emptySucess, sucess, error} from './ajax.js';
 import {getBase64Img} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
@@ -40,6 +46,7 @@ import {
   CREATE_REPEAT_NAME
 } from '../config/constant.js';
 
+// 常规菜单，基础表情和高级表情
 const normalMenu = ctx => {
   const list = getTable(STORY_TABLE, ctx).map(({mid, name, md5, type}) => ({mid, name, md5, type}));
   const textList = getNamedColumnFromTable(TEXT_TABLE, ['mid'], ctx).map(item => item.mid);
@@ -54,6 +61,22 @@ const normalMenu = ctx => {
 const gifMenu = ctx => {
   const list = getDataListByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
   return list.map(item => item.name);
+};
+
+const normalImageMenu = ctx => {
+  const {normal, senior} = normalMenu(ctx);
+  const normalList = normal.map(({name, md5, type}) => {
+    const image = getBase64Img(type, md5);
+    return {name, image};
+  });
+  const seniorList = senior.map(({name, md5, type}) => {
+    const image = getBase64Img(type, md5);
+    return {name, image};
+  });
+  return {
+    normal: normalList,
+    senior: seniorList
+  };
 };
 
 const getCatalog = ctx => {
@@ -115,23 +138,7 @@ const create = (options, ctx) => {
 
   writeImg(md5, image);
 
-  const textData = { // 初始化 text 表
-    mid,
-    x: 0,
-    y: 0,
-    max: 100,
-    size: 32,
-    font: 'sans-serif',
-    color: '#000000',
-    stroke: 'transparent',
-    swidth: 1,
-    align: 'start',
-    direction: 'down',
-    blur: 0,
-    degree: 0,
-    senior: 1
-  };
-  const textResult = insertTextTable(textData, ctx);
+  const textResult = insertTextTable({ mid }, ctx);
   if (textResult) {
     return error(textResult, CREATE_TEXT_FAIL);
   }
@@ -145,24 +152,12 @@ const create = (options, ctx) => {
       return error(gifResult, CREATE_GIF_FAIL);
     }
   } else if (type === STORY_TYPE.IMAGE) { // 初始化 IMAGE 表
-    const imageData = {
-      mid,
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-      ipath: IMAGE_TYPE.SVG // 默认使用 SVG
-    };
-    const imageResult = insertImageTable(imageData, ctx);
+    const imageResult = insertImageTable({ mid }, ctx);
     if (imageResult) {
       return error(imageResult, CREATE_IMAGE_FAIL);
     }
   } else if (type === STORY_TYPE.ADDITIONAL) { // 初始化 ADDITIONAL 表
-    const additionalData = {
-      mid,
-      text: ''
-    };
-    const data = insertAdditionalTable(additionalData, ctx);
+    const data = insertAdditionalTable({ mid }, ctx);
     if (data) {
       return error(data, CREATE_ADDITIONAL_FAIL);
     }
@@ -216,6 +211,17 @@ const getBase64 = (type, name, ctx) => {
   return imageBase64;
 };
 
+const getOptions = (mid, type, md5, ctx) => {
+  const image = getBase64Img(type, md5);
+  const children = getDataListByColumn(mid, 'mid', TEXT_TABLE, ctx);
+
+  return {
+    mid,
+    image,
+    children
+  };
+}
+
 const checkRepeat = (name, ctx) => {
   const story = getDataByColumn(name, 'name', STORY_TABLE, ctx);
 
@@ -241,11 +247,13 @@ const getLatestMid = (time, ctx) => {
 export {
   normalMenu,
   gifMenu,
+  normalImageMenu,
   getCatalog,
   open,
   create,
   update,
   updateStoryName,
+  getOptions,
   getBase64,
   getLatestMid
 };

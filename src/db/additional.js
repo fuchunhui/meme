@@ -1,5 +1,5 @@
 import { run } from './query.js';
-import { ADDITIONAL_TABLE } from './schema.js';
+import { ADDITIONAL_TABLE } from './constant.js';
 
 const insertAdditionalTable = (options, ctx) => {
   const { mid, text = '' } = options;

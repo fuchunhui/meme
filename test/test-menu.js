@@ -5,7 +5,8 @@
  */
 
 import { normalMenu, gifMenu, getCatalog } from '../src/service/data.js';
-import { getTable, STORY_TABLE, TEXT_TABLE } from '../src/db/index.js';
+import { getTable } from '../src/db/index.js';
+import { STORY_TABLE, TEXT_TABLE } from '../src/db/constant.js';
 
 // 测试上下文
 const ctx = { path: 'meme' };

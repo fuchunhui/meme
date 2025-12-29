@@ -1,5 +1,5 @@
 import { run } from './query.js';
-import { TEXT_TABLE } from './schema.js';
+import { TEXT_TABLE } from './constant.js';
 
 const insertTextTable = (options, ctx) => {
   const {
@@ -9,7 +9,7 @@ const insertTextTable = (options, ctx) => {
     max = 100,
     size = 32,
     font = 'sans-serif',
-    color = 'black',
+    color = '#000000',
     stroke = 'transparent',
     swidth = 1,
     align = 'start',

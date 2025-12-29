@@ -5,8 +5,6 @@ import {
   ADDITIONAL_TABLE,
   TEXT_TABLE,
   LOG_TABLE,
-  STORY_TYPE,
-  IMAGE_TYPE,
 } from './constant.js';
 
 const TABLES = Object.freeze({
@@ -41,15 +39,6 @@ const assertSafeColumnList = columns => {
 };
 
 export {
-  TABLES,
-  STORY_TABLE,
-  GIF_TABLE,
-  IMAGE_TABLE,
-  ADDITIONAL_TABLE,
-  TEXT_TABLE,
-  LOG_TABLE,
-  STORY_TYPE,
-  IMAGE_TYPE,
   isSafeIdentifier,
   assertSafeIdentifier,
   assertSafeTableName,

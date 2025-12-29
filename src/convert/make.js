@@ -57,9 +57,9 @@ const make = (text, options, extensions) => {
   return base64;
 };
 
-const makeMenu = (images, options) => {
-  const {normal: inor, senior: isen, series: iser} = images;
-  const {normal, senior, series, title} = options;
+const makeImageMenu = (images, options) => {
+  const {normal: inor, senior: isen} = images;
+  const {normal, senior, title} = options;
   const data = [
     {
       title: normal,
@@ -70,12 +70,6 @@ const makeMenu = (images, options) => {
     data.push({
       title: senior,
       children: isen
-    });
-  }
-  if (iser.length) {
-    data.push({
-      title: series,
-      children: iser
     });
   }
 
@@ -141,5 +135,5 @@ const makeMenu = (images, options) => {
 
 export {
   make,
-  makeMenu
+  makeImageMenu
 };

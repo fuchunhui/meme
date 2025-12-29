@@ -1,5 +1,3 @@
-// Compatibility facade: keep the old public API, but implement via manager + dao + query layers.
-
 import { getDB, writeDB } from './manager.js';
 import {
   queryAllTables,

@@ -6,17 +6,20 @@ import {createContext} from './convert/context.js';
 import {
   getDataByColumn,
   getDataListByColumn,
-  getSpecialDataListByColumn,
   getColumnByTable,
-  insertLog,
+  insertLog
+} from './db/index.js';
+
+import {
   STORY_TABLE,
   TEXT_TABLE,
-  FEATURE_TABLE,
   ADDITIONAL_TABLE,
-  FEATURE_TYPE,
-  GIF_TABLE
-} from './db/index.js';
-import {make, makeMenu} from './convert/make.js';
+  GIF_TABLE,
+  STORY_TYPE, // FEATURE_TYPE
+  IMAGE_TYPE
+} from './db/constant.js';
+
+import {make, makeImageMenu} from './convert/make.js';
 import {getFontSize} from './convert/base.js';
 import {makeGif} from './convert/gif.js';
 import {
@@ -33,39 +36,19 @@ import {
 import {send} from './service/index.js';
 import {
   normalMenu,
-  seriesMenu,
-  getBase64,
+  normalImageMenu,
   gifMenu,
+  getOptions,
+  getBase64,
   getLatestMid
 } from './service/data.js';
 
 import {COMMAND_LIST} from './config/constant.js';
 
-export * from './service/router.js';
-
-const special = (command, key, toid, text, ctx) => {
-  const commands = getSpecialDataListByColumn(command, 'feature', ctx);
-  const specialCommand = commands.length > 0;
-
-  if (specialCommand) {
-    const index = Math.floor(Math.random() * commands.length);
-    const data = commands[index];
-    if (data.image) {
-      const base64 = make(text, data);
-      send(key, toid, base64);
-    }
-  }
-
-  return specialCommand;
-};
-
 const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
-  if (command === '') {
-    const storyList = normalMenu(ctx);
-    const seriesMap = seriesMenu(ctx);
-    const gifList = gifMenu(ctx); // 与 story 菜单和在一起
-
-    const content = formatAllMenu(name, storyList.concat(gifList), seriesMap);
+  if (command === '') { // 空命令，返回完整菜单
+    const {normal, senior} = normalMenu(ctx);
+    const content = formatAllMenu(name, normal, senior);
     send(key, toid, content, 'MD');
 
     return;
@@ -76,11 +59,9 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
     if (command === 'help') {
       content = formatHelp(ctx);
     } else if (command === 'image') {
-      // 当前每次 600ms 左右，根据实际情况，考虑是否优化为每天生成一次固定菜单。
-      const imageList = normalMenu(ctx); // 已调整成 normalMenu
+      const imageList = normalImageMenu(ctx);
       const options = formatImageMenu(name);
-
-      const base64 = makeMenu(imageList, options);
+      const base64 = makeImageMenu(imageList, options); // TODO 文件大小的检查，需要处理。
       send(key, toid, base64);
       return;
     } else if (command === 'special') { // 特殊节日、彩蛋命令
@@ -92,13 +73,48 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
       const commandList = getLatestMid(duration, ctx);
       content = formatNewsMenu(commandList);
     } else if (command === '*') {
-      console.log('随机操作已下线');
+      content = '随机指令已下线，请使用其他命令。';
     }
 
     send(key, toid, content, 'MD');
     return;
   }
 
+  // 从这里开始修改，根据 story 的类型，执行不同的动作 12.29
+
+  const data = getDataByColumn(command, 'name', STORY_TABLE, ctx);
+  console.info('story data: ', data);
+
+  if (!data.md5) { // 未找到对应的表情包，返回提示信息
+    let content = '';
+    let messagesType = 'TEXT';
+    const percent = Math.floor(Math.random() * 100);
+    if (percent < 20) {
+      content = formatOther();
+    } else if (percent < 60) {
+      content = formatGuide(name);
+      messagesType = 'MD';
+    } else {
+      content = formatNull();
+    }
+
+    send(key, toid, content, messagesType);
+  }
+
+  if (data.type === STORY_TYPE.TEXT) {
+    let content = text;
+    const base64 = make(content, data); // TODO data没有 image 内容，拼接进来处理
+    send(key, toid, base64);
+  } else if (data.type === STORY_TYPE.ADDITIONAL) {
+    const additional = getColumnByTable(data.mid, 'mid', ADDITIONAL_TABLE, ctx);
+    content += additional.text; // 补充的文本，后置处理
+
+  } else if (data.type === STORY_TYPE.IMAGE) {
+  } else if (data.type === STORY_TYPE.REPEAT) {
+  } else if (data.type === STORY_TYPE.GIF) {
+  }
+
+  // 下面的逻辑待优化 12.29
   const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE, ctx);
   if (singleList.length) {
     const {type, sid, sname, tid} = singleList[0];
@@ -185,10 +201,6 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
     }
   }
 
-  if (special(command, key, toid, text, ctx)) {
-    return;
-  }
-
   const gifList = getDataListByColumn(command, 'title', GIF_TABLE, ctx);
   if (gifList.length) {
     makeGif(text, gifList[0]).then(base64 => {
@@ -197,38 +209,12 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
     return;
   }
 
-  const data = getDataByColumn(command, 'title', STORY_TABLE, ctx);
-  if (data.image) {
-    let content = text;
-    if (data.senior === 2) {
-      const additional = getColumnByTable(data.mid, 'mid', ADDITIONAL_TABLE, ctx);
-      content += additional.text; // 补充的文本，后置处理
-    }
-
-    const base64 = make(content, data);
-    send(key, toid, base64);
-  } else {
-    let content = '';
-    let messagesType = 'TEXT';
-    const percent = Math.floor(Math.random() * 100);
-    if (percent < 20) {
-      content = formatOther();
-    } else if (percent < 60) {
-      content = formatGuide(name);
-      messagesType = 'MD';
-    } else {
-      content = formatNull();
-    }
-
-    send(key, toid, content, messagesType);
-
-    insertLog({
-      fromid,
-      text: command,
-      date: new Date(),
-      ctx
-    });
-  }
+  insertLog({ // 日志调整为每次都记录
+    fromid,
+    text: command,
+    date: new Date(),
+    ctx
+  });
 };
 
 const main = encryption => {

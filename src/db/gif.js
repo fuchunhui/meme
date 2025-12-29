@@ -1,5 +1,5 @@
 import { run } from './query.js';
-import { GIF_TABLE } from './schema.js';
+import { GIF_TABLE } from './constant.js';
 
 const insertGifTable = (options, ctx) => {
   const { mid, frame = '' } = options;
