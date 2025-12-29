@@ -6,32 +6,27 @@ import {writeImg} from '../convert/write.js';
 import {
   ELEMENT_TYPE,
   IMAGE_TYPE,
-  // Story 操作
+  ELEMENT_TABLE,
+  getDataListByColumn,
+  STORY_TYPE,
+  STORY_TABLE,
   createStory,
   getStoryByMid,
   getStoryByName,
   getAllStories,
   updateStory,
-  // Element 操作
   createElement,
   getElementsByStoryId,
   getElementsByStoryIdAndType,
-  // Text 元素操作
   createText,
   getTextByEid,
   updateText,
   getTextsByEids,
-  // Image 元素操作
   createImage,
   getImageByEid,
   updateImage,
-  // Gif 元素操作
   createGif,
   updateGif,
-  // Additional 元素操作
-  createAdditional,
-  getAdditionalByEid,
-  updateAdditional,
 } from '../db/index.js';
 
 import {emptySucess, sucess, error} from './ajax.js';
@@ -43,26 +38,21 @@ import {
   CREATE_TEXT_FAIL,
   CREATE_GIF_FAIL,
   CREATE_IMAGE_FAIL,
-  CREATE_ADDITIONAL_FAIL,
   UPDATE_TEXT_FAIL,
   UPDATE_IMAGE_FAIL,
-  UPDATE_ADDITIONAL_FAIL,
   UPDATE_NAME_FAIL,
   CREATE_REPEAT_NAME
 } from '../config/constant.js';
 
-// 常规菜单，基础表情和高级表情
 const normalMenu = ctx => {
   const storyList = getAllStories(ctx).map(({mid, name, md5}) => ({mid, name, md5}));
-  
-  // 统计每个 Story 包含的文本元素数量
+
   const countMap = {};
   storyList.forEach(story => {
-    const elements = getElementsByStoryIdAndType(story.mid, ELEMENT_TYPE.TEXT, ctx);
+    const elements = getElementsByStoryId(story.mid, ctx);
     countMap[story.mid] = elements.length;
   });
   
-  // 分组：单文本为 normal，多文本为 senior
   const [normal, senior] = group(storyList, item => countMap[item.mid] === 1);
   return {
     normal,
@@ -71,22 +61,19 @@ const normalMenu = ctx => {
 };
 
 const gifMenu = ctx => {
-  const allStories = getAllStories(ctx);
-  const gifStories = allStories.filter(story => {
-    const elements = getElementsByStoryId(story.mid, ctx);
-    return elements.some(el => el.type === ELEMENT_TYPE.GIF);
-  });
-  return gifStories.map(item => item.name);
+  // 查询 Story 表中 type = GIF 的条目，避免扫描所有元素
+  const gifStories = getDataListByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
+  return (gifStories || []).map(s => s.name);
 };
 
 const normalImageMenu = ctx => {
   const {normal, senior} = normalMenu(ctx);
   const normalList = normal.map(({name, md5}) => {
-    const image = getBase64Img('TEXT', md5);
+    const image = getBase64Img(IMAGE_TYPE.TEXT, md5);
     return {name, image};
   });
   const seniorList = senior.map(({name, md5}) => {
-    const image = getBase64Img('TEXT', md5);
+    const image = getBase64Img(IMAGE_TYPE.TEXT, md5);
     return {name, image};
   });
   return {
@@ -101,7 +88,7 @@ const getCatalog = ctx => {
 
   return list.map(({mid, name}) => {
     const elements = getElementsByStoryId(mid, ctx);
-    const type = elements.length > 0 ? elements[0].type : 'TEXT';
+    const type = elements.length > 0 ? elements[0].type : IMAGE_TYPE.TEXT;
     return {mid, name, type};
   });
 };
@@ -119,28 +106,22 @@ const open = (mid, ctx) => {
   const children = getTextsByEids(textEids, ctx);
   
   // 判断主要类型和获取额外信息
-  let type = 'TEXT';
+  let type = IMAGE_TYPE.TEXT;
   let more = '';
   
   const imageElements = elements.filter(el => el.type === ELEMENT_TYPE.IMAGE);
-  const gifElements = elements.filter(el => el.type === ELEMENT_TYPE.GIF);
-  const additionalElements = elements.filter(el => el.type === ELEMENT_TYPE.ADDITIONAL);
-  
+  const isGifStory = story.type === STORY_TYPE.GIF;
+  // const additionalElements = elements.filter(el => el.type === ELEMENT_TYPE.ADDITIONAL);
+
   if (imageElements.length > 0) {
-    type = 'IMAGE';
+    type = IMAGE_TYPE.IMAGE;
     const imageData = getImageByEid(imageElements[0].eid, ctx);
     if (imageData) {
       const {x, y, width, height, ipath} = imageData;
       more = {x, y, width, height, ipath};
     }
-  } else if (gifElements.length > 0) {
-    type = 'GIF';
-  } else if (additionalElements.length > 0) {
-    type = 'ADDITIONAL';
-    const additionalData = getAdditionalByEid(additionalElements[0].eid, ctx);
-    if (additionalData) {
-      more = {text: additionalData.text};
-    }
+  } else if (isGifStory) {
+    type = IMAGE_TYPE.GIF;
   }
   
   const image = getBase64Img(type, md5);
@@ -166,7 +147,8 @@ const create = (options, ctx) => {
   const md5 = crypto.createHash('md5').update(name).digest('hex');
 
   try {
-    createStory(mid, name, md5, '', ctx);
+    const storyType = type === IMAGE_TYPE.GIF ? STORY_TYPE.GIF : STORY_TYPE.TEXT;
+    createStory(mid, name, md5, '', storyType, ctx);
     writeImg(md5, image);
 
     // 创建默认文本元素
@@ -175,18 +157,15 @@ const create = (options, ctx) => {
     createText(textEid, {}, ctx);
 
     // 根据类型创建相应的元素
-    if (type === 'GIF') {
+    if (type === IMAGE_TYPE.GIF) {
       const gifEid = `${mid}_gif_0`;
-      createElement(gifEid, mid, ELEMENT_TYPE.GIF, -1, true, ctx);
+      // GIF is represented at story level; create an IMAGE element as the container
+      createElement(gifEid, mid, ELEMENT_TYPE.IMAGE, -1, true, ctx);
       createGif(gifEid, { frame: 'NORMAL' }, ctx);
-    } else if (type === 'IMAGE') {
+    } else if (type === IMAGE_TYPE.IMAGE) {
       const imageEid = `${mid}_image_0`;
       createElement(imageEid, mid, ELEMENT_TYPE.IMAGE, -1, true, ctx);
       createImage(imageEid, {}, ctx);
-    } else if (type === 'ADDITIONAL') {
-      const additionalEid = `${mid}_additional_0`;
-      createElement(additionalEid, mid, ELEMENT_TYPE.ADDITIONAL, -1, true, ctx);
-      createAdditional(additionalEid, {}, ctx);
     }
 
     return sucess({ mid });
@@ -208,16 +187,16 @@ const update = (params, ctx) => {
     }
     
     // 根据类型更新相应元素
-    if (type === 'IMAGE' && more) {
+    if (type === IMAGE_TYPE.IMAGE && more) {
       const imageElements = elements.filter(el => el.type === ELEMENT_TYPE.IMAGE);
       if (imageElements.length > 0) {
         updateImage(imageElements[0].eid, more, ctx);
       }
-    } else if (type === 'ADDITIONAL' && more) {
-      const additionalElements = elements.filter(el => el.type === ELEMENT_TYPE.ADDITIONAL);
-      if (additionalElements.length > 0) {
-        updateAdditional(additionalElements[0].eid, more, ctx);
-      }
+    // } else if (type === 'ADDITIONAL' && more) {
+    //   const additionalElements = elements.filter(el => el.type === ELEMENT_TYPE.ADDITIONAL);
+    //   if (additionalElements.length > 0) {
+    //     updateAdditional(additionalElements[0].eid, more, ctx);
+    //   }
     }
     
     return emptySucess();

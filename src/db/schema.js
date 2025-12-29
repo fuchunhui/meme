@@ -1,17 +1,17 @@
 import {
   STORY_TABLE,
+  ELEMENT_TABLE,
   GIF_TABLE,
   IMAGE_TABLE,
-  ADDITIONAL_TABLE,
   TEXT_TABLE,
   LOG_TABLE,
 } from './constant.js';
 
 const TABLES = Object.freeze({
   STORY_TABLE,
+  ELEMENT_TABLE,
   GIF_TABLE,
   IMAGE_TABLE,
-  ADDITIONAL_TABLE,
   TEXT_TABLE,
   LOG_TABLE,
 });

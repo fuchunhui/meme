@@ -62,7 +62,11 @@ const getDataListByColumn = (value, column, tableName, ctx) => {
 
 const getNamedColumnFromTable = (tableName, columns = [], ctx) => {
   assertSafeTableName(tableName);
-  const columnSQL = columns?.length ? (columns.forEach(c => assertSafeIdentifier(c, 'column')), columns.join(', ')) : '*';
+  let columnSQL = '*';
+  if (Array.isArray(columns) && columns.length) {
+    columns.forEach(c => assertSafeIdentifier(c, 'column'));
+    columnSQL = columns.join(', ');
+  }
   return all(`SELECT ${columnSQL} FROM ${tableName};`, {}, ctx);
 };
 

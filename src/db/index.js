@@ -6,7 +6,6 @@ export * from './core/element.js';
 export * from './elements/text.js';
 export * from './elements/image.js';
 export * from './elements/gif.js';
-export * from './elements/additional.js';
 
 // ============ 基础模块 ============
 export { getDB, writeDB } from './manager.js';
@@ -26,8 +25,8 @@ export {
   TEXT_TABLE,
   IMAGE_TABLE,
   GIF_TABLE,
-  ADDITIONAL_TABLE,
   LOG_TABLE,
   ELEMENT_TYPE,
   IMAGE_TYPE,
+  STORY_TYPE,
 } from './constant.js';

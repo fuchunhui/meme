@@ -1,19 +1,19 @@
-import { getDB } from '../manager.js';
+import { run, get, all } from '../query.js';
 import { ELEMENT_TABLE } from '../constant.js';
 
 /**
  * 创建一个新的 Element（元素）
  * @param {String} eid - Element 唯一标识
  * @param {String} storyId - 关联的 Story ID
- * @param {String} type - 元素类型（TEXT, IMAGE, GIF 等）
+ * @param {String} type - 元素类型（TEXT, IMAGE）
  * @param {Number} layer - 图层顺序
  * @param {Boolean} visible - 是否可见
  * @param {String} ctx - 数据库上下文
  */
 const createElement = (eid, storyId, type, layer = 0, visible = true, ctx) => {
   const sql = `INSERT INTO ${ELEMENT_TABLE} (eid, story_id, type, layer, visible)
-    VALUES (?, ?, ?, ?, ?);`;
-  getDB(ctx).run(sql, [eid, storyId, type, layer, visible ? 1 : 0]);
+    VALUES (:eid, :story_id, :type, :layer, :visible);`;
+  run(sql, { ':eid': eid, ':story_id': storyId, ':type': type, ':layer': layer, ':visible': visible ? 1 : 0 }, ctx);
 };
 
 /**
@@ -23,8 +23,8 @@ const createElement = (eid, storyId, type, layer = 0, visible = true, ctx) => {
  * @returns {Object} Element 对象
  */
 const getElementByEid = (eid, ctx) => {
-  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE eid = ?;`;
-  return getDB(ctx).get(sql, [eid]);
+  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE eid = :eid;`;
+  return get(sql, { ':eid': eid }, ctx);
 };
 
 /**
@@ -34,8 +34,8 @@ const getElementByEid = (eid, ctx) => {
  * @returns {Array} Element 列表，按 layer 排序
  */
 const getElementsByStoryId = (storyId, ctx) => {
-  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE story_id = ? ORDER BY layer ASC;`;
-  return getDB(ctx).all(sql, [storyId]);
+  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE story_id = :storyId ORDER BY layer ASC;`;
+  return all(sql, { ':storyId': storyId }, ctx);
 };
 
 /**
@@ -46,8 +46,8 @@ const getElementsByStoryId = (storyId, ctx) => {
  * @returns {Array} Element 列表
  */
 const getElementsByStoryIdAndType = (storyId, type, ctx) => {
-  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE story_id = ? AND type = ? ORDER BY layer ASC;`;
-  return getDB(ctx).all(sql, [storyId, type]);
+  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE story_id = :storyId AND type = :type ORDER BY layer ASC;`;
+  return all(sql, { ':storyId': storyId, ':type': type }, ctx);
 };
 
 /**
@@ -77,8 +77,14 @@ const updateElement = (eid, data, ctx) => {
   
   values.push(eid);
   
-  const sql = `UPDATE ${ELEMENT_TABLE} SET ${fields.join(', ')} WHERE eid = ?;`;
-  getDB(ctx).run(sql, values);
+  const sql = `UPDATE ${ELEMENT_TABLE} SET ${fields.join(', ')} WHERE eid = :eid;`;
+  const params = {};
+  const keys = fields.map(f => f.split(' = ')[0]);
+  for (let i = 0; i < values.length - 1; i++) {
+    params[`:${keys[i].trim()}`] = values[i];
+  }
+  params[':eid'] = values[values.length - 1];
+  run(sql, params, ctx);
 };
 
 /**
@@ -87,8 +93,8 @@ const updateElement = (eid, data, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const deleteElement = (eid, ctx) => {
-  const sql = `DELETE FROM ${ELEMENT_TABLE} WHERE eid = ?;`;
-  getDB(ctx).run(sql, [eid]);
+  const sql = `DELETE FROM ${ELEMENT_TABLE} WHERE eid = :eid;`;
+  run(sql, { ':eid': eid }, ctx);
 };
 
 /**
@@ -97,8 +103,8 @@ const deleteElement = (eid, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const deleteElementsByStoryId = (storyId, ctx) => {
-  const sql = `DELETE FROM ${ELEMENT_TABLE} WHERE story_id = ?;`;
-  getDB(ctx).run(sql, [storyId]);
+  const sql = `DELETE FROM ${ELEMENT_TABLE} WHERE story_id = :storyId;`;
+  run(sql, { ':storyId': storyId }, ctx);
 };
 
 /**
@@ -108,8 +114,8 @@ const deleteElementsByStoryId = (storyId, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const reorderElement = (eid, newLayer, ctx) => {
-  const sql = `UPDATE ${ELEMENT_TABLE} SET layer = ? WHERE eid = ?;`;
-  getDB(ctx).run(sql, [newLayer, eid]);
+  const sql = `UPDATE ${ELEMENT_TABLE} SET layer = :layer WHERE eid = :eid;`;
+  run(sql, { ':layer': newLayer, ':eid': eid }, ctx);
 };
 
 export {

@@ -1,4 +1,4 @@
-import { getDB } from '../manager.js';
+import { run, get, all } from '../query.js';
 import { GIF_TABLE } from '../constant.js';
 
 /**
@@ -13,9 +13,9 @@ const createGif = (eid, options, ctx) => {
   } = options;
 
   const sql = `INSERT INTO ${GIF_TABLE} (eid, frame)
-    VALUES (?, ?);`;
+    VALUES (:eid, :frame);`;
 
-  getDB(ctx).run(sql, [eid, frame]);
+  run(sql, { ':eid': eid, ':frame': frame }, ctx);
 };
 
 /**
@@ -25,8 +25,8 @@ const createGif = (eid, options, ctx) => {
  * @returns {Object} 动图配置对象
  */
 const getGifByEid = (eid, ctx) => {
-  const sql = `SELECT * FROM ${GIF_TABLE} WHERE eid = ?;`;
-  return getDB(ctx).get(sql, [eid]);
+  const sql = `SELECT * FROM ${GIF_TABLE} WHERE eid = :eid;`;
+  return get(sql, { ':eid': eid }, ctx);
 };
 
 /**
@@ -48,8 +48,14 @@ const updateGif = (eid, options, ctx) => {
 
   values.push(eid);
 
-  const sql = `UPDATE ${GIF_TABLE} SET ${fields.join(', ')} WHERE eid = ?;`;
-  getDB(ctx).run(sql, values);
+  const sql = `UPDATE ${GIF_TABLE} SET ${fields.join(', ')} WHERE eid = :eid;`;
+  const params = {};
+  const keys = fields.map(f => f.split(' = ')[0]);
+  for (let i = 0; i < values.length - 1; i++) {
+    params[`:${keys[i].trim()}`] = values[i];
+  }
+  params[':eid'] = values[values.length - 1];
+  run(sql, params, ctx);
 };
 
 /**
@@ -58,8 +64,8 @@ const updateGif = (eid, options, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const deleteGif = (eid, ctx) => {
-  const sql = `DELETE FROM ${GIF_TABLE} WHERE eid = ?;`;
-  getDB(ctx).run(sql, [eid]);
+  const sql = `DELETE FROM ${GIF_TABLE} WHERE eid = :eid;`;
+  run(sql, { ':eid': eid }, ctx);
 };
 
 /**
@@ -73,7 +79,7 @@ const getGifsByEids = (eids, ctx) => {
   
   const placeholders = eids.map(() => '?').join(',');
   const sql = `SELECT * FROM ${GIF_TABLE} WHERE eid IN (${placeholders});`;
-  return getDB(ctx).all(sql, eids);
+  return all(sql, eids, ctx);
 };
 
 export {

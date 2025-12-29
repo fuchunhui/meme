@@ -5,10 +5,10 @@ import {
   TEXT_TABLE,
   IMAGE_TABLE,
   GIF_TABLE,
-  ADDITIONAL_TABLE,
   LOG_TABLE,
   ELEMENT_TYPE,
   IMAGE_TYPE,
+  STORY_TYPE,
 } from './constant.js';
 
 let currentDB = '';
@@ -26,7 +26,6 @@ const resetDB = () => {
     TEXT_TABLE,
     IMAGE_TABLE,
     GIF_TABLE,
-    ADDITIONAL_TABLE,
     LOG_TABLE,
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
@@ -46,7 +45,6 @@ const initDB = path => {
   initText();
   initImage();
   initGif();
-  initAdditional();
   initLog();
 
   writeDB(currentDB);
@@ -70,6 +68,7 @@ const initStory = () => {
     name VARCHAR(50) COLLATE NOCASE,
     md5 CHAR(32) NOT NULL,
     feature VARCHAR(100) COLLATE NOCASE,
+    type VARCHAR(20) CHECK(type IN ('${STORY_TYPE.TEXT}', '${STORY_TYPE.GIF}')) NOT NULL DEFAULT 'TEXT',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
@@ -82,7 +81,7 @@ const initStory = () => {
  * 1. id: 主键，自增
  * 2. eid: 元素唯一标识
  * 3. story_id: 关联的 Story 表 mid
- * 4. type: 元素类型（TEXT, IMAGE, GIF, ADDITIONAL 等）
+ * 4. type: 元素类型（TEXT, IMAGE, GIF 等）
  * 5. layer: 图层顺序，数值越大越靠上
  * 6. visible: 是否可见
  */
@@ -91,8 +90,7 @@ const initElement = () => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     eid CHAR(20) NOT NULL UNIQUE,
     story_id CHAR(20) NOT NULL,
-    type VARCHAR(20) CHECK(type IN ('${ELEMENT_TYPE.TEXT}', '${ELEMENT_TYPE.IMAGE}', `
-      + `'${ELEMENT_TYPE.GIF}', '${ELEMENT_TYPE.ADDITIONAL}')) NOT NULL,
+    type VARCHAR(20) CHECK(type IN ('${ELEMENT_TYPE.TEXT}', '${ELEMENT_TYPE.IMAGE}')) NOT NULL,
     layer INT DEFAULT 0,
     visible BOOLEAN DEFAULT 1,
     FOREIGN KEY (story_id) REFERENCES ${STORY_TABLE}(mid)
@@ -158,20 +156,6 @@ const initGif = () => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     eid CHAR(20) NOT NULL UNIQUE,
     frame VARCHAR(32) NOT NULL DEFAULT 'NORMAL',
-    FOREIGN KEY (eid) REFERENCES ${ELEMENT_TABLE}(eid)
-  );`;
-  getLocalDB().run(sql);
-};
-
-/**
- * 初始化 Additional 表（附加信息元素配置）
- * @description 存储附加的文本信息，用于特殊场景
- */
-const initAdditional = () => {
-  const sql = `CREATE TABLE ${ADDITIONAL_TABLE} (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    eid CHAR(20) NOT NULL UNIQUE,
-    text VARCHAR(200) COLLATE NOCASE,
     FOREIGN KEY (eid) REFERENCES ${ELEMENT_TABLE}(eid)
   );`;
   getLocalDB().run(sql);

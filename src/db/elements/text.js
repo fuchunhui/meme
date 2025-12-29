@@ -1,4 +1,4 @@
-import { getDB } from '../manager.js';
+import { run, get, all } from '../query.js';
 import { TEXT_TABLE } from '../constant.js';
 
 /**
@@ -27,11 +27,25 @@ const createText = (eid, options, ctx) => {
 
   const sql = `INSERT INTO ${TEXT_TABLE}
     (eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree, senior)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    VALUES (:eid, :content, :x, :y, :max, :size, :font, :color, :stroke, :swidth, :align, :direction, :blur, :degree, :senior);`;
 
-  getDB(ctx).run(sql, [
-    eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree, senior
-  ]);
+  run(sql, {
+    ':eid': eid,
+    ':content': content,
+    ':x': x,
+    ':y': y,
+    ':max': max,
+    ':size': size,
+    ':font': font,
+    ':color': color,
+    ':stroke': stroke,
+    ':swidth': swidth,
+    ':align': align,
+    ':direction': direction,
+    ':blur': blur,
+    ':degree': degree,
+    ':senior': senior,
+  }, ctx);
 };
 
 /**
@@ -41,8 +55,8 @@ const createText = (eid, options, ctx) => {
  * @returns {Object} 文本配置对象
  */
 const getTextByEid = (eid, ctx) => {
-  const sql = `SELECT * FROM ${TEXT_TABLE} WHERE eid = ?;`;
-  return getDB(ctx).get(sql, [eid]);
+  const sql = `SELECT * FROM ${TEXT_TABLE} WHERE eid = :eid;`;
+  return get(sql, { ':eid': eid }, ctx);
 };
 
 /**
@@ -83,8 +97,14 @@ const updateText = (eid, options, ctx) => {
 
   values.push(eid);
 
-  const sql = `UPDATE ${TEXT_TABLE} SET ${fields.join(', ')} WHERE eid = ?;`;
-  getDB(ctx).run(sql, values);
+  const sql = `UPDATE ${TEXT_TABLE} SET ${fields.join(', ')} WHERE eid = :eid;`;
+  const params = {};
+  const keys = fields.map(f => f.split(' = ')[0]);
+  for (let i = 0; i < values.length - 1; i++) {
+    params[`:${keys[i].trim()}`] = values[i];
+  }
+  params[':eid'] = values[values.length - 1];
+  run(sql, params, ctx);
 };
 
 /**
@@ -93,8 +113,8 @@ const updateText = (eid, options, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const deleteText = (eid, ctx) => {
-  const sql = `DELETE FROM ${TEXT_TABLE} WHERE eid = ?;`;
-  getDB(ctx).run(sql, [eid]);
+  const sql = `DELETE FROM ${TEXT_TABLE} WHERE eid = :eid;`;
+  run(sql, { ':eid': eid }, ctx);
 };
 
 /**
@@ -108,7 +128,7 @@ const getTextsByEids = (eids, ctx) => {
   
   const placeholders = eids.map(() => '?').join(',');
   const sql = `SELECT * FROM ${TEXT_TABLE} WHERE eid IN (${placeholders});`;
-  return getDB(ctx).all(sql, eids);
+  return all(sql, eids, ctx);
 };
 
 export {
