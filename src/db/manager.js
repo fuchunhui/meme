@@ -49,8 +49,6 @@ const writeDB = (dbKey = 'meme') => {
 };
 
 export {
-  SQL,
-  DB_DIR,
   getDB,
   writeDB,
 };

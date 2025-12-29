@@ -43,11 +43,11 @@ app.post(/(.*)/, (req, res) => {
     return;
   }
 
-  const data = req.body;
-  if (!data) {
+  const encryption = req.body;
+  if (!encryption) {
     console.error('req.body 不见了');
   }
-  main(data);
+  main(encryption);
 });
 
 app.listen(process.env.PORT || 8080, () => {
