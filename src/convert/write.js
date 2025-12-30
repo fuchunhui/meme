@@ -50,14 +50,6 @@ const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
   return path.resolve(__dirname, targetDir, `${fileName}.${type}`);
 };
 
-// 随机获取某一类型的文件名，当前暂未使用
-const getFileName = (ext = 'svg', targetDir = 'lib') => {
-  const files = fs.readdirSync(path.resolve(__dirname, targetDir, ext));
-  const file = files[Math.floor(Math.random() * files.length)];
-  const ext = path.extname(file);
-  return file.slice(0, file.length - ext.length);
-};
-
 // 暂时没用，原来用于测试生成效果的函数
 const writeTempImg = (base64Img, fileName = named(), targetDir = 'output') => {
   if (!fs.existsSync(targetDir)) {
@@ -75,6 +67,5 @@ export {
   getNamedBase64Img,
   removeImg,
   named,
-  getFileName,
   tempFile
 };
