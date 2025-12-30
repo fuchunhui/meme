@@ -40,35 +40,33 @@ const getImageByEid = (eid, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const updateImage = (eid, options, ctx) => {
-  const fields = [];
-  const values = [];
+  const sets = [];
+  const params = { ':eid': eid };
 
-  const fieldMap = {
-    x: 'x',
-    y: 'y',
-    width: 'width',
-    height: 'height',
-    ipath: 'ipath',
-  };
-
-  Object.keys(fieldMap).forEach(key => {
-    if (options[key] !== undefined) {
-      fields.push(`${fieldMap[key]} = ?`);
-      values.push(options[key]);
-    }
-  });
-
-  if (fields.length === 0) return;
-
-  values.push(eid);
-
-  const sql = `UPDATE ${IMAGE_TABLE} SET ${fields.join(', ')} WHERE eid = :eid;`;
-  const params = {};
-  const keys = fields.map(f => f.split(' = ')[0]);
-  for (let i = 0; i < values.length - 1; i++) {
-    params[`:${keys[i].trim()}`] = values[i];
+  if (options.x !== undefined) {
+    sets.push('x = :x');
+    params[':x'] = options.x;
   }
-  params[':eid'] = values[values.length - 1];
+  if (options.y !== undefined) {
+    sets.push('y = :y');
+    params[':y'] = options.y;
+  }
+  if (options.width !== undefined) {
+    sets.push('width = :width');
+    params[':width'] = options.width;
+  }
+  if (options.height !== undefined) {
+    sets.push('height = :height');
+    params[':height'] = options.height;
+  }
+  if (options.ipath !== undefined) {
+    sets.push('ipath = :ipath');
+    params[':ipath'] = options.ipath;
+  }
+
+  if (sets.length === 0) return;
+
+  const sql = `UPDATE ${IMAGE_TABLE} SET ${sets.join(', ')} WHERE eid = :eid;`;
   run(sql, params, ctx);
 };
 

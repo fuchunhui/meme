@@ -154,9 +154,9 @@ const initImage = () => {
 const initGif = () => {
   const sql = `CREATE TABLE ${GIF_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    eid CHAR(20) NOT NULL UNIQUE,
+    mid CHAR(20) NOT NULL UNIQUE,
     frame VARCHAR(32) NOT NULL DEFAULT 'NORMAL',
-    FOREIGN KEY (eid) REFERENCES ${ELEMENT_TABLE}(eid)
+    FOREIGN KEY (mid) REFERENCES ${STORY_TABLE}(mid)
   );`;
   getLocalDB().run(sql);
 };

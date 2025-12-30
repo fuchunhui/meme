@@ -66,44 +66,27 @@ const getTextByEid = (eid, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const updateText = (eid, options, ctx) => {
-  const fields = [];
-  const values = [];
+  const sets = [];
+  const params = { ':eid': eid };
 
-  const fieldMap = {
-    content: 'content',
-    x: 'x',
-    y: 'y',
-    max: 'max',
-    size: 'size',
-    font: 'font',
-    color: 'color',
-    stroke: 'stroke',
-    swidth: 'swidth',
-    align: 'align',
-    direction: 'direction',
-    blur: 'blur',
-    degree: 'degree',
-    senior: 'senior',
-  };
+  if (options.content !== undefined) { sets.push('content = :content'); params[':content'] = options.content; }
+  if (options.x !== undefined) { sets.push('x = :x'); params[':x'] = options.x; }
+  if (options.y !== undefined) { sets.push('y = :y'); params[':y'] = options.y; }
+  if (options.max !== undefined) { sets.push('max = :max'); params[':max'] = options.max; }
+  if (options.size !== undefined) { sets.push('size = :size'); params[':size'] = options.size; }
+  if (options.font !== undefined) { sets.push('font = :font'); params[':font'] = options.font; }
+  if (options.color !== undefined) { sets.push('color = :color'); params[':color'] = options.color; }
+  if (options.stroke !== undefined) { sets.push('stroke = :stroke'); params[':stroke'] = options.stroke; }
+  if (options.swidth !== undefined) { sets.push('swidth = :swidth'); params[':swidth'] = options.swidth; }
+  if (options.align !== undefined) { sets.push('align = :align'); params[':align'] = options.align; }
+  if (options.direction !== undefined) { sets.push('direction = :direction'); params[':direction'] = options.direction; }
+  if (options.blur !== undefined) { sets.push('blur = :blur'); params[':blur'] = options.blur; }
+  if (options.degree !== undefined) { sets.push('degree = :degree'); params[':degree'] = options.degree; }
+  if (options.senior !== undefined) { sets.push('senior = :senior'); params[':senior'] = options.senior; }
 
-  Object.keys(fieldMap).forEach(key => {
-    if (options[key] !== undefined) {
-      fields.push(`${fieldMap[key]} = ?`);
-      values.push(options[key]);
-    }
-  });
+  if (sets.length === 0) return;
 
-  if (fields.length === 0) return;
-
-  values.push(eid);
-
-  const sql = `UPDATE ${TEXT_TABLE} SET ${fields.join(', ')} WHERE eid = :eid;`;
-  const params = {};
-  const keys = fields.map(f => f.split(' = ')[0]);
-  for (let i = 0; i < values.length - 1; i++) {
-    params[`:${keys[i].trim()}`] = values[i];
-  }
-  params[':eid'] = values[values.length - 1];
+  const sql = `UPDATE ${TEXT_TABLE} SET ${sets.join(', ')} WHERE eid = :eid;`;
   run(sql, params, ctx);
 };
 

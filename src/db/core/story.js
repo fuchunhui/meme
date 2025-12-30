@@ -54,40 +54,32 @@ const getAllStories = ctx => {
  * @param {String} ctx - 数据库上下文
  */
 const updateStory = (mid, data, ctx) => {
-  const fields = [];
-  const values = [];
-  
+  const sets = [];
+  const params = { ':mid': mid };
+
   if (data.name !== undefined) {
-    fields.push('name = ?');
-    values.push(data.name);
+    sets.push('name = :name');
+    params[':name'] = data.name;
   }
   if (data.md5 !== undefined) {
-    fields.push('md5 = ?');
-    values.push(data.md5);
+    sets.push('md5 = :md5');
+    params[':md5'] = data.md5;
   }
   if (data.feature !== undefined) {
-    fields.push('feature = ?');
-    values.push(data.feature);
+    sets.push('feature = :feature');
+    params[':feature'] = data.feature;
   }
   if (data.type !== undefined) {
-    fields.push('type = ?');
-    values.push(data.type);
+    sets.push('type = :type');
+    params[':type'] = data.type;
   }
-  
-  if (fields.length === 0) return;
-  
-  fields.push('updated_at = CURRENT_TIMESTAMP');
-  values.push(mid);
-  
-  const sql = `UPDATE ${STORY_TABLE} SET ${fields.join(', ')} WHERE mid = :mid;`;
-  // values currently contains fields values then mid
-  const params = {};
-  const keys = fields.map(f => f.split(' = ')[0]);
-  // map positional values to params
-  for (let i = 0; i < values.length - 1; i++) {
-    params[`:${keys[i].trim()}`] = values[i];
+
+  if (sets.length === 0) {
+    return;
   }
-  params[':mid'] = values[values.length - 1];
+
+  sets.push('updated_at = CURRENT_TIMESTAMP');
+  const sql = `UPDATE ${STORY_TABLE} SET ${sets.join(', ')} WHERE mid = :mid;`;
   run(sql, params, ctx);
 };
 

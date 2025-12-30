@@ -2,11 +2,9 @@ import crypto from 'crypto';
 import {getMid} from '../utils/keys.js';
 import {writeImg} from '../convert/write.js';
 
-// 从统一的 db 模块导入
 import {
   ELEMENT_TYPE,
   IMAGE_TYPE,
-  ELEMENT_TABLE,
   getDataListByColumn,
   STORY_TYPE,
   STORY_TABLE,
@@ -26,7 +24,6 @@ import {
   getImageByEid,
   updateImage,
   createGif,
-  updateGif,
 } from '../db/index.js';
 
 import {emptySucess, sucess, error} from './ajax.js';
@@ -35,17 +32,13 @@ import {convert} from '../convert/base64.js';
 import {group, arrayToCountObject} from '../utils/utils.js';
 import {
   CREATE_STORY_FAIL,
-  CREATE_TEXT_FAIL,
-  CREATE_GIF_FAIL,
-  CREATE_IMAGE_FAIL,
   UPDATE_TEXT_FAIL,
-  UPDATE_IMAGE_FAIL,
   UPDATE_NAME_FAIL,
   CREATE_REPEAT_NAME
 } from '../config/constant.js';
 
 const normalMenu = ctx => {
-  const storyList = getAllStories(ctx).map(({mid, name, md5}) => ({mid, name, md5}));
+  const storyList = getAllStories(ctx).map(({mid, name, md5, type}) => ({mid, name, md5, type}));
 
   const countMap = {};
   storyList.forEach(story => {
@@ -61,19 +54,18 @@ const normalMenu = ctx => {
 };
 
 const gifMenu = ctx => {
-  // 查询 Story 表中 type = GIF 的条目，避免扫描所有元素
   const gifStories = getDataListByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
   return (gifStories || []).map(s => s.name);
 };
 
 const normalImageMenu = ctx => {
   const {normal, senior} = normalMenu(ctx);
-  const normalList = normal.map(({name, md5}) => {
-    const image = getBase64Img(IMAGE_TYPE.TEXT, md5);
+  const normalList = normal.map(({name, md5, type}) => {
+    const image = getBase64Img(type, md5);
     return {name, image};
   });
-  const seniorList = senior.map(({name, md5}) => {
-    const image = getBase64Img(IMAGE_TYPE.TEXT, md5);
+  const seniorList = senior.map(({name, md5, type}) => {
+    const image = getBase64Img(type, md5);
     return {name, image};
   });
   return {
@@ -84,47 +76,41 @@ const normalImageMenu = ctx => {
 
 const getCatalog = ctx => {
   const list = getAllStories(ctx);
-  if (!list.length) return [];
+  if (!list.length) {
+    return [];
+  }
 
-  return list.map(({mid, name}) => {
-    const elements = getElementsByStoryId(mid, ctx);
-    const type = elements.length > 0 ? elements[0].type : IMAGE_TYPE.TEXT;
+  return list.map(({mid, name, type}) => {
     return {mid, name, type};
   });
 };
 
 const open = (mid, ctx) => {
   const story = getStoryByMid(mid, ctx);
-  if (!story) return null;
+  if (!story) {
+    return null;
+  }
   
-  const {name, md5} = story;
-  const elements = getElementsByStoryId(mid, ctx);
-  
-  // 获取所有文本元素的配置
-  const textElements = elements.filter(el => el.type === ELEMENT_TYPE.TEXT);
-  const textEids = textElements.map(el => el.eid);
-  const children = getTextsByEids(textEids, ctx);
-  
-  // 判断主要类型和获取额外信息
-  let type = IMAGE_TYPE.TEXT;
-  let more = '';
-  
-  const imageElements = elements.filter(el => el.type === ELEMENT_TYPE.IMAGE);
-  const isGifStory = story.type === STORY_TYPE.GIF;
-  // const additionalElements = elements.filter(el => el.type === ELEMENT_TYPE.ADDITIONAL);
+  const {name, md5, type} = story;
+  const image = getBase64Img(type, md5);
 
-  if (imageElements.length > 0) {
-    type = IMAGE_TYPE.IMAGE;
-    const imageData = getImageByEid(imageElements[0].eid, ctx);
-    if (imageData) {
+  const children = elements.map(({eid, type}) => {
+    let more = null;
+    if (type === ELEMENT_TYPE.TEXT) {
+      const textData = getTextByEid(eid, ctx);
+      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
+      more = {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
+    } else if (ELEMENT_TYPE.IMAGE) {
+      const imageData = getImageByEid(eid, ctx);
       const {x, y, width, height, ipath} = imageData;
       more = {x, y, width, height, ipath};
     }
-  } else if (isGifStory) {
-    type = IMAGE_TYPE.GIF;
-  }
-  
-  const image = getBase64Img(type, md5);
+
+    return {
+      type,
+      more,
+    }
+  });
 
   return {
     mid,
@@ -132,7 +118,6 @@ const open = (mid, ctx) => {
     type,
     image,
     children,
-    more
   };
 };
 
@@ -142,30 +127,24 @@ const create = (options, ctx) => {
     return result;
   }
 
-  const {name, type, image} = options;
+  const {name, type, image, layerType = ELEMENT_TYPE.TEXT} = options;
   const mid = getMid();
   const md5 = crypto.createHash('md5').update(name).digest('hex');
 
   try {
-    const storyType = type === IMAGE_TYPE.GIF ? STORY_TYPE.GIF : STORY_TYPE.TEXT;
-    createStory(mid, name, md5, '', storyType, ctx);
+    createStory(mid, name, md5, '', type, ctx);
+    if (type === STORY_TYPE.GIF) {
+      createGif(mid, {}, ctx);
+    }
     writeImg(md5, image);
 
-    // 创建默认文本元素
-    const textEid = `${mid}_text_0`;
-    createElement(textEid, mid, ELEMENT_TYPE.TEXT, 0, true, ctx);
-    createText(textEid, {}, ctx);
+    const eid = `${mid}_${layerType.toLowerCase()}_0`;
+    createElement(eid, mid, layerType, 0, true, ctx);
 
-    // 根据类型创建相应的元素
-    if (type === IMAGE_TYPE.GIF) {
-      const gifEid = `${mid}_gif_0`;
-      // GIF is represented at story level; create an IMAGE element as the container
-      createElement(gifEid, mid, ELEMENT_TYPE.IMAGE, -1, true, ctx);
-      createGif(gifEid, { frame: 'NORMAL' }, ctx);
-    } else if (type === IMAGE_TYPE.IMAGE) {
-      const imageEid = `${mid}_image_0`;
-      createElement(imageEid, mid, ELEMENT_TYPE.IMAGE, -1, true, ctx);
-      createImage(imageEid, {}, ctx);
+    if (layerType = ELEMENT_TYPE.GIF) {
+      createImage(eid, {}, ctx);
+    } else {
+      createText(eid, {}, ctx);
     }
 
     return sucess({ mid });
@@ -174,30 +153,26 @@ const create = (options, ctx) => {
   }
 };
 
-const update = (params, ctx) => {
+const update = (params, ctx) => { // TODO
   const {mid, options, more, type} = params;
 
   try {
-    const elements = getElementsByStoryId(mid, ctx);
+    // TODO 这部分逻辑未来设计实现
+    // const elements = getElementsByStoryId(mid, ctx);
     
-    // 更新文本元素（默认更新第一个文本元素）
-    const textElements = elements.filter(el => el.type === ELEMENT_TYPE.TEXT);
-    if (textElements.length > 0) {
-      updateText(textElements[0].eid, options, ctx);
-    }
+    // // 更新文本元素（默认更新第一个文本元素）
+    // const textElements = elements.filter(el => el.type === ELEMENT_TYPE.TEXT);
+    // if (textElements.length > 0) {
+    //   updateText(textElements[0].eid, options, ctx);
+    // }
     
-    // 根据类型更新相应元素
-    if (type === IMAGE_TYPE.IMAGE && more) {
-      const imageElements = elements.filter(el => el.type === ELEMENT_TYPE.IMAGE);
-      if (imageElements.length > 0) {
-        updateImage(imageElements[0].eid, more, ctx);
-      }
-    // } else if (type === 'ADDITIONAL' && more) {
-    //   const additionalElements = elements.filter(el => el.type === ELEMENT_TYPE.ADDITIONAL);
-    //   if (additionalElements.length > 0) {
-    //     updateAdditional(additionalElements[0].eid, more, ctx);
+    // // 根据类型更新相应元素
+    // if (type === IMAGE_TYPE.IMAGE && more) {
+    //   const imageElements = elements.filter(el => el.type === ELEMENT_TYPE.IMAGE);
+    //   if (imageElements.length > 0) {
+    //     updateImage(imageElements[0].eid, more, ctx);
     //   }
-    }
+    // }
     
     return emptySucess();
   } catch (err) {

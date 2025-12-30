@@ -10,7 +10,7 @@ import { ELEMENT_TABLE } from '../constant.js';
  * @param {Boolean} visible - 是否可见
  * @param {String} ctx - 数据库上下文
  */
-const createElement = (eid, storyId, type, layer = 0, visible = true, ctx) => {
+const createElement = (eid, storyId, type, layer = 1, visible = true, ctx) => {
   const sql = `INSERT INTO ${ELEMENT_TABLE} (eid, story_id, type, layer, visible)
     VALUES (:eid, :story_id, :type, :layer, :visible);`;
   run(sql, { ':eid': eid, ':story_id': storyId, ':type': type, ':layer': layer, ':visible': visible ? 1 : 0 }, ctx);
@@ -57,33 +57,25 @@ const getElementsByStoryIdAndType = (storyId, type, ctx) => {
  * @param {String} ctx - 数据库上下文
  */
 const updateElement = (eid, data, ctx) => {
-  const fields = [];
-  const values = [];
-  
+  const sets = [];
+  const params = { ':eid': eid };
+
   if (data.layer !== undefined) {
-    fields.push('layer = ?');
-    values.push(data.layer);
+    sets.push('layer = :layer');
+    params[':layer'] = data.layer;
   }
   if (data.visible !== undefined) {
-    fields.push('visible = ?');
-    values.push(data.visible ? 1 : 0);
+    sets.push('visible = :visible');
+    params[':visible'] = data.visible ? 1 : 0;
   }
   if (data.type !== undefined) {
-    fields.push('type = ?');
-    values.push(data.type);
+    sets.push('type = :type');
+    params[':type'] = data.type;
   }
-  
-  if (fields.length === 0) return;
-  
-  values.push(eid);
-  
-  const sql = `UPDATE ${ELEMENT_TABLE} SET ${fields.join(', ')} WHERE eid = :eid;`;
-  const params = {};
-  const keys = fields.map(f => f.split(' = ')[0]);
-  for (let i = 0; i < values.length - 1; i++) {
-    params[`:${keys[i].trim()}`] = values[i];
-  }
-  params[':eid'] = values[values.length - 1];
+
+  if (sets.length === 0) return;
+
+  const sql = `UPDATE ${ELEMENT_TABLE} SET ${sets.join(', ')} WHERE eid = :eid;`;
   run(sql, params, ctx);
 };
 
