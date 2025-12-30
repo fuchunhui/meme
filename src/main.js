@@ -43,6 +43,7 @@ import {
 } from './service/data.js';
 
 import {COMMAND_LIST} from './config/constant.js';
+import { getNamedBase64Img } from './convert/write.js';
 
 const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
   if (command === '') { // 空命令，返回完整菜单
@@ -79,12 +80,17 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
     return;
   }
 
-  // 从这里开始修改，根据 story 的类型，执行不同的动作 12.29
+  const {mid, type, md5} = getDataByColumn(command, 'name', STORY_TABLE, ctx);
+  console.info('story data: ', {mid, type, md5});
 
-  const data = getDataByColumn(command, 'name', STORY_TABLE, ctx);
-  console.info('story data: ', data);
+  insertLog({ // 日志调整为每次都记录
+    fromid,
+    text: command,
+    date: new Date(),
+    ctx
+  });
 
-  if (!data.md5) { // 未找到对应的表情包，返回提示信息
+  if (!md5) { // 未找到对应的表情包，返回提示信息
     let content = '';
     let messagesType = 'TEXT';
     const percent = Math.floor(Math.random() * 100);
@@ -98,122 +104,33 @@ const control = ({fromid, toid, command, text, params, key, name}, ctx) => {
     }
 
     send(key, toid, content, messagesType);
-  }
-
-  if (data.type === STORY_TYPE.TEXT) {
-    let content = text;
-    const base64 = make(content, data); // TODO data没有 image 内容，拼接进来处理
-    send(key, toid, base64);
-  } else if (data.type === STORY_TYPE.ADDITIONAL) {
-    const additional = getColumnByTable(data.mid, 'mid', ADDITIONAL_TABLE, ctx);
-    content += additional.text; // 补充的文本，后置处理
-
-  } else if (data.type === STORY_TYPE.IMAGE) {
-  } else if (data.type === STORY_TYPE.REPEAT) {
-  } else if (data.type === STORY_TYPE.GIF) {
-  }
-
-  // 下面的逻辑待优化 12.29
-  const singleList = getDataListByColumn(command, 'feature', FEATURE_TABLE, ctx);
-  if (singleList.length) {
-    const {type, sid, sname, tid} = singleList[0];
-    let param = params.length ? params[0] : '';
-
-    const imageData = getDataByColumn(sid, 'mid', sname, ctx);
-    if (!imageData.image) {
-      const content = formatError();
-      send(key, toid, content, 'TEXT');
-
-      insertLog({
-        fromid,
-        text: `miss ${sid} in ${sname}. title is [${command}].`,
-        date: new Date(),
-        ctx
-      });
-      return;
-    }
-
-    if (type === FEATURE_TYPE.REPEAT && !param) {
-      param = text;
-    }
-
-    if (param) {
-      let options = {};
-      let imageBase64 = '';
-
-      if ([FEATURE_TYPE.TEXT, FEATURE_TYPE.REPEAT].includes(type)) {
-        const textStyles = getDataListByColumn(tid, 'mid', TEXT_TABLE, ctx);
-        if (textStyles.length) {
-          options = textStyles[0];
-        }
-
-        // param 和 text 互换，是为了保证，文本内容在前，参数在后。对应解析过程中，text 是取得最后的文本内容。
-        const tempText = param;
-        param = text;
-        text = tempText;
-      }
-
-      if (type === FEATURE_TYPE.IMAGE) {
-        const {x, y, width, height, ipath} = singleList[0];
-        imageBase64 = getBase64(ipath, param, ctx);
-
-        if (imageBase64) {
-          options = {
-            image: imageBase64,
-            x,
-            y,
-            width,
-            height
-          };
-        } else {
-          const {font, color, direction, blur, degree, stroke, swidth} = imageData;
-          options = {
-            x: x + width / 2,
-            y: y + getFontSize(font),
-            max: width,
-            font,
-            color,
-            align: 'center',
-            direction,
-            blur,
-            degree,
-            stroke,
-            swidth
-          };
-
-          insertLog({
-            fromid,
-            text: `[${command}], missing [${param}].`,
-            date: new Date(),
-            ctx
-          });
-        }
-      }
-
-      const base64 = make(text, imageData, {
-        picture: Boolean(imageBase64),
-        text: param,
-        options
-      });
-      send(key, toid, base64);
-      return;
-    }
-  }
-
-  const gifList = getDataListByColumn(command, 'title', GIF_TABLE, ctx);
-  if (gifList.length) {
-    makeGif(text, gifList[0]).then(base64 => {
-      send(key, toid, base64);
-    });
     return;
   }
 
-  insertLog({ // 日志调整为每次都记录
-    fromid,
-    text: command,
-    date: new Date(),
-    ctx
+  const {image, children} = getOptions(mid, type, md5, ctx); // 默认返回的顺序已经按照 layer 排序，TODO 确认一下
+  children.forEach((child, index) => {
+    const {type, more} = child;
+      // TODO check 原有逻辑：param 和 text 互换，是为了保证，文本内容在前，参数在后。对应解析过程中，text 是取得最后的文本内容。新逻辑确认下具体的解析规则，是否完全一致
+    const text = params[index] || ''; // 这里按顺序取参数
+    if (type === ELEMENT_TYPE.IMAGE) {
+      more.image = getNamedBase64Img(more.ipath, text); // 绘制的时候，注意如果 image 为空，则不绘制
+    } else { // TEXT
+      more.content = text + (more.content || ''); // 追加文本内容
+    }
   });
+
+  if (type === STORY_TYPE.GIF) {
+    // makeGif(text, gifList[0]).then(base64 => { // 原始用法，备注保留
+    makeGif(image, children).then(base64 => {
+      send(key, toid, base64);
+    });
+  } else {
+    // const base64 = make(content, data); // 原始用法，参考待删除
+
+    // 所以解析不再需要区分 param 和 text 了，直接按顺序取参数即可
+    const base64 = make(image, children);
+    send(key, toid, base64);
+  }
 };
 
 const main = encryption => {

@@ -20,9 +20,9 @@ const writeImg = (fileName, base64Img) => {
   fs.writeFileSync(`${targetDir}/${fileName}.${type}`, base64Image, {encoding: 'base64'});
 };
 
-const getBase64Img = (type, md5) => {
+const getBase64Img = (type, name = '') => {
   const ext = type.toLowerCase() === 'gif' ? 'gif' : 'png';
-  const filePath = path.resolve(__dirname, 'lib', ext, `${md5}.${ext}`);
+  const filePath = path.resolve(__dirname, 'lib', ext, `${name}.${ext}`);
   if (!fs.existsSync(filePath)) {
     return '';
   }
@@ -35,6 +35,28 @@ const removeImg = path => {
   fs.rmSync(path);
 };
 
+const getNamedBase64Img = (ext, name = '') => {
+  const filePath = path.resolve(__dirname, 'lib', ext, `${name}.${ext}`);
+  if (!fs.existsSync(filePath)) {
+    return '';
+  }
+
+  const base64Image = fs.readFileSync(filePath, {encoding: 'base64'});
+  ext = ext === 'svg' ? 'svg+xml' : ext;
+  return `data:image/${ext};base64,${base64Image}`;
+};
+
+const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
+  return path.resolve(__dirname, targetDir, `${fileName}.${type}`);
+};
+
+// 随机获取某一类型的文件名，当前暂未使用
+const getFileName = (ext = 'svg', targetDir = 'lib') => {
+  const files = fs.readdirSync(path.resolve(__dirname, targetDir, ext));
+  const file = files[Math.floor(Math.random() * files.length)];
+  const ext = path.extname(file);
+  return file.slice(0, file.length - ext.length);
+};
 
 // 暂时没用，原来用于测试生成效果的函数
 const writeTempImg = (base64Img, fileName = named(), targetDir = 'output') => {
@@ -47,39 +69,12 @@ const writeTempImg = (base64Img, fileName = named(), targetDir = 'output') => {
   fs.writeFileSync(`${targetDir}/${fileName}.${type}`, base64Image, {encoding: 'base64'});
 };
 
-const testFile = (ipath = 'svg', name = '', targetDir = 'lib') => {
-  const filePath = path.resolve(__dirname, targetDir, ipath, `${name}.${ipath}`);
-  const backPath = path.resolve(__dirname, targetDir, 'png', `${name}.png`); // 兼容 png 路径
-
-  const existPath = fs.existsSync(filePath)
-    ? filePath
-    : fs.existsSync(backPath)
-      ? backPath
-      : false;
-  return existPath;
-};
-
-const getFileName = (ipath = 'svg', targetDir = 'lib') => {
-  const tardir = path.resolve(__dirname, targetDir, ipath);
-  const files = fs.readdirSync(tardir);
-  const index = Math.floor(Math.random() * files.length);
-  const file = files[index];
-  const ext = path.extname(file);
-  return file.slice(0, file.length - ext.length);
-};
-
-const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
-  return path.resolve(__dirname, targetDir, `${fileName}.${type}`);
-};
-
 export {
   writeImg,
   getBase64Img,
+  getNamedBase64Img,
   removeImg,
-
-
   named,
-  testFile,
   getFileName,
   tempFile
 };

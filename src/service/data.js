@@ -15,7 +15,6 @@ import {
   updateStory,
   createElement,
   getElementsByStoryId,
-  getElementsByStoryIdAndType,
   createText,
   getTextByEid,
   updateText,
@@ -27,9 +26,9 @@ import {
 } from '../db/index.js';
 
 import {emptySucess, sucess, error} from './ajax.js';
-import {getBase64Img} from '../convert/write.js';
+import {getBase64Img, getNamedBase64Img} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
-import {group, arrayToCountObject} from '../utils/utils.js';
+import {group} from '../utils/utils.js';
 import {
   CREATE_STORY_FAIL,
   UPDATE_TEXT_FAIL,
@@ -91,34 +90,9 @@ const open = (mid, ctx) => {
     return null;
   }
   
-  const {name, md5, type} = story;
-  const image = getBase64Img(type, md5);
-
-  const children = elements.map(({eid, type}) => {
-    let more = null;
-    if (type === ELEMENT_TYPE.TEXT) {
-      const textData = getTextByEid(eid, ctx);
-      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
-      more = {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
-    } else if (ELEMENT_TYPE.IMAGE) {
-      const imageData = getImageByEid(eid, ctx);
-      const {x, y, width, height, ipath} = imageData;
-      more = {x, y, width, height, ipath};
-    }
-
-    return {
-      type,
-      more,
-    }
-  });
-
-  return {
-    mid,
-    name,
-    type,
-    image,
-    children,
-  };
+  const {md5, type} = story;
+  const options = getOptions(mid, type, md5, ctx);
+  return options;
 };
 
 const create = (options, ctx) => {
@@ -190,28 +164,41 @@ const updateStoryName = (options, ctx) => {
   }
 };
 
-// 待优化，为【上号】类的需求，提供物理文件的信息
 const getBase64 = (type, name, ctx) => {
   let imageBase64 = '';
-  // const filePath = getRandomPath();
-  // imageBase64 = convert(filePath);
 
-  // const filePath = testFile(type.toLowerCase(), name);
-  // if (filePath) {
-  //   imageBase64 = convert(filePath);
-  // }
+  const filePath = testFile(type.toLowerCase(), name);
+  if (filePath) {
+    imageBase64 = convert(filePath);
+  }
 
   return imageBase64;
 };
 
 const getOptions = (mid, type, md5, ctx) => {
   const image = getBase64Img(type, md5);
-  const elements = getElementsByStoryIdAndType(mid, ELEMENT_TYPE.TEXT, ctx);
-  const textEids = elements.map(el => el.eid);
-  const children = getTextsByEids(textEids, ctx);
+  const elements = getElementsByStoryId(mid, ctx);
+  const children = elements.map(({eid, type}) => {
+    let more = null;
+    if (type === ELEMENT_TYPE.TEXT) {
+      const textData = getTextByEid(eid, ctx);
+      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
+      more = {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
+    } else if (ELEMENT_TYPE.IMAGE) {
+      const imageData = getImageByEid(eid, ctx);
+      const {x, y, width, height, ipath} = imageData;
+      more = {x, y, width, height, ipath};
+    }
+
+    return {
+      type,
+      more,
+    }
+  });
 
   return {
     mid,
+    type,
     image,
     children
   };
