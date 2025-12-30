@@ -10,7 +10,8 @@ extImg.onerror = err => {
   console.error(err);
 };
 
-const make = (text, options, extensions) => {
+// 待删除
+const makeOld = (text, options, extensions) => {
   const base64Img = options.image;
   const parts = base64Img.split(';base64,');
   const type = parts[0].split(':').pop();
@@ -57,6 +58,59 @@ const make = (text, options, extensions) => {
   return base64;
 };
 
+const make = (image, children) => {
+  const {width, height} = getSize(image);
+
+  if (!width || !height) {
+    return Promise.resolve(image);
+  }
+
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = async () => {
+      ctx.drawImage(img, 0, 0);
+
+      // 处理所有子元素，等待图片类型的加载完成
+      const childPromises = children.map(child => {
+        return new Promise((childResolve) => {
+          const {type, more} = child;
+          if (type === 'text') {
+            fillText(ctx, width, more);
+            childResolve();
+          } else if (type === 'image') {
+            const {x, y, width: w, height: h, image} = more;
+            if (!image) {
+              childResolve();
+              return;
+            }
+            const eimg = new Image();
+            eimg.onload = () => {
+              ctx.drawImage(eimg, x, y, w, h);
+              childResolve();
+            };
+            eimg.onerror = () => childResolve(); // 失败也继续
+            eimg.src = image;
+          } else {
+            childResolve();
+          }
+        });
+      });
+
+      await Promise.all(childPromises);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = err => {
+      console.error(err);
+      reject(err);
+    };
+    img.src = image;
+  });
+};
+
 const makeImageMenu = (images, options) => {
   const {normal: inor, senior: isen} = images;
   const {normal, senior, title} = options;
@@ -100,37 +154,47 @@ const makeImageMenu = (images, options) => {
     y += headHeight;
   }
 
-  data.forEach(({title, children}) => {
-    ctx.font = '24px sans-serif';
-    ctx.fillText(title, x, y);
+  return new Promise((resolve) => {
+    const imagePromises = [];
 
-    y += secondHeight + gap;
+    data.forEach(({title, children}) => {
+      ctx.font = '24px sans-serif';
+      ctx.fillText(title, x, y);
 
-    children.forEach(({title: ctitle, image}, cidx) => {
-      const img = new Image();
+      y += secondHeight + gap;
 
-      const cx = x + (cidx % times) * (dimension + gap);
-      const cy = y + Math.floor(cidx / times) * (dimension + gap);
+      children.forEach(({title: ctitle, image}, cidx) => {
+        const cx = x + (cidx % times) * (dimension + gap);
+        const cy = y + Math.floor(cidx / times) * (dimension + gap);
 
-      img.onload = () => {
-        ctx.drawImage(img, cx, cy, dimension, dimension);
+        const promise = new Promise((imgResolve) => {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, cx, cy, dimension, dimension);
 
-        ctx.save();
-        ctx.font = '16px sans-serif';
-        ctx.fillStyle = '#FF0000';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(ctitle, cx + padding, cy + dimension);
+            ctx.save();
+            ctx.font = '16px sans-serif';
+            ctx.fillStyle = '#FF0000';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(ctitle, cx + padding, cy + dimension);
 
-        ctx.restore();
-      };
-      img.src = image;
+            ctx.restore();
+            imgResolve();
+          };
+          img.onerror = () => imgResolve(); // 失败也继续
+          img.src = image;
+        });
+        imagePromises.push(promise);
+      });
+
+      y += Math.ceil(children.length / times) * (dimension + gap);
     });
 
-    y += Math.ceil(children.length / times) * (dimension + gap);
+    Promise.all(imagePromises).then(() => {
+      const base64 = canvas.toDataURL();
+      resolve(base64);
+    });
   });
-
-  const base64 = canvas.toDataURL();
-  return base64;
 };
 
 export {

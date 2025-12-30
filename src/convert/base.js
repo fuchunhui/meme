@@ -50,8 +50,8 @@ const _breakLines = (text, width, ctx) => {
   return lines;
 };
 
-const fillText = (ctx, width, text, options) => {
-  const {x, y, font, color, align, max, direction, blur = 0, degree = 0, stroke, swidth} = options;
+const fillText = (ctx, width, options) => {
+  const {x, y, font, color, align, max, direction, blur = 0, degree = 0, stroke, swidth, content} = options;
   ctx.font = font || '32px sans-serif';
   ctx.fillStyle = color || '#000000';
   if (blur) {
@@ -63,7 +63,7 @@ const fillText = (ctx, width, text, options) => {
 
   const maxWidth = max || width;
   const size = getFontSize(font);
-  const lines = _breakLines(text, maxWidth, ctx);
+  const lines = _breakLines(content, maxWidth, ctx);
   lines.forEach((item, index) => {
     let offset = 0;
     if (direction === 'down') {

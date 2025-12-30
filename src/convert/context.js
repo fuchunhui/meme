@@ -2,14 +2,13 @@ import {parser} from './parser.js';
 import {getConfig} from '../config/index.js';
 
 const createContext = encryption => {
-  const {fromid, toid, command, text, params, key} = parser(encryption);
+  const {fromid, toid, command, params, key} = parser(encryption);
   const {name, path, help, warns, news, others} = getConfig(key);
 
   const context = {
     fromid,
     toid,
     command,
-    text,
     params,
     key,
     name,

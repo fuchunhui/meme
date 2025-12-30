@@ -82,7 +82,7 @@ class TextGif extends Events {
     this.emit('extraction complete');
   }
 
-  async #writeMessage(text, get_as_buffer, write_path, retain) {
+  async #writeMessage(get_as_buffer, write_path, retain) {
     let encoder = null;
     if (write_path || get_as_buffer) {
       encoder = new GIFEncoder(this.#width, this.#height, 'neuquant', false, this.extractedFrames.length);
@@ -124,7 +124,7 @@ class TextGif extends Events {
         ctx.putImageData(this.extractedFrames[index].imageData, 0, 0);
       }
 
-      fillText(ctx, this.#width, text, this.options);
+      fillText(ctx, this.#width, this.options);
 
       let withoutText = null;
       if (this.extractedFrames[index].disposal !== 2) {
@@ -173,17 +173,17 @@ class TextGif extends Events {
     }
   }
 
-  async textGif({text, get_as_buffer, write_path, retain}) {
+  async textGif({get_as_buffer, write_path, retain}) {
     get_as_buffer = get_as_buffer ?? true;
     retain = retain ?? false;
     let buffer = null;
 
     if (this.extractionComplete) {
-      buffer = await this.#writeMessage(text, get_as_buffer, write_path, retain);
+      buffer = await this.#writeMessage(get_as_buffer, write_path, retain);
     } else {
       await new Promise(resolve => {
         this.on('extraction complete', async () => {
-          buffer = await this.#writeMessage(text, get_as_buffer, write_path, retain);
+          buffer = await this.#writeMessage(get_as_buffer, write_path, retain);
           resolve();
         });
       });

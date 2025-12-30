@@ -1,6 +1,5 @@
 import crypto from 'crypto-js';
 import {config} from '../config/index.js';
-import {matchText} from '../utils/regex.js';
 
 const {enc, mode, pad, AES} = crypto;
 
@@ -72,38 +71,47 @@ const parser = encryption => {
 
   let command = '';
   let params = [];
-  let param = '';
-  let text = '';
 
   if (message) {
-    let surplus = '';
     const index = message.indexOf(' ');
     if (index !== -1) {
       command = message.slice(0, index);
-      surplus = message.slice(index + 1); // 除去 command 剩余的部分内容
+      const surplus = message.slice(index + 1).trim(); // 除去 command 剩余的部分内容
 
-      const quotationText = matchText(surplus);
-      if (quotationText) { // 判断末尾的文字，是不是带有引号
-        text = quotationText.slice(1, quotationText.length - 1);
-        if (surplus.length > quotationText.length) { // 检测，除去文本后，是否还有参数
-          const tIndex = surplus.lastIndexOf(quotationText);
-          param = surplus.slice(0, tIndex).trim();
-        }
-      } else {
-        const lastIndex = surplus.lastIndexOf(' '); // 查找空格，从后面获取 text 内容，文本后置是保证，命令和参数的紧密结合，像函数调用一样
-        if (lastIndex !== -1) {
-          text = surplus.slice(lastIndex + 1);
-          param = surplus.slice(0, lastIndex);
+      // 解析参数，支持引号包裹
+      let currentParam = '';
+      let inQuotes = false;
+      let quoteChar = '';
+
+      for (let i = 0; i < surplus.length; i++) {
+        const char = surplus[i];
+
+        // 遇到引号
+        if ((char === '"' || char === "'") && !inQuotes) {
+          inQuotes = true;
+          quoteChar = char;
+        } else if (char === quoteChar && inQuotes) {
+          // 结束引号
+          inQuotes = false;
+          quoteChar = '';
+        } else if (char === ' ' && !inQuotes) {
+          // 空格分隔参数（非引号内）
+          if (currentParam) {
+            params.push(currentParam);
+            currentParam = '';
+          }
         } else {
-          text = surplus;
+          // 累加字符
+          currentParam += char;
         }
+      }
+
+      // 添加最后一个参数
+      if (currentParam) {
+        params.push(currentParam);
       }
     } else {
       command = message;
-    }
-
-    if (param) {
-      params = [param];
     }
   }
 
@@ -111,7 +119,6 @@ const parser = encryption => {
     fromid,
     toid,
     command,
-    text,
     params,
     key
   };
