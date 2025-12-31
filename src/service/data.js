@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import {getMid} from '../utils/keys.js';
-import {writeImg} from '../convert/write.js';
+import {writeImg, getBase64Img} from '../convert/write.js';
 
 import {
   ELEMENT_TYPE,
@@ -24,8 +24,6 @@ import {
 } from '../db/index.js';
 
 import {emptySucess, sucess, error} from './ajax.js';
-import {getBase64Img} from '../convert/write.js';
-import {convert} from '../convert/base64.js';
 import {group} from '../utils/utils.js';
 import {
   CREATE_STORY_FAIL,
@@ -113,7 +111,7 @@ const create = (options, ctx) => {
     const eid = `${mid}_${layerType.toLowerCase()}_0`;
     createElement(eid, mid, layerType, 0, true, ctx);
 
-    if (layerType = ELEMENT_TYPE.GIF) {
+    if (layerType === ELEMENT_TYPE.IMAGE) {
       createImage(eid, {}, ctx);
     } else {
       createText(eid, {}, ctx);
@@ -125,7 +123,8 @@ const create = (options, ctx) => {
   }
 };
 
-const createLayer = (mid, type, ctx) => {
+const createLayer = (params, ctx) => {
+  const {mid, type} = params;
   const elements = getElementsByStoryId(mid, ctx);
   const layer = elements.length;
   const eid = `${mid}_${type.toLowerCase()}_${layer}`;
@@ -174,17 +173,6 @@ const updateStoryName = (options, ctx) => {
   }
 };
 
-const getBase64 = (type, name, ctx) => {
-  let imageBase64 = '';
-
-  const filePath = testFile(type.toLowerCase(), name);
-  if (filePath) {
-    imageBase64 = convert(filePath);
-  }
-
-  return imageBase64;
-};
-
 const getOptions = (mid, type, md5, ctx) => {
   const image = getBase64Img(type, md5);
   const elements = getElementsByStoryId(mid, ctx);
@@ -192,11 +180,11 @@ const getOptions = (mid, type, md5, ctx) => {
     let options = null;
     if (type === ELEMENT_TYPE.TEXT) {
       const textData = getTextByEid(eid, ctx);
-      const {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
+      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
       options = {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
     } else if (ELEMENT_TYPE.IMAGE) {
       const imageData = getImageByEid(eid, ctx);
-      const {eid, x, y, width, height, ipath} = imageData;
+      const {x, y, width, height, ipath} = imageData;
       options = {eid, x, y, width, height, ipath};
     }
 
@@ -247,6 +235,5 @@ export {
   update,
   updateStoryName,
   getOptions,
-  getBase64,
   getLatestMid
 };

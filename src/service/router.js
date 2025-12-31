@@ -6,8 +6,7 @@ import {
   create,
   createLayer,
   update,
-  updateStoryName,
-  getBase64
+  updateStoryName
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -46,15 +45,24 @@ router.get('/image/catalog', (req, res) => {
 
 
 router.get('/image/open', (req, res) => {
-  const ctx = buildCtx(req);
-  const {mid} = req.query;
-  const data = open(mid, ctx);
+  try {
+    const ctx = buildCtx(req);
+    const {mid} = req.query;
+    const data = open(mid, ctx);
 
-  res.json({
-    data,
-    errNo: 0,
-    message: 'success'
-  });
+    res.json({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
+  } catch (err) {
+    console.error('image open error:', err);
+    res.status(500).json({
+      data: null,
+      errNo: -1,
+      message: err.message
+    });
+  }
 });
 
 
@@ -101,18 +109,6 @@ router.get('/image/config', (req, res) => {
   const data = {
     commands: COMMAND_LIST
   };
-  res.json({
-    data,
-    errNo: 0,
-    message: 'success'
-  });
-});
-
-// 是否保留待验证，具体是否还有价值
-router.get('/image/base64', (req, res) => {
-  const ctx = buildCtx(req);
-  const {ipath, value} = req.query;
-  const data = getBase64(ipath, value, ctx);
   res.json({
     data,
     errNo: 0,

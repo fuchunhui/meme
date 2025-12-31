@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "node server.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
-    "test": "cross-env NODE_ENV=test node .draft/test.js",
+    "test": "node test/setup.js && cross-env NODE_ENV=test mocha",
+    "test:db": "node test/setup.js && cross-env NODE_ENV=test mocha test/db.*.test.js",
+    "test:api": "node test/setup.js && cross-env NODE_ENV=test mocha test/api.test.js",
     "test:shell": "sh .draft/test.sh",
     "test:message": "node .draft/test-msg.js",
     "test:svg": "node .draft/test-svg.js",
@@ -30,7 +32,9 @@
   },
   "devDependencies": {
     "cross-env": "^10.0.0",
-    "eslint": "^9.32.0"
+    "eslint": "^9.32.0",
+    "mocha": "^11.7.5",
+    "supertest": "^7.1.4"
   },
   "repository": {
     "type": "git",

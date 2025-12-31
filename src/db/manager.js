@@ -13,9 +13,16 @@ const DB_MAP = Object.create(null);
 
 const loadDbFile = dbKey => {
   const filePath = path.join(DB_DIR, `${dbKey}.db`);
+  
+  // 如果文件不存在，跳过加载
+  if (!fs.existsSync(filePath)) {
+    return false;
+  }
+  
   const buffer = fs.readFileSync(filePath);
   const db = new SQL.Database(new Uint8Array(buffer));
   DB_MAP[dbKey] = { db, path: filePath };
+  return true;
 };
 
 // Always load default meme db
@@ -30,9 +37,15 @@ config.forEach(({ path: dbKey }) => {
 
 const assertDbKey = dbKey => {
   const key = dbKey || 'meme';
+  
+  // 如果数据库未加载，尝试加载
   if (!DB_MAP[key]) {
-    throw new Error(`Unknown db key: ${String(key)}`);
+    const loaded = loadDbFile(key);
+    if (!loaded) {
+      throw new Error(`Unknown db key: ${String(key)}`);
+    }
   }
+  
   return key;
 };
 

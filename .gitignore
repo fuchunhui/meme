@@ -26,3 +26,8 @@ assets/*
 
 .vercel
 output
+
+/test
+/public/db/butter.db
+/public/db/test-api-db.db
+/public/db/test-db.db
