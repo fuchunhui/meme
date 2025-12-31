@@ -4,7 +4,6 @@ import {writeImg} from '../convert/write.js';
 
 import {
   ELEMENT_TYPE,
-  IMAGE_TYPE,
   getDataListByColumn,
   STORY_TYPE,
   STORY_TABLE,
@@ -18,7 +17,6 @@ import {
   createText,
   getTextByEid,
   updateText,
-  getTextsByEids,
   createImage,
   getImageByEid,
   updateImage,
@@ -26,7 +24,7 @@ import {
 } from '../db/index.js';
 
 import {emptySucess, sucess, error} from './ajax.js';
-import {getBase64Img, getNamedBase64Img} from '../convert/write.js';
+import {getBase64Img} from '../convert/write.js';
 import {convert} from '../convert/base64.js';
 import {group} from '../utils/utils.js';
 import {
@@ -127,27 +125,39 @@ const create = (options, ctx) => {
   }
 };
 
-const update = (params, ctx) => { // TODO
-  const {mid, options, more, type} = params;
+const createLayer = (mid, type, ctx) => {
+  const elements = getElementsByStoryId(mid, ctx);
+  const layer = elements.length;
+  const eid = `${mid}_${type.toLowerCase()}_${layer}`;
+
+  createElement(eid, mid, type, layer, true, ctx);
+
+  let options = {};
+  if (type === ELEMENT_TYPE.IMAGE) {
+    createImage(eid, {}, ctx);
+    const imageData = getImageByEid(eid, ctx);
+    const {x, y, width, height, ipath} = imageData;
+    options = {eid, x, y, width, height, ipath};
+  } else {
+    createText(eid, {}, ctx);
+    const textData = getTextByEid(eid, ctx);
+    const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
+    options = {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
+  }
+
+  return sucess({ eid, type, options });
+}
+
+const update = (params, ctx) => {
+  const {eid, type, options} = params;
 
   try {
-    // TODO 这部分逻辑未来设计实现
-    // const elements = getElementsByStoryId(mid, ctx);
-    
-    // // 更新文本元素（默认更新第一个文本元素）
-    // const textElements = elements.filter(el => el.type === ELEMENT_TYPE.TEXT);
-    // if (textElements.length > 0) {
-    //   updateText(textElements[0].eid, options, ctx);
-    // }
-    
-    // // 根据类型更新相应元素
-    // if (type === IMAGE_TYPE.IMAGE && more) {
-    //   const imageElements = elements.filter(el => el.type === ELEMENT_TYPE.IMAGE);
-    //   if (imageElements.length > 0) {
-    //     updateImage(imageElements[0].eid, more, ctx);
-    //   }
-    // }
-    
+    if (type === ELEMENT_TYPE.IMAGE) {
+      updateImage(eid, options, ctx);
+    } else {
+      updateText(eid, options, ctx);
+    }
+
     return emptySucess();
   } catch (err) {
     return error(err.toString(), UPDATE_TEXT_FAIL);
@@ -179,20 +189,20 @@ const getOptions = (mid, type, md5, ctx) => {
   const image = getBase64Img(type, md5);
   const elements = getElementsByStoryId(mid, ctx);
   const children = elements.map(({eid, type}) => {
-    let more = null;
+    let options = null;
     if (type === ELEMENT_TYPE.TEXT) {
       const textData = getTextByEid(eid, ctx);
-      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
-      more = {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
+      const {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
+      options = {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
     } else if (ELEMENT_TYPE.IMAGE) {
       const imageData = getImageByEid(eid, ctx);
-      const {x, y, width, height, ipath} = imageData;
-      more = {x, y, width, height, ipath};
+      const {eid, x, y, width, height, ipath} = imageData;
+      options = {eid, x, y, width, height, ipath};
     }
 
     return {
       type,
-      more,
+      options,
     }
   });
 
@@ -233,6 +243,7 @@ export {
   getCatalog,
   open,
   create,
+  createLayer,
   update,
   updateStoryName,
   getOptions,

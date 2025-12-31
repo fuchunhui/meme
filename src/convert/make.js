@@ -3,60 +3,6 @@ import {getSize} from './size.js';
 import {fillText} from './base.js';
 
 const {createCanvas, Image} = pkg;
-const NOT_SUPPORT = ['image/gif', 'image/bmp'];
-
-const extImg = new Image();
-extImg.onerror = err => {
-  console.error(err);
-};
-
-// 待删除
-const makeOld = (text, options, extensions) => {
-  const base64Img = options.image;
-  const parts = base64Img.split(';base64,');
-  const type = parts[0].split(':').pop();
-
-  if (NOT_SUPPORT.includes(type) || text === '') {
-    return base64Img;
-  }
-
-  let base64 = '';
-  const {width, height} = getSize(base64Img);
-
-  if (width && height) {
-    const img = new Image();
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext('2d');
-
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0);
-      ctx.save();
-
-      fillText(ctx, width, text, options);
-      if (extensions) {
-        const {picture, text: eText, options: eOptions} = extensions;
-        if (picture) {
-          const {image: eBase64, x: ex, y: ey, width: ewidth, height: eheight} = eOptions;
-          extImg.onload = () => {
-            ctx.drawImage(extImg, ex, ey, ewidth, eheight);
-            base64 = canvas.toDataURL(type);
-            return base64;
-          };
-          extImg.src = eBase64;
-        } else {
-          ctx.restore();
-          fillText(ctx, width, eText, eOptions);
-        }
-      }
-      base64 = canvas.toDataURL(type);
-    };
-    img.onerror = err => {
-      console.error(err);
-    };
-    img.src = base64Img;
-  }
-  return base64;
-};
 
 const make = (image, children) => {
   const {width, height} = getSize(image);
@@ -76,12 +22,12 @@ const make = (image, children) => {
       // 处理所有子元素，等待图片类型的加载完成
       const childPromises = children.map(child => {
         return new Promise((childResolve) => {
-          const {type, more} = child;
+          const {type, options} = child;
           if (type === 'text') {
-            fillText(ctx, width, more);
+            fillText(ctx, width, options);
             childResolve();
           } else if (type === 'image') {
-            const {x, y, width: w, height: h, image} = more;
+            const {x, y, width: w, height: h, image} = options;
             if (!image) {
               childResolve();
               return;

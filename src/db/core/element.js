@@ -4,16 +4,16 @@ import { ELEMENT_TABLE } from '../constant.js';
 /**
  * 创建一个新的 Element（元素）
  * @param {String} eid - Element 唯一标识
- * @param {String} storyId - 关联的 Story ID
+ * @param {String} mid - 关联的 Story ID
  * @param {String} type - 元素类型（TEXT, IMAGE）
  * @param {Number} layer - 图层顺序
  * @param {Boolean} visible - 是否可见
  * @param {String} ctx - 数据库上下文
  */
-const createElement = (eid, storyId, type, layer = 1, visible = true, ctx) => {
-  const sql = `INSERT INTO ${ELEMENT_TABLE} (eid, story_id, type, layer, visible)
-    VALUES (:eid, :story_id, :type, :layer, :visible);`;
-  run(sql, { ':eid': eid, ':story_id': storyId, ':type': type, ':layer': layer, ':visible': visible ? 1 : 0 }, ctx);
+const createElement = (eid, mid, type, layer = 1, visible = true, ctx) => {
+  const sql = `INSERT INTO ${ELEMENT_TABLE} (eid, mid, type, layer, visible)
+    VALUES (:eid, :mid, :type, :layer, :visible);`;
+  run(sql, { ':eid': eid, ':mid': mid, ':type': type, ':layer': layer, ':visible': visible ? 1 : 0 }, ctx);
 };
 
 /**
@@ -28,26 +28,26 @@ const getElementByEid = (eid, ctx) => {
 };
 
 /**
- * 根据 storyId 获取所有 Element 列表
- * @param {String} storyId - Story ID
+ * 根据 mid 获取所有 Element 列表
+ * @param {String} mid - Story ID
  * @param {String} ctx - 数据库上下文
  * @returns {Array} Element 列表，按 layer 排序
  */
-const getElementsByStoryId = (storyId, ctx) => {
-  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE story_id = :storyId ORDER BY layer ASC;`;
-  return all(sql, { ':storyId': storyId }, ctx);
+const getElementsByStoryId = (mid, ctx) => {
+  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE mid = :mid ORDER BY layer ASC;`;
+  return all(sql, { ':mid': mid }, ctx);
 };
 
 /**
- * 根据 storyId 和类型获取 Element 列表
- * @param {String} storyId - Story ID
+ * 根据 mid 和类型获取 Element 列表
+ * @param {String} mid - Story ID
  * @param {String} type - 元素类型
  * @param {String} ctx - 数据库上下文
  * @returns {Array} Element 列表
  */
-const getElementsByStoryIdAndType = (storyId, type, ctx) => {
-  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE story_id = :storyId AND type = :type ORDER BY layer ASC;`;
-  return all(sql, { ':storyId': storyId, ':type': type }, ctx);
+const getElementsByStoryIdAndType = (mid, type, ctx) => {
+  const sql = `SELECT * FROM ${ELEMENT_TABLE} WHERE mid = :mid AND type = :type ORDER BY layer ASC;`;
+  return all(sql, { ':mid': mid, ':type': type }, ctx);
 };
 
 /**
@@ -91,12 +91,12 @@ const deleteElement = (eid, ctx) => {
 
 /**
  * 删除指定 Story 的所有 Element
- * @param {String} storyId - Story ID
+ * @param {String} mid - Story ID
  * @param {String} ctx - 数据库上下文
  */
-const deleteElementsByStoryId = (storyId, ctx) => {
-  const sql = `DELETE FROM ${ELEMENT_TABLE} WHERE story_id = :storyId;`;
-  run(sql, { ':storyId': storyId }, ctx);
+const deleteElementsByStoryId = (mid, ctx) => {
+  const sql = `DELETE FROM ${ELEMENT_TABLE} WHERE mid = :mid;`;
+  run(sql, { ':mid': mid }, ctx);
 };
 
 /**

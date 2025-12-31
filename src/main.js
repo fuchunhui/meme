@@ -17,7 +17,6 @@ import {
   formatMenu,
   formatNull,
   formatHelp,
-  formatError,
   formatOther,
   formatGuide,
   formatImageMenu,
@@ -29,7 +28,6 @@ import {
   normalImageMenu,
   gifMenu,
   getOptions,
-  getBase64,
   getLatestMid
 } from './service/data.js';
 
@@ -99,14 +97,14 @@ const control = async ctx => {
     return;
   }
 
-  const {image, children} = getOptions(mid, type, md5, ctx); // 默认返回的顺序已经按照 layer 排序，TODO 确认一下
+  const {image, children} = getOptions(mid, type, md5, ctx);
   children.forEach((child, index) => {
-    const {type, more} = child;
+    const {type, options} = child;
     const text = params[index] || ''; // 这里按顺序取参数
     if (type === ELEMENT_TYPE.IMAGE) {
-      more.image = getNamedBase64Img(more.ipath, text);
+      options.image = getNamedBase64Img(options.ipath, text);
     } else { // TEXT
-      more.content = text + (more.content || ''); // 追加文本内容
+      options.content = text + (options.content || ''); // 追加文本内容
     }
   });
 

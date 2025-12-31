@@ -1,6 +1,6 @@
+import fs from 'fs';
 import {TextGif} from './textgif.js';
 import {tempFile, removeImg} from './write.js';
-import {convert} from './base64.js';
 
 const makeGif = async (image, options) => {
   const gif = new TextGif({
@@ -32,7 +32,9 @@ const makeGif = async (image, options) => {
     write_path: filePath
   });
 
-  const base64 = convert(filePath);
+  const data = fs.readFileSync(filePath, {encoding: 'base64'});
+  const base64 = `data:image/gif;base64,${data}`;
+
   removeImg(filePath);
 
   return Promise.resolve(base64);

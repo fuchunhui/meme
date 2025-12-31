@@ -4,6 +4,7 @@ import {
   getCatalog,
   open,
   create,
+  createLayer,
   update,
   updateStoryName,
   getBase64
@@ -31,7 +32,7 @@ router.use((req, res, next) => {
   next();
 });
 
-// 此接口已可以正常工作，新建接口完毕 ✅
+
 router.get('/image/catalog', (req, res) => {
   const ctx = buildCtx(req);
   const data = getCatalog(ctx);
@@ -43,7 +44,7 @@ router.get('/image/catalog', (req, res) => {
   });
 });
 
-// TODO 0812 根据不同的类型，返回不同的明细数据
+
 router.get('/image/open', (req, res) => {
   const ctx = buildCtx(req);
   const {mid} = req.query;
@@ -56,7 +57,7 @@ router.get('/image/open', (req, res) => {
   });
 });
 
-// 单图上传，然后选择类型，调用不同类型的初始化方案，确认功能。接口验证通过 ✅
+
 router.post('/image/create', (req, res) => {
   console.info('image create: ', JSON.stringify(req.body));
   const ctx = buildCtx(req);
@@ -64,7 +65,14 @@ router.post('/image/create', (req, res) => {
   res.json(data);
 });
 
-// TODO 不同类型，不同的保存接口，基础调用统一逻辑，然后差别处理不同部分 ✅
+router.post('/image/createLayer', (req, res) => {
+  console.info('create layer: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = createLayer(req.body, ctx);
+  res.json(data);
+});
+
+
 router.post('/image/update', (req, res) => {
   console.info('image update: ', JSON.stringify(req.body));
   const ctx = buildCtx(req);
@@ -74,7 +82,6 @@ router.post('/image/update', (req, res) => {
 
 // image/upload 上传图片接口，支持多个图片上传
 
-// 更新 story name 的接口 ✅
 router.post('/image/update/name', (req, res) => {
   console.info('image save: ', JSON.stringify(req.body));
   const ctx = buildCtx(req);
@@ -101,7 +108,7 @@ router.get('/image/config', (req, res) => {
   });
 });
 
-// 暂时保留，原始从 Feature 表获取 IMAGE 类型的图片 base64数据，可以废弃
+// 是否保留待验证，具体是否还有价值
 router.get('/image/base64', (req, res) => {
   const ctx = buildCtx(req);
   const {ipath, value} = req.query;

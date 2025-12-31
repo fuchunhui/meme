@@ -31,10 +31,6 @@ const getBase64Img = (type, name = '') => {
   return `data:image/${ext};base64,${base64Image}`;
 };
 
-const removeImg = path => {
-  fs.rmSync(path);
-};
-
 const getNamedBase64Img = (ext, name = '') => {
   const filePath = path.resolve(__dirname, 'lib', ext, `${name}.${ext}`);
   if (!fs.existsSync(filePath)) {
@@ -46,8 +42,12 @@ const getNamedBase64Img = (ext, name = '') => {
   return `data:image/${ext};base64,${base64Image}`;
 };
 
-const tempFile = (type = 'gif', fileName = named(), targetDir = 'output') => {
+const tempFile = (type = 'gif', targetDir = 'output', fileName = named()) => {
   return path.resolve(__dirname, targetDir, `${fileName}.${type}`);
+};
+
+const removeImg = path => {
+  fs.rmSync(path);
 };
 
 // 暂时没用，原来用于测试生成效果的函数

@@ -80,7 +80,7 @@ const initStory = () => {
  * @description
  * 1. id: 主键，自增
  * 2. eid: 元素唯一标识
- * 3. story_id: 关联的 Story 表 mid
+ * 3. mid: 关联的 Story 表 mid
  * 4. type: 元素类型（TEXT, IMAGE, GIF 等）
  * 5. layer: 图层顺序，数值越大越靠上
  * 6. visible: 是否可见
@@ -89,11 +89,11 @@ const initElement = () => {
   const sql = `CREATE TABLE ${ELEMENT_TABLE} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     eid CHAR(20) NOT NULL UNIQUE,
-    story_id CHAR(20) NOT NULL,
+    mid CHAR(20) NOT NULL,
     type VARCHAR(20) CHECK(type IN ('${ELEMENT_TYPE.TEXT}', '${ELEMENT_TYPE.IMAGE}')) NOT NULL,
     layer INT DEFAULT 0,
     visible BOOLEAN DEFAULT 1,
-    FOREIGN KEY (story_id) REFERENCES ${STORY_TABLE}(mid)
+    FOREIGN KEY (mid) REFERENCES ${STORY_TABLE}(mid)
   );`;
   getLocalDB().run(sql);
 };
