@@ -1,23 +1,22 @@
 {
   "name": "meme",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "a meme robot",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "debug": "cross-env NODE_ENV=test node --inspect-brk app.js",
+    "debug": "cross-env NODE_ENV=test node --inspect-brk server.js",
     "test": "node test/setup.js && cross-env NODE_ENV=test mocha",
     "test:db": "node test/setup.js && cross-env NODE_ENV=test mocha test/db.*.test.js",
     "test:api": "node test/setup.js && cross-env NODE_ENV=test mocha test/api.test.js",
-    "test:shell": "sh .draft/test.sh",
+    "test:shell": "sh .draft/test-shell.sh",
     "test:message": "node .draft/test-msg.js",
     "test:svg": "node .draft/test-svg.js",
     "test:convert": "node .draft/test-convert.js",
     "view:db": "sh .draft/view-db.sh",
     "view:sync": "sh .draft/view-sync.sh",
-    "view:public": "sh .draft/view-public.sh",
-    "import": "node build/import.js"
+    "view:public": "sh .draft/view-public.sh"
   },
   "type": "module",
   "dependencies": {
