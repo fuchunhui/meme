@@ -5,6 +5,8 @@ import {
   open,
   create,
   createLayer,
+  deleteLayer,
+  reorderLayer,
   update,
   updateStoryName
 } from './data.js';
@@ -31,7 +33,6 @@ router.use((req, res, next) => {
   next();
 });
 
-
 router.get('/image/catalog', (req, res) => {
   const ctx = buildCtx(req);
   const data = getCatalog(ctx);
@@ -42,7 +43,6 @@ router.get('/image/catalog', (req, res) => {
     message: 'success'
   });
 });
-
 
 router.get('/image/open', (req, res) => {
   try {
@@ -65,7 +65,6 @@ router.get('/image/open', (req, res) => {
   }
 });
 
-
 router.post('/image/create', (req, res) => {
   console.info('image create: ', JSON.stringify(req.body));
   const ctx = buildCtx(req);
@@ -80,6 +79,19 @@ router.post('/image/createLayer', (req, res) => {
   res.json(data);
 });
 
+router.post('/image/deleteLayer', (req, res) => {
+  console.info('delete layer: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = deleteLayer(req.body, ctx);
+  res.json(data);
+});
+
+router.post('/image/reorderLayer', (req, res) => {
+  console.info('reorder layer: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = reorderLayer(req.body, ctx);
+  res.json(data);
+});
 
 router.post('/image/update', (req, res) => {
   console.info('image update: ', JSON.stringify(req.body));

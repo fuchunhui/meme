@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import {getMid} from '../utils/keys.js';
+import {getMid, getEid} from '../utils/keys.js';
 import {writeImg, getBase64Img} from '../convert/write.js';
 
 import {
@@ -21,6 +21,10 @@ import {
   getImageByEid,
   updateImage,
   createGif,
+  deleteElement,
+  deleteText,
+  deleteImage,
+  reorderElement,
 } from '../db/index.js';
 
 import {emptySucess, sucess, error} from './ajax.js';
@@ -75,9 +79,25 @@ const getCatalog = ctx => {
     return [];
   }
 
-  return list.map(({mid, name, type}) => {
+  const catalog = list.map(({mid, name, type}) => {
     return {mid, name, type};
   });
+
+  const [textCatalog, gifCatalog] = group(catalog, item => item.type === STORY_TYPE.TEXT);
+  return [
+    {
+      type: STORY_TYPE.TEXT,
+      id: 'text_catalog',
+      name: '文本表情',
+      children: textCatalog
+    },
+    {
+      type: STORY_TYPE.GIF,
+      id: 'gif_catalog',
+      name: '动图表情',
+      children: gifCatalog
+    }
+  ];
 };
 
 const open = (mid, ctx) => {
@@ -86,9 +106,12 @@ const open = (mid, ctx) => {
     return null;
   }
   
-  const {md5, type} = story;
+  const {name, md5, type} = story;
   const options = getOptions(mid, type, md5, ctx);
-  return options;
+  return {
+    name,
+    ...options
+  };
 };
 
 const create = (options, ctx) => {
@@ -108,7 +131,7 @@ const create = (options, ctx) => {
     }
     writeImg(md5, image);
 
-    const eid = `${mid}_${layerType.toLowerCase()}_0`;
+    const eid = getEid();
     createElement(eid, mid, layerType, 0, true, ctx);
 
     if (layerType === ELEMENT_TYPE.IMAGE) {
@@ -127,7 +150,7 @@ const createLayer = (params, ctx) => {
   const {mid, type} = params;
   const elements = getElementsByStoryId(mid, ctx);
   const layer = elements.length;
-  const eid = `${mid}_${type.toLowerCase()}_${layer}`;
+  const eid = getEid();
 
   createElement(eid, mid, type, layer, true, ctx);
 
@@ -146,6 +169,59 @@ const createLayer = (params, ctx) => {
 
   return sucess({ eid, type, options });
 }
+
+const deleteLayer = (params, ctx) => {
+  const {mid, eid} = params;
+  const elements = getElementsByStoryId(mid, ctx);
+  const element = elements.find(e => e.eid === eid);
+  if (!element) {
+    return error('Layer not found', 'DELETE_LAYER_FAIL');
+  }
+  const layerToDelete = element.layer;
+
+  if (element.type === ELEMENT_TYPE.TEXT) {
+    deleteText(eid, ctx);
+  } else if (element.type === ELEMENT_TYPE.IMAGE) {
+    deleteImage(eid, ctx);
+  }
+  deleteElement(eid, ctx);
+
+  elements.forEach(e => {
+    if (e.layer > layerToDelete) {
+      const newLayer = e.layer - 1;
+      reorderElement(e.eid, newLayer, ctx);
+    }
+  });
+
+  return emptySucess();
+};
+
+// 调整图层顺序，direction: 'up' | 'down'
+const reorderLayer = (params, ctx) => {
+  const {mid, eid, direction} = params;
+  const elements = getElementsByStoryId(mid, ctx);
+  const index = elements.findIndex(e => e.eid === eid);
+  if (index === -1) {
+    return error('Layer not found', 'REORDER_LAYER_FAIL');
+  }
+
+  const target = elements[index];
+  if (direction === 'up') {
+    if (index === 0) return emptySucess();
+    const prev = elements[index - 1];
+    reorderElement(target.eid, prev.layer, ctx);
+    reorderElement(prev.eid, target.layer, ctx);
+  } else if (direction === 'down') {
+    if (index === elements.length - 1) return emptySucess();
+    const next = elements[index + 1];
+    reorderElement(target.eid, next.layer, ctx);
+    reorderElement(next.eid, target.layer, ctx);
+  } else {
+    return error('Invalid direction', 'REORDER_LAYER_FAIL');
+  }
+
+  return emptySucess();
+};
 
 const update = (params, ctx) => {
   const {eid, type, options} = params;
@@ -232,6 +308,8 @@ export {
   open,
   create,
   createLayer,
+  deleteLayer,
+  reorderLayer,
   update,
   updateStoryName,
   getOptions,

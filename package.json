@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
+    "dev": "nodemon server.js",
     "debug": "cross-env NODE_ENV=test node --inspect-brk server.js",
     "test": "node test/setup.js && cross-env NODE_ENV=test mocha",
     "test:db": "node test/setup.js && cross-env NODE_ENV=test mocha test/db.*.test.js",
@@ -33,6 +33,7 @@
     "cross-env": "^10.0.0",
     "eslint": "^9.32.0",
     "mocha": "^11.7.5",
+    "nodemon": "^3.1.11",
     "supertest": "^7.1.4"
   },
   "repository": {
