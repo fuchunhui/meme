@@ -140,7 +140,7 @@ const initImage = () => {
     y INT DEFAULT 0,
     width INT DEFAULT 100,
     height INT DEFAULT 100,
-    ipath VARCHAR(16) CHECK(ipath IN ('${IMAGE_TYPE.DB}', '${IMAGE_TYPE.SVG}', '${IMAGE_TYPE.PNG}'))`
+    ipath VARCHAR(16) CHECK(ipath IN ('${IMAGE_TYPE.DB}', '${IMAGE_TYPE.SVG}', '${IMAGE_TYPE.IMAGE}'))`
       + ` NOT NULL DEFAULT '${IMAGE_TYPE.SVG}',
     FOREIGN KEY (eid) REFERENCES ${ELEMENT_TABLE}(eid)
   );`;

@@ -11,7 +11,6 @@ export const COMMAND_LIST = [
   'image', // 图片菜单
   'release', // 最近版本发布changelog
   '*', // 随机内容
-  '中秋',
   'gif',
   'news' // 最近上新的内容
 ];

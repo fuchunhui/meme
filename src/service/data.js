@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import {getMid, getEid} from '../utils/keys.js';
-import {writeImg, getBase64Img} from '../convert/write.js';
+import {writeImg, getBase64Img, getBase64ImgByPath} from '../convert/write.js';
 
 import {
   ELEMENT_TYPE,
@@ -120,7 +120,8 @@ const create = (options, ctx) => {
     return result;
   }
 
-  const {name, type, image, layerType = ELEMENT_TYPE.TEXT} = options;
+  const {name, image, layerType = ELEMENT_TYPE.TEXT} = options;
+  const type = image.startsWith('data:image/gif') ? STORY_TYPE.GIF : STORY_TYPE.TEXT;
   const mid = getMid();
   const md5 = crypto.createHash('md5').update(name).digest('hex');
 
@@ -145,6 +146,62 @@ const create = (options, ctx) => {
     return error(err.toString(), CREATE_STORY_FAIL);
   }
 };
+
+const update = (params, ctx) => {
+  const {eid, type, options} = params;
+
+  try {
+    if (type === ELEMENT_TYPE.IMAGE) {
+      updateImage(eid, options, ctx);
+    } else {
+      updateText(eid, options, ctx);
+    }
+
+    return emptySucess();
+  } catch (err) {
+    return error(err.toString(), UPDATE_TEXT_FAIL);
+  }
+};
+
+const updateStoryName = (options, ctx) => {
+  try {
+    const {mid, name} = options;
+    updateStory(mid, { name }, ctx);
+    return emptySucess();
+  } catch (err) {
+    return error(err.toString(), UPDATE_NAME_FAIL);
+  }
+};
+
+const getOptions = (mid, type, md5, ctx) => {
+  const image = getBase64Img(type, md5);
+  const elements = getElementsByStoryId(mid, ctx);
+  const children = elements.map(({eid, type}) => {
+    let options = null;
+    if (type === ELEMENT_TYPE.TEXT) {
+      const textData = getTextByEid(eid, ctx);
+      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
+      options = {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
+    } else if (ELEMENT_TYPE.IMAGE) {
+      const imageData = getImageByEid(eid, ctx);
+      const {x, y, width, height, ipath} = imageData;
+      options = {eid, x, y, width, height, ipath};
+    }
+
+    return {
+      type,
+      options,
+    }
+  });
+
+  return {
+    mid,
+    type,
+    image,
+    children
+  };
+}
+
 
 const createLayer = (params, ctx) => {
   const {mid, type} = params;
@@ -223,59 +280,8 @@ const reorderLayer = (params, ctx) => {
   return emptySucess();
 };
 
-const update = (params, ctx) => {
-  const {eid, type, options} = params;
-
-  try {
-    if (type === ELEMENT_TYPE.IMAGE) {
-      updateImage(eid, options, ctx);
-    } else {
-      updateText(eid, options, ctx);
-    }
-
-    return emptySucess();
-  } catch (err) {
-    return error(err.toString(), UPDATE_TEXT_FAIL);
-  }
-};
-
-const updateStoryName = (options, ctx) => {
-  try {
-    const {mid, name} = options;
-    updateStory(mid, { name }, ctx);
-    return emptySucess();
-  } catch (err) {
-    return error(err.toString(), UPDATE_NAME_FAIL);
-  }
-};
-
-const getOptions = (mid, type, md5, ctx) => {
-  const image = getBase64Img(type, md5);
-  const elements = getElementsByStoryId(mid, ctx);
-  const children = elements.map(({eid, type}) => {
-    let options = null;
-    if (type === ELEMENT_TYPE.TEXT) {
-      const textData = getTextByEid(eid, ctx);
-      const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
-      options = {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
-    } else if (ELEMENT_TYPE.IMAGE) {
-      const imageData = getImageByEid(eid, ctx);
-      const {x, y, width, height, ipath} = imageData;
-      options = {eid, x, y, width, height, ipath};
-    }
-
-    return {
-      type,
-      options,
-    }
-  });
-
-  return {
-    mid,
-    type,
-    image,
-    children
-  };
+const getNamedImg = (ipath = 'svg', name) => {
+  return getBase64ImgByPath(ipath.toLowerCase(), name);
 }
 
 const checkRepeat = (name, ctx) => {
@@ -312,6 +318,7 @@ export {
   reorderLayer,
   update,
   updateStoryName,
+  getNamedImg,
   getOptions,
   getLatestMid
 };

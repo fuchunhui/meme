@@ -8,7 +8,8 @@ import {
   deleteLayer,
   reorderLayer,
   update,
-  updateStoryName
+  updateStoryName,
+  getNamedImg,
 } from './data.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
@@ -31,6 +32,17 @@ router.use((req, res, next) => {
   }
 
   next();
+});
+
+router.get('/image/config', (req, res) => {
+  const data = {
+    commands: COMMAND_LIST
+  };
+  res.json({
+    data,
+    errNo: 0,
+    message: 'success'
+  });
 });
 
 router.get('/image/catalog', (req, res) => {
@@ -72,35 +84,12 @@ router.post('/image/create', (req, res) => {
   res.json(data);
 });
 
-router.post('/image/createLayer', (req, res) => {
-  console.info('create layer: ', JSON.stringify(req.body));
-  const ctx = buildCtx(req);
-  const data = createLayer(req.body, ctx);
-  res.json(data);
-});
-
-router.post('/image/deleteLayer', (req, res) => {
-  console.info('delete layer: ', JSON.stringify(req.body));
-  const ctx = buildCtx(req);
-  const data = deleteLayer(req.body, ctx);
-  res.json(data);
-});
-
-router.post('/image/reorderLayer', (req, res) => {
-  console.info('reorder layer: ', JSON.stringify(req.body));
-  const ctx = buildCtx(req);
-  const data = reorderLayer(req.body, ctx);
-  res.json(data);
-});
-
 router.post('/image/update', (req, res) => {
   console.info('image update: ', JSON.stringify(req.body));
   const ctx = buildCtx(req);
   const data = update(req.body, ctx);
   res.json(data);
 });
-
-// image/upload 上传图片接口，支持多个图片上传
 
 router.post('/image/update/name', (req, res) => {
   console.info('image save: ', JSON.stringify(req.body));
@@ -109,23 +98,45 @@ router.post('/image/update/name', (req, res) => {
   res.json(data);
 });
 
-router.get('/image/download', (req, res) => {
-  console.info('备用接口', req, res);
+router.get('/image/named', (req, res) => {
+  try {
+    const ctx = buildCtx(req);
+    const {ipath, name} = req.query;
+    const data = getNamedImg(ipath, name, ctx);
+
+    res.json({
+      data,
+      errNo: 0,
+      message: 'success'
+    });
+  } catch (err) {
+    res.status(500).json({
+      data: null,
+      errNo: -1,
+      message: err.message
+    });
+  }
 });
 
-router.get('/image/export', (req, res) => {
-  console.info('备用接口', req, res);
+router.post('/image/layer/create', (req, res) => {
+  console.info('create layer: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = createLayer(req.body, ctx);
+  res.json(data);
 });
 
-router.get('/image/config', (req, res) => {
-  const data = {
-    commands: COMMAND_LIST
-  };
-  res.json({
-    data,
-    errNo: 0,
-    message: 'success'
-  });
+router.post('/image/layer/delete', (req, res) => {
+  console.info('delete layer: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = deleteLayer(req.body, ctx);
+  res.json(data);
+});
+
+router.post('/image/layer/reorder', (req, res) => {
+  console.info('reorder layer: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = reorderLayer(req.body, ctx);
+  res.json(data);
 });
 
 export {

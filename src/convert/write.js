@@ -38,6 +38,18 @@ const getNamedBase64Img = (ext, name = '') => {
   }
 
   const base64Image = fs.readFileSync(filePath, {encoding: 'base64'});
+  return `data:image/${ext};base64,${base64Image}`;
+};
+
+const getBase64ImgByPath = (ipath = 'svg', name = '') => {
+  const realExt = ipath === 'svg' ? 'svg' : 'png'; // 目前只支持 svg 和 png
+  const filePath = path.resolve(__dirname, 'lib', ipath, `${name}.${realExt}`);
+  if (!fs.existsSync(filePath)) {
+    return '';
+  }
+
+  let ext = path.extname(filePath).replace('.', '');
+  const base64Image = fs.readFileSync(filePath, {encoding: 'base64'});
   ext = ext === 'svg' ? 'svg+xml' : ext;
   return `data:image/${ext};base64,${base64Image}`;
 };

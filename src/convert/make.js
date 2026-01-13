@@ -1,6 +1,7 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
 import {fillText} from './base.js';
+import { ELEMENT_TYPE } from '../db/index.js';
 
 const {createCanvas, Image} = pkg;
 
@@ -23,10 +24,10 @@ const make = (image, children) => {
       const childPromises = children.map(child => {
         return new Promise((childResolve) => {
           const {type, options} = child;
-          if (type === 'text') {
+          if (type === ELEMENT_TYPE.TEXT) {
             fillText(ctx, width, options);
             childResolve();
-          } else if (type === 'image') {
+          } else if (type === ELEMENT_TYPE.IMAGE) {
             const {x, y, width: w, height: h, image} = options;
             if (!image) {
               childResolve();
