@@ -82,6 +82,33 @@ const fillText = (ctx, width, options) => {
   });
 };
 
+const fillNumberText = (ctx, options) => {
+  const {
+    x,
+    y,
+    radius,
+    number,
+    circleColor = 'green',
+    textColor = 'white',
+    fontFamily = 'sans-serif'
+  } = options;
+
+  // 画圆圈
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 0.8, 0, Math.PI * 2);
+  ctx.fillStyle = circleColor;
+  ctx.fill();
+  ctx.closePath();
+
+  // 画数字
+  ctx.fillStyle = textColor;
+  ctx.font = `${radius}px ${fontFamily}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(number.toString(), x, y);
+};
+
 export {
-  fillText
+  fillText,
+  fillNumberText
 };

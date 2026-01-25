@@ -11,7 +11,7 @@ import {
   ELEMENT_TYPE
 } from './db/index.js';
 
-import {make, makeImageMenu} from './convert/make.js';
+import {make, makeImageMenu, makeWithNumber} from './convert/make.js';
 import {makeGif} from './convert/gif.js';
 import {
   formatAllMenu,
@@ -110,10 +110,14 @@ const control = async ctx => {
   });
 
   let base64 = '';
-  if (type === STORY_TYPE.GIF) {
-    base64 = await makeGif(image, children);
+  if (params.length === 0) {
+    base64 = await makeWithNumber(image, children);
   } else {
-    base64 = await make(image, children);
+    if (type === STORY_TYPE.GIF) {
+      base64 = await makeGif(image, children);
+    } else {
+      base64 = await make(image, children);
+    }
   }
 
   send(key, toid, base64);

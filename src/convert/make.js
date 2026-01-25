@@ -1,6 +1,6 @@
 import pkg from 'canvas';
 import {getSize} from './size.js';
-import {fillText} from './base.js';
+import {fillText, fillNumberText} from './base.js';
 import { ELEMENT_TYPE } from '../db/index.js';
 
 const {createCanvas, Image} = pkg;
@@ -144,7 +144,84 @@ const makeImageMenu = (images, options) => {
   });
 };
 
+const makeWithNumber = (image, children) => {
+  const {width, height} = getSize(image);
+
+  if (!width || !height) {
+    return Promise.resolve(image);
+  }
+
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = async () => {
+      ctx.drawImage(img, 0, 0);
+
+      const childPromises = children.map((child, index) => {
+        return new Promise((childResolve) => {
+          const {type, options} = child;
+          if (type === ELEMENT_TYPE.TEXT) {
+            const radius = options.size || 20;
+            const x = options.x;
+            const y = options.y;
+            const align = options.align || 'center';
+            const direction = options.direction || 'down';
+            const number = index + 1;
+
+            let drawX = x;
+            if (align === 'start') {
+              drawX = x + radius;
+            } else if (align === 'end') {
+              drawX = x - radius;
+            }
+
+            let drawY = y;
+            if (direction === 'down') {
+              drawY = y - radius / 2;
+            } else if (direction === 'up') {
+              drawY = y + radius / 2;
+            }
+
+            fillNumberText(ctx, {
+              x: drawX,
+              y: drawY,
+              radius,
+              number
+            });
+          } else if (type === ELEMENT_TYPE.IMAGE) {
+            const {x, y, width: w, height: h} = options;
+            const radius = Math.min(w, h) / 2;
+            const centerX = x + w / 2;
+            const centerY = y + h / 2;
+            const number = index + 1;
+
+            fillNumberText(ctx, {
+              x: centerX,
+              y: centerY,
+              radius,
+              number
+            });
+          }
+          childResolve();
+        });
+      });
+
+      await Promise.all(childPromises);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = err => {
+      console.error(err);
+      reject(err);
+    };
+    img.src = image;
+  });
+};
+
 export {
   make,
-  makeImageMenu
+  makeImageMenu,
+  makeWithNumber
 };
