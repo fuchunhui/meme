@@ -12,7 +12,7 @@ const formatMenu = (data, title = '常用菜单') => {
 };
 
 const formatMultiLineMenu = (data, length) => {
-  const source = data.sort().map(item => `• ${item} `);
+  const source = data.sort().map(item => `• ${item.name} `);
   const list = splitArray(source, length);
   const menu = [];
   list.forEach(item => {
@@ -70,15 +70,15 @@ const formatError = () => {
 const formatHelp = ctx => {
   const {name, help} = ctx;
   let list = [
-    '#### 我是一个<font color="red"> 斗图 </font>智障机器人',
-    `- 菜单：\`@${name}\`，查询命令列表`,
-    `- 动图：\`@${name} gif\`，查询 gif 动图命令列表`,
-    `- 图片：\`@${name} image\`，以图片形式查询命令列表`,
-    `- 上新：\`@${name} news\`，查询近期新增的命令列表`,
-    `- 使用：\`@${name} 命令\`，获取原始表情`,
-    `- 文字：\`@${name} 命令 文字\`，返回拼接文字的表情`,
-    `- 参数：\`@${name} 命令 参数 文字\`，返回符合输入参数的文字表情`,
-    `- 支持空格: 请使用双引号包裹文字内容，\`@${name} 命令 “这句话 是我说的”\``
+    '#### 使用说明：',
+    `- 原表情：\`@${name} 指令\``,
+    `- 加文字：\`@${name} 指令 文字1 文字2 ...\``,
+    `- 加空格: 使用双引号包裹，\`@${name} 指令 “这句话 是我说的”\``,
+    '#### 系统指令：',
+    `- 菜单：\`@${name}\` 查询列表`,
+    `- 动图：\`@${name} gif\` 查询动图列表`,
+    `- 图片：\`@${name} image\` 查询图片`,
+    `- 上新：\`@${name} news\` 近期新增`
   ];
   if (help.length) {
     list = list.concat(ctx.help);

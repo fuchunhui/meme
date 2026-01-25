@@ -9,6 +9,7 @@ import Canvas from 'canvas';
 import Events from 'events';
 import * as fs from 'fs';
 import {fillText} from './base.js';
+import { ELEMENT_TYPE } from '../db/index.js';
 
 class TextGif extends Events {
 
@@ -21,12 +22,12 @@ class TextGif extends Events {
 
   constructor({
     file_path,
-    options,
+    children,
     repeat,
     transparent
   }) {
     super();
-    this.options = options ?? {
+    this.children = children ?? {
       x: 0,
       y: 0,
       max: 100,
@@ -124,7 +125,36 @@ class TextGif extends Events {
         ctx.putImageData(this.extractedFrames[index].imageData, 0, 0);
       }
 
-      fillText(ctx, this.#width, this.options);
+      if (Array.isArray(this.children)) {
+        const childPromises = this.children.map(child => {
+          return new Promise(resolve => {
+            const {type, options} = child || {};
+            if (type === ELEMENT_TYPE.TEXT) {
+              fillText(ctx, this.#width, options);
+              resolve();
+            } else if (type === ELEMENT_TYPE.IMAGE) {
+              const {x, y, width: w, height: h, image} = options || {};
+              if (!image) {
+                resolve();
+                return;
+              }
+              const eimg = new Canvas.Image();
+              eimg.onload = () => {
+                ctx.drawImage(eimg, x, y, w, h);
+                resolve();
+              };
+              eimg.onerror = () => resolve();
+              eimg.src = image;
+            } else {
+              resolve();
+            }
+          });
+        });
+
+        await Promise.all(childPromises);
+      } else if (this.children) {
+        fillText(ctx, this.#width, this.children);
+      }
 
       let withoutText = null;
       if (this.extractedFrames[index].disposal !== 2) {

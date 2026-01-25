@@ -1,10 +1,5 @@
 const LINE_HEIGHT = 1.2;
 
-const getFontSize = font => {
-  const fontSize = font.match(/(\d{1,3})px/) || ['', '32'];
-  return Number(fontSize[1]);
-};
-
 const _findBreakPoint = (text, width, ctx) => {
   let min = 0;
   let max = text.length - 1;
@@ -51,8 +46,8 @@ const _breakLines = (text, width, ctx) => {
 };
 
 const fillText = (ctx, width, options) => {
-  const {x, y, font, color, align, max, direction, blur = 0, degree = 0, stroke, swidth, content} = options;
-  ctx.font = font || '32px sans-serif';
+  const {x, y, size, font, color, align, max, direction, blur = 0, degree = 0, stroke, swidth, content} = options;
+  ctx.font = `${size}px ${font}` || '32px sans-serif';
   ctx.fillStyle = color || '#000000';
   if (blur) {
     ctx.filter = `blur(${blur}px)`;
@@ -62,7 +57,6 @@ const fillText = (ctx, width, options) => {
   ctx.lineWidth = swidth || 1;
 
   const maxWidth = max || width;
-  const size = getFontSize(font);
   const lines = _breakLines(content, maxWidth, ctx);
   lines.forEach((item, index) => {
     let offset = 0;
@@ -89,6 +83,5 @@ const fillText = (ctx, width, options) => {
 };
 
 export {
-  getFontSize,
   fillText
 };

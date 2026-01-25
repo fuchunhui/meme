@@ -77,6 +77,7 @@ export {
   writeImg,
   getBase64Img,
   getNamedBase64Img,
+  getBase64ImgByPath,
   removeImg,
   named,
   tempFile

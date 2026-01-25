@@ -7,7 +7,8 @@ import {
   getDataByColumn,
   STORY_TABLE,
   STORY_TYPE,
-  insertLog
+  insertLog,
+  ELEMENT_TYPE
 } from './db/index.js';
 
 import {make, makeImageMenu} from './convert/make.js';
@@ -70,9 +71,6 @@ const control = async ctx => {
     return;
   }
 
-  const {mid, type, md5} = getDataByColumn(command, 'name', STORY_TABLE, ctx);
-  console.info('story data: ', {mid, type, md5});
-
   insertLog({ // 日志调整为每次都记录
     fromid,
     text: command,
@@ -80,7 +78,8 @@ const control = async ctx => {
     ctx
   });
 
-  if (!md5) { // 未找到对应的表情包，返回提示信息
+  const result = getDataByColumn(command, 'name', STORY_TABLE, ctx);
+  if (!result) {
     let content = '';
     let messagesType = 'TEXT';
     const percent = Math.floor(Math.random() * 100);
@@ -96,6 +95,8 @@ const control = async ctx => {
     send(key, toid, content, messagesType);
     return;
   }
+
+  const {mid, type, md5} = result;
 
   const {image, children} = getOptions(mid, type, md5, ctx);
   children.forEach((child, index) => {

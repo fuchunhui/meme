@@ -11,7 +11,7 @@ const createText = (eid, options, ctx) => {
   const {
     content = '',
     x = 0,
-    y = 0,
+    y = 30, // size - 2
     max = 100,
     size = 32,
     font = 'sans-serif',

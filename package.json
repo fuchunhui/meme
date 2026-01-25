@@ -12,8 +12,7 @@
     "test:api": "node test/setup.js && cross-env NODE_ENV=test mocha test/api.test.js",
     "test:shell": "sh .draft/test-shell.sh",
     "test:message": "node .draft/test-msg.js",
-    "test:svg": "node .draft/test-svg.js",
-    "test:convert": "node .draft/test-convert.js",
+    "t": "node .draft/test-main.js",
     "view:db": "sh .draft/view-db.sh",
     "view:sync": "sh .draft/view-sync.sh",
     "view:public": "sh .draft/view-public.sh"

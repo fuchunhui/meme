@@ -2,10 +2,10 @@ import fs from 'fs';
 import {TextGif} from './textgif.js';
 import {tempFile, removeImg} from './write.js';
 
-const makeGif = async (image, options) => {
+const makeGif = async (image, children) => {
   const gif = new TextGif({
     file_path: image,
-    options
+    children
   });
 
   // 通过监听 on frame 事件，在不同的帧索引，修改配置信息即可实现对文本的细节控制。

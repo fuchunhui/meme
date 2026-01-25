@@ -110,7 +110,7 @@ const makeImageMenu = (images, options) => {
 
       y += secondHeight + gap;
 
-      children.forEach(({title: ctitle, image}, cidx) => {
+      children.forEach(({name: ctitle, image}, cidx) => {
         const cx = x + (cidx % times) * (dimension + gap);
         const cy = y + Math.floor(cidx / times) * (dimension + gap);
 
