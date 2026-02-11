@@ -178,11 +178,7 @@ const makeWithNumber = (image, children) => {
             }
 
             let drawY = y;
-            if (direction === 'down') {
-              drawY = y - radius / 2;
-            } else if (direction === 'up') {
-              drawY = y + radius / 2;
-            }
+            drawY = y - radius / 4; // 微调位置，感觉更居中一些
 
             fillNumberText(ctx, {
               x: drawX,

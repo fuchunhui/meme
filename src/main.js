@@ -120,6 +120,12 @@ const control = async ctx => {
     }
   }
 
+  const base64Size = (base64.length * 3) / 4 - (base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0);
+  if (base64Size > 1024 * 1024) {
+    send(key, toid, `【${command}】生成图片过大，请尝试其他指令。当前大小：${(base64Size / 1024 / 1024).toFixed(2)} MB`, 'TEXT');
+    return;
+  }
+
   send(key, toid, base64);
 };
 

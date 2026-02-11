@@ -18,7 +18,7 @@ const createText = (eid, options, ctx) => {
     color = '#000000',
     stroke = 'transparent',
     swidth = 1,
-    align = 'start',
+    align = 'center',
     direction = 'down',
     blur = 0,
     degree = 0,

@@ -34,7 +34,7 @@ const makeGif = async (image, children) => {
 
   const data = fs.readFileSync(filePath, {encoding: 'base64'});
   const base64 = `data:image/gif;base64,${data}`;
-
+  // console.log('生成 gif 成功', filePath);
   removeImg(filePath);
 
   return Promise.resolve(base64);
