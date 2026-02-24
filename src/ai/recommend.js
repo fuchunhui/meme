@@ -19,14 +19,14 @@ const analyzeInput = async (text) => {
 }
 
 要求：
-- keywords 用于匹配数据库 feature 字段（逗号分隔的标签），提取 3-8 个
+- keywords 用于匹配 feature 字段（逗号分隔的标签），提取 3-8 个
 - parameters 来自用户输入原文，是会写到表情图上的文字，提取 1-4 个
-- intent 不超过 80 字`;
+- intent 不超过 60 字`;
 
   const { text: raw } = await generateText({
     model,
     messages: [{ role: 'user', content: prompt }],
-    maxTokens: 600,
+    maxTokens: 300,
   });
 
   const match = raw.match(/\{[\s\S]*\}/);
