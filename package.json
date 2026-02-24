@@ -1,6 +1,6 @@
 {
   "name": "meme",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "a meme robot",
   "main": "server.js",
   "scripts": {
@@ -15,10 +15,19 @@
     "t": "node .draft/test-main.js",
     "view:db": "sh .draft/view-db.sh",
     "view:sync": "sh .draft/view-sync.sh",
-    "view:public": "sh .draft/view-public.sh"
+    "view:public": "sh .draft/view-public.sh",
+    "ai:test": "node --env-file=.env ai/test.js",
+    "ai:chat": "node --env-file=.env ai/chat.js",
+    "ai:generate": "node --env-file=.env ai/generate.js",
+    "ai:agent": "node --env-file=.env ai/agent.js",
+    "ai:recommend": "node --env-file=.env src/ai/recommend-example.js",
+    "ai:feature": "node --env-file=.env src/ai/feature.js"
   },
   "type": "module",
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.6",
+    "@ai-sdk/openai": "^3.0.29",
+    "ai": "^6.0.85",
     "axios": "^1.13.2",
     "canvas": "^3.2.1",
     "cors": "^2.8.5",
@@ -26,7 +35,11 @@
     "express": "^5.2.1",
     "gif-encoder-2": "^1.0.5",
     "gif-frames": "^1.0.1",
-    "sql.js": "^1.13.0"
+    "sql.js": "^1.13.0",
+    "zod": "^4.3.6"
+  },
+  "optionalDependencies": {
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "cross-env": "^10.1.0",

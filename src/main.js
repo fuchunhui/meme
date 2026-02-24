@@ -34,6 +34,39 @@ import {
 
 import {COMMAND_LIST} from './config/constant.js';
 import { getNamedBase64Img } from './convert/write.js';
+import { recommendMemeCommand } from './ai/recommend.js';
+
+const generateAndSend = async ({ mid, type, md5 }, params, command, key, toid, ctx) => {
+  const {image, children} = getOptions(mid, type, md5, ctx);
+  children.forEach((child, index) => {
+    const {type, options} = child;
+    const text = params[index] || '';
+    if (type === ELEMENT_TYPE.IMAGE) {
+      options.image = getNamedBase64Img(options.ipath, text);
+    } else {
+      options.content = text + (options.content || '');
+    }
+  });
+
+  let base64 = '';
+  if (params.length === 0) {
+    base64 = await makeWithNumber(image, children);
+  } else {
+    if (type === STORY_TYPE.GIF) {
+      base64 = await makeGif(image, children);
+    } else {
+      base64 = await make(image, children);
+    }
+  }
+
+  const base64Size = (base64.length * 3) / 4 - (base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0);
+  if (base64Size > 1024 * 1024) {
+    send(key, toid, `【${command}】生成图片过大，请尝试其他指令。当前大小：${(base64Size / 1024 / 1024).toFixed(2)} MB`, 'TEXT');
+    return;
+  }
+
+  send(key, toid, base64);
+};
 
 const control = async ctx => {
   const {fromid, toid, command, params, key, name} = ctx;
@@ -80,6 +113,19 @@ const control = async ctx => {
 
   const result = getDataByColumn(command, 'name', STORY_TABLE, ctx);
   if (!result) {
+    const aiQuery = command.length > 50 ? command.slice(0, 50) : command;
+    const aiResult = await recommendMemeCommand(aiQuery, ctx);
+    console.log('AI 推荐结果: ', aiResult);
+    const rec = aiResult.success ? aiResult.recommendation : null;
+
+    if (rec?.confidence === 'HIGH' && rec.command) {
+      const recResult = getDataByColumn(rec.command, 'name', STORY_TABLE, ctx);
+      if (recResult) {
+        await generateAndSend(recResult, rec.parameters, rec.command, key, toid, ctx);
+        return;
+      }
+    }
+
     let content = '';
     let messagesType = 'TEXT';
     const percent = Math.floor(Math.random() * 100);
@@ -96,37 +142,7 @@ const control = async ctx => {
     return;
   }
 
-  const {mid, type, md5} = result;
-
-  const {image, children} = getOptions(mid, type, md5, ctx);
-  children.forEach((child, index) => {
-    const {type, options} = child;
-    const text = params[index] || ''; // 这里按顺序取参数
-    if (type === ELEMENT_TYPE.IMAGE) {
-      options.image = getNamedBase64Img(options.ipath, text);
-    } else { // TEXT
-      options.content = text + (options.content || ''); // 追加文本内容
-    }
-  });
-
-  let base64 = '';
-  if (params.length === 0) {
-    base64 = await makeWithNumber(image, children);
-  } else {
-    if (type === STORY_TYPE.GIF) {
-      base64 = await makeGif(image, children);
-    } else {
-      base64 = await make(image, children);
-    }
-  }
-
-  const base64Size = (base64.length * 3) / 4 - (base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0);
-  if (base64Size > 1024 * 1024) {
-    send(key, toid, `【${command}】生成图片过大，请尝试其他指令。当前大小：${(base64Size / 1024 / 1024).toFixed(2)} MB`, 'TEXT');
-    return;
-  }
-
-  send(key, toid, base64);
+  await generateAndSend(result, params, command, key, toid, ctx);
 };
 
 const main = encryption => {

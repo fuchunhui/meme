@@ -4,6 +4,7 @@ node_modules
 /mock
 
 # local env files
+.env
 .env.local
 .env.*.local
 
@@ -31,3 +32,5 @@ output
 /public/db/butter.db
 /public/db/test-api-db.db
 /public/db/test-db.db
+
+/try
