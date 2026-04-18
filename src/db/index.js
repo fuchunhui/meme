@@ -1,6 +1,7 @@
 // ============ 核心模块 ============
 export * from './core/story.js';
 export * from './core/element.js';
+export * from './core/static.js';
 
 // ============ 元素配置模块 ============
 export * from './elements/text.js';
@@ -17,6 +18,7 @@ export {
   getNamedColumnFromTable,
 } from './query.js';
 export { insertLog } from './log.js';
+export { insertStaticSendLog, getRecentStaticSentItemIds } from './static-log.js';
 
 // ============ 常量 ============
 export {
@@ -25,7 +27,9 @@ export {
   TEXT_TABLE,
   IMAGE_TABLE,
   GIF_TABLE,
+  STATIC_ITEM_TABLE,
   LOG_TABLE,
+  STATIC_SEND_LOG_TABLE,
   ELEMENT_TYPE,
   IMAGE_TYPE,
   STORY_TYPE,

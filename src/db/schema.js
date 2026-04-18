@@ -5,6 +5,8 @@ import {
   IMAGE_TABLE,
   TEXT_TABLE,
   LOG_TABLE,
+  STATIC_ITEM_TABLE,
+  STATIC_SEND_LOG_TABLE,
 } from './constant.js';
 
 const TABLES = Object.freeze({
@@ -14,6 +16,8 @@ const TABLES = Object.freeze({
   IMAGE_TABLE,
   TEXT_TABLE,
   LOG_TABLE,
+  STATIC_ITEM_TABLE,
+  STATIC_SEND_LOG_TABLE,
 });
 
 const isSafeIdentifier = value => typeof value === 'string' && /^[A-Za-z_][A-Za-z0-9_]*$/.test(value);

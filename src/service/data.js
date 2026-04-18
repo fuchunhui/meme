@@ -182,7 +182,7 @@ const getOptions = (mid, type, md5, ctx) => {
       const textData = getTextByEid(eid, ctx);
       const {content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree} = textData;
       options = {eid, content, x, y, max, size, font, color, stroke, swidth, align, direction, blur, degree};
-    } else if (ELEMENT_TYPE.IMAGE) {
+    } else if (type === ELEMENT_TYPE.IMAGE) {
       const imageData = getImageByEid(eid, ctx);
       const {x, y, width, height, ipath} = imageData;
       options = {eid, x, y, width, height, ipath};

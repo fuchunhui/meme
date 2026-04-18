@@ -11,6 +11,14 @@ import {
   updateStoryName,
   getNamedImg,
 } from './data.js';
+import {
+  createStaticCollection,
+  addStaticItems,
+  getStaticCatalog,
+  getStaticItems,
+  getStaticItemImage,
+  deleteStaticItem,
+} from './static.js';
 
 import {COMMAND_LIST} from '../config/constant.js';
 
@@ -136,6 +144,48 @@ router.post('/image/layer/reorder', (req, res) => {
   console.info('reorder layer: ', JSON.stringify(req.body));
   const ctx = buildCtx(req);
   const data = reorderLayer(req.body, ctx);
+  res.json(data);
+});
+
+router.get('/image/static/catalog', (req, res) => {
+  const ctx = buildCtx(req);
+  const data = getStaticCatalog(ctx);
+  res.json(data);
+});
+
+router.get('/image/static/items', (req, res) => {
+  const ctx = buildCtx(req);
+  const {mid} = req.query;
+  const data = getStaticItems(mid, ctx);
+  res.json(data);
+});
+
+router.get('/image/static/item', (req, res) => {
+  const ctx = buildCtx(req);
+  const id = Number(req.query.id);
+  const data = getStaticItemImage(id, ctx);
+  res.json(data);
+});
+
+router.post('/image/static/create', (req, res) => {
+  console.info('static create: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = createStaticCollection(req.body, ctx);
+  res.json(data);
+});
+
+router.post('/image/static/add', (req, res) => {
+  console.info('static add items: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const data = addStaticItems(req.body, ctx);
+  res.json(data);
+});
+
+router.post('/image/static/item/delete', (req, res) => {
+  console.info('static delete item: ', JSON.stringify(req.body));
+  const ctx = buildCtx(req);
+  const id = Number(req.body.id);
+  const data = deleteStaticItem(id, ctx);
   res.json(data);
 });
 

@@ -24,6 +24,7 @@ import {
   formatNewsMenu
 } from './convert/format.js';
 import {send} from './service/index.js';
+import { pickStaticImages, STATIC_RETURN_COUNT } from './service/static.js';
 import {
   normalMenu,
   normalImageMenu,
@@ -66,6 +67,22 @@ const generateAndSend = async ({ mid, type, md5 }, params, command, key, toid, c
   }
 
   send(key, toid, base64);
+};
+
+const sendStaticStory = ({ story, command, fromid, key, toid, ctx }) => {
+  const staticImages = pickStaticImages({
+    mid: story.mid,
+    fromid,
+    count: STATIC_RETURN_COUNT,
+  }, ctx);
+
+  if (!staticImages.length) {
+    send(key, toid, `【${command}】暂时还没有可用的静态表情。`, 'TEXT');
+    return true;
+  }
+
+  send(key, toid, staticImages);
+  return true;
 };
 
 const control = async ctx => {
@@ -121,6 +138,11 @@ const control = async ctx => {
     if (rec?.confidence === 'HIGH' && rec.command) {
       const recResult = getDataByColumn(rec.command, 'name', STORY_TABLE, ctx);
       if (recResult) {
+        if (recResult.type === STORY_TYPE.STATIC) {
+          sendStaticStory({ story: recResult, command: rec.command, fromid, key, toid, ctx });
+          return;
+        }
+
         await generateAndSend(recResult, rec.parameters, rec.command, key, toid, ctx);
         return;
       }
@@ -139,6 +161,11 @@ const control = async ctx => {
     }
 
     send(key, toid, content, messagesType);
+    return;
+  }
+
+  if (result.type === STORY_TYPE.STATIC) {
+    sendStaticStory({ story: result, command, fromid, key, toid, ctx });
     return;
   }
 

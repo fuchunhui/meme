@@ -6,6 +6,8 @@ import {
   IMAGE_TABLE,
   GIF_TABLE,
   LOG_TABLE,
+  STATIC_ITEM_TABLE,
+  STATIC_SEND_LOG_TABLE,
   ELEMENT_TYPE,
   IMAGE_TYPE,
   STORY_TYPE,
@@ -27,6 +29,8 @@ const resetDB = () => {
     IMAGE_TABLE,
     GIF_TABLE,
     LOG_TABLE,
+    STATIC_ITEM_TABLE,
+    STATIC_SEND_LOG_TABLE,
   ];
   const sql = nameList.map(item => `DROP TABLE IF EXISTS ${item};`).join('');
   getLocalDB().run(sql);
@@ -45,7 +49,9 @@ const initDB = path => {
   initText();
   initImage();
   initGif();
+  initStaticItem();
   initLog();
+  initStaticSendLog();
 
   writeDB(currentDB);
 };
@@ -68,7 +74,8 @@ const initStory = () => {
     name VARCHAR(50) COLLATE NOCASE,
     md5 CHAR(32) NOT NULL,
     feature VARCHAR(100) COLLATE NOCASE,
-    type VARCHAR(20) CHECK(type IN ('${STORY_TYPE.TEXT}', '${STORY_TYPE.GIF}')) NOT NULL DEFAULT 'TEXT',
+    type VARCHAR(20) CHECK(type IN ('${STORY_TYPE.TEXT}', '${STORY_TYPE.GIF}', '${STORY_TYPE.STATIC}'))
+      NOT NULL DEFAULT 'TEXT',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
@@ -162,6 +169,23 @@ const initGif = () => {
 };
 
 /**
+ * 初始化 StaticItem 表（静态表情集合明细）
+ */
+const initStaticItem = () => {
+  const sql = `CREATE TABLE ${STATIC_ITEM_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mid CHAR(20) NOT NULL,
+    hash CHAR(32) NOT NULL,
+    ext VARCHAR(10) NOT NULL DEFAULT 'png',
+    tags VARCHAR(100) COLLATE NOCASE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mid) REFERENCES ${STORY_TABLE}(mid),
+    UNIQUE(mid, hash)
+  );`;
+  getLocalDB().run(sql);
+};
+
+/**
  * 初始化 Log 表
  * @description 存储日志信息
  */
@@ -170,6 +194,20 @@ const initLog = () => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fromid CHAR(100) NOT NULL,
     text VARCHAR(200) NOT NULL,
+    date Date
+  );`;
+  getLocalDB().run(sql);
+};
+
+/**
+ * 初始化 StaticSendLog 表
+ */
+const initStaticSendLog = () => {
+  const sql = `CREATE TABLE ${STATIC_SEND_LOG_TABLE} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fromid CHAR(100) NOT NULL,
+    mid CHAR(20) NOT NULL,
+    item_id INT NOT NULL,
     date Date
   );`;
   getLocalDB().run(sql);

@@ -21,7 +21,8 @@
     "ai:generate": "node --env-file=.env ai/generate.js",
     "ai:agent": "node --env-file=.env ai/agent.js",
     "ai:recommend": "node --env-file=.env src/ai/recommend-example.js",
-    "ai:feature": "node --env-file=.env src/ai/feature.js"
+    "ai:feature": "node --env-file=.env src/ai/feature.js",
+    "docker": "sh .docker/build.sh"
   },
   "type": "module",
   "dependencies": {

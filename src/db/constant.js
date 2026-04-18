@@ -3,8 +3,10 @@ export const ELEMENT_TABLE = 'ELEMENT';
 export const TEXT_TABLE = 'TEXT';
 export const IMAGE_TABLE = 'IMAGE';
 export const GIF_TABLE = 'GIF';
+export const STATIC_ITEM_TABLE = 'STATIC_ITEM';
 
 export const LOG_TABLE = 'LOGGER';
+export const STATIC_SEND_LOG_TABLE = 'STATIC_SEND_LOG';
 
 // 元素类型
 export const ELEMENT_TYPE = {
@@ -23,4 +25,5 @@ export const IMAGE_TYPE = {
 export const STORY_TYPE = {
   'TEXT': 'TEXT',
   'GIF': 'GIF',
+  'STATIC': 'STATIC',
 };
