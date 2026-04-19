@@ -23,6 +23,7 @@ yarn-error.log*
 *.sw*
 
 .draft
+.docker
 assets/*
 
 .vercel
@@ -34,3 +35,5 @@ output
 /public/db/test-db.db
 
 /try
+/scripts
+/lib/static

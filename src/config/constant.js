@@ -9,6 +9,7 @@ export const COMMAND_LIST = [
   'special', // 彩蛋菜单
   'help', // 帮助指令
   'image', // 图片菜单
+  'theme', // 主题菜单
   'release', // 最近版本发布changelog
   '*', // 随机内容
   'gif',

@@ -29,6 +29,7 @@ import {
   normalMenu,
   normalImageMenu,
   gifMenu,
+  staticMenu,
   getOptions,
   getLatestMid
 } from './service/data.js';
@@ -89,7 +90,8 @@ const control = async ctx => {
   const {fromid, toid, command, params, key, name} = ctx;
   if (command === '') { // 空命令，返回完整菜单
     const {normal, senior} = normalMenu(ctx);
-    const content = formatAllMenu(name, normal, senior);
+    const theme = staticMenu(ctx);
+    const content = formatAllMenu(name, normal, senior, theme);
     send(key, toid, content, 'MD');
 
     return;
@@ -109,6 +111,8 @@ const control = async ctx => {
       content = '彩蛋or💣';
     } else if (command === 'gif') { // gif 菜单
       content = formatMenu(gifMenu(ctx), 'gif 动图菜单');
+    } else if (command === 'theme') { // 主题菜单
+      content = formatMenu(staticMenu(ctx), '主题菜单');
     } else if (command === 'news') {
       const duration = new Date().getTime() - 30 * 24 * 60 * 60 * 1000; // 统计近一个月数据
       const commandList = getLatestMid(duration, ctx);

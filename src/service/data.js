@@ -37,7 +37,9 @@ import {
 } from '../config/constant.js';
 
 const normalMenu = ctx => {
-  const storyList = getAllStories(ctx).map(({mid, name, md5, type}) => ({mid, name, md5, type}));
+  const storyList = getAllStories(ctx)
+    .filter(({type}) => type !== STORY_TYPE.STATIC)
+    .map(({mid, name, md5, type}) => ({mid, name, md5, type}));
 
   const countMap = {};
   storyList.forEach(story => {
@@ -55,6 +57,11 @@ const normalMenu = ctx => {
 const gifMenu = ctx => {
   const gifStories = getDataListByColumn(STORY_TYPE.GIF, 'type', STORY_TABLE, ctx);
   return (gifStories || []).map(s => s.name);
+};
+
+const staticMenu = ctx => {
+  const staticStories = getDataListByColumn(STORY_TYPE.STATIC, 'type', STORY_TABLE, ctx);
+  return (staticStories || []).map(s => s.name);
 };
 
 const normalImageMenu = ctx => {
@@ -309,6 +316,7 @@ const getLatestMid = (time, ctx) => {
 export {
   normalMenu,
   gifMenu,
+  staticMenu,
   normalImageMenu,
   getCatalog,
   open,

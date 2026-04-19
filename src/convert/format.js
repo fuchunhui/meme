@@ -3,16 +3,19 @@ import {splitArray} from '../utils/utils.js';
 const COMMAND_LENGTH = 4;
 
 const formatMenu = (data, title = '常用菜单') => {
-  const list = data.map(item => {
-    return `- ${item}`;
+  const source = data.sort().map(item => `• ${item} `);
+  const list = splitArray(source, COMMAND_LENGTH);
+  const menuList = [];
+  list.forEach(item => {
+    menuList.push(item.join(''));
   });
-  const content = `#### ${title}：\n` + list.join('\n');
-  const menu = list.length ? content : `目前不存在 ${title} \n`;
+  const content = `#### ${title}：\n` + menuList.join('\n');
+  const menu = menuList.length ? content : `目前不存在 ${title} \n`;
   return menu;
 };
 
 const formatMultiLineMenu = (data, length) => {
-  const source = data.sort().map(item => `• ${item.name} `);
+  const source = data.sort().map(item => item.name ? `• ${item.name} ` : `• ${item} `);
   const list = splitArray(source, length);
   const menu = [];
   list.forEach(item => {
@@ -72,12 +75,14 @@ const formatHelp = ctx => {
   let list = [
     '#### 使用说明：',
     `- 原表情：\`@${name} 指令\``,
-    `- 加文字：\`@${name} 指令 文字1 文字2 ...\``,
+    `- 加文字：\`@${name} 指令 文字1 文字2 文字3 ...\``,
+    `- 主题图：\`@${name} 主题指令\``,
     `- 加空格: 使用双引号包裹，\`@${name} 指令 “这句话 是我说的”\``,
-    '#### 系统指令：',
-    `- 菜单：\`@${name}\` 查询列表`,
+    '#### 系统指令查询：',
+    `- 菜单：\`@${name}\` 查询指令信息`,
     `- 动图：\`@${name} gif\` 查询动图列表`,
-    `- 图片：\`@${name} image\` 查询图片`,
+    `- 主题：\`@${name} theme\` 查询主题列表`,
+    `- 图片：\`@${name} image\` 查询指令图片列表`,
     `- 上新：\`@${name} news\` 近期新增`
   ];
   if (help.length) {
@@ -87,9 +92,10 @@ const formatHelp = ctx => {
   return list.join('\n');
 };
 
-const formatAllMenu = (name, normal, senior) => {
+const formatAllMenu = (name, normal, senior, staticList = []) => {
   const storyList = formatMultiLineMenu(normal, COMMAND_LENGTH);
   const seniorList = formatMultiLineMenu(senior, COMMAND_LENGTH);
+  const staticMenu = formatMultiLineMenu(staticList, COMMAND_LENGTH);
 
   let content = [
     '#### 常用菜单：',
@@ -100,6 +106,13 @@ const formatAllMenu = (name, normal, senior) => {
     content = content.concat([
       `高级用法：\`@${name} 上号 vscode 打工人\``,
       seniorList,
+    ]);
+  }
+
+  if (staticMenu.length) {
+    content = content.concat([
+      `主题用法：\`@${name} 小黄鸡\``,
+      staticMenu,
     ]);
   }
 
